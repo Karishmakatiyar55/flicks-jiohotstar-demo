@@ -266,37 +266,16 @@ svg{display:block}
 .icon-btn{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#ffffff0d}
 /* ---------- on-screen guided tour ---------- */
 .cue-ring{position:absolute;z-index:70;pointer-events:none;border-radius:14px;border:2.5px solid #c7b8ff;box-shadow:0 0 0 4px #8b6cff55,0 0 28px #8b6cffaa;opacity:0;transition:opacity .2s;animation:cueRing 1.6s ease-in-out infinite}
-.cue-ring.dim{box-shadow:0 0 0 4px #8b6cff55,0 0 28px #8b6cffaa,0 0 0 9999px #00000070}
 .cue-ring.on{opacity:1}
-@keyframes cueRing{50%{border-color:#fff;box-shadow:0 0 0 7px #8b6cff40,0 0 36px #8b6cffcc}}
-.cue-ring.dim{animation:cueRingDim 1.6s ease-in-out infinite}
-@keyframes cueRingDim{50%{border-color:#fff;box-shadow:0 0 0 7px #8b6cff40,0 0 36px #8b6cffcc,0 0 0 9999px #00000070}}
+@keyframes cueRing{0%,100%{border-color:#c7b8ff;box-shadow:0 0 0 3px #8b6cff66,0 0 22px #8b6cffaa}50%{border-color:#fff;box-shadow:0 0 0 7px #8b6cff33,0 0 34px #a58bffdd}}
 .cue-dot{position:absolute;z-index:71;pointer-events:none;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:#fff;box-shadow:0 0 0 0 #ffffffaa;opacity:0;animation:cueDot 1.4s ease-out infinite}
 .cue-dot.on{opacity:.95}
 @keyframes cueDot{0%{transform:scale(.8);box-shadow:0 0 0 0 #ffffffb0}70%{transform:scale(1);box-shadow:0 0 0 18px #ffffff00}100%{transform:scale(.8);box-shadow:0 0 0 0 #ffffff00}}
-.cue-tip{position:absolute;z-index:72;width:min(300px,calc(100% - 24px));padding:12px 13px 11px;border-radius:14px;background:linear-gradient(145deg,#2a1d63,#3b1f5e);border:1px solid #a58bff;box-shadow:0 14px 40px #000b;color:#fff;opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;pointer-events:none}
-.cue-tip.on{opacity:1;transform:none;pointer-events:auto}
-.cue-tip .arr{position:absolute;width:14px;height:14px;background:inherit;border:inherit;transform:rotate(45deg);left:var(--ax,50%);margin-left:-7px}
-.cue-tip.below .arr{top:-8px;border-right:0;border-bottom:0;background:#2b1d63}
-.cue-tip.above .arr{bottom:-8px;border-left:0;border-top:0;background:#3a1f5e}
-.cue-tip .k{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#d9cfff}
-.cue-tip .k .n{margin-left:auto;color:#b9a9ef;letter-spacing:.02em;text-transform:none;font-weight:600}
-.cue-tip b{display:block;font-size:15px;margin:5px 0 3px}
-.cue-tip p{margin:0;font-size:12.8px;line-height:1.45;color:#e7e1ff}
-.cue-tip .acts{display:flex;align-items:center;gap:8px;margin-top:10px}
-.cue-tip .acts .skip{font-size:12px;color:#b9a9ef;height:32px;padding:0 4px}
-.cue-tip .acts .nx{margin-left:auto;height:34px;padding:0 14px;border-radius:999px;background:#fff;color:#1a1035;font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:6px}
-.cue-tip .bar{height:3px;border-radius:2px;background:#ffffff22;margin-top:10px;overflow:hidden}
-.cue-tip .bar i{display:block;height:100%;background:linear-gradient(90deg,#c7b8ff,#ff8fb1)}
-.cue-final{position:absolute;inset:0;z-index:75;display:none;align-items:center;justify-content:center;background:#000a;padding:24px}
-.cue-final.on{display:flex}
-.cue-final .card{width:100%;max-width:320px;border-radius:18px;padding:20px;background:linear-gradient(145deg,#2a1d63,#3b1f5e);border:1px solid #a58bff;text-align:center;box-shadow:0 20px 60px #000c}
-.cue-final h3{margin:10px 0 6px;font-size:19px}
-.cue-final p{margin:0 0 16px;font-size:13px;line-height:1.5;color:#e7e1ff}
-.cue-final .row2{display:flex;gap:8px}
-.cue-final .row2 button{flex:1;height:42px;border-radius:12px;font-weight:700;font-size:14px}
-.cue-final .row2 .a{background:#fff;color:#1a1035}
-.cue-final .row2 .b{background:#ffffff1f;color:#fff}
+.cue-swipe{position:absolute;right:14px;bottom:30%;z-index:72;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff;background:#6d4dffcc;border:2px solid #d9cfff;box-shadow:0 0 0 0 #8b6cffaa,0 0 24px #8b6cffaa;opacity:0;pointer-events:none;transition:opacity .25s}
+.cue-swipe.on{opacity:1;pointer-events:auto;animation:cueSwipe 1.5s ease-in-out infinite}
+@keyframes cueSwipe{0%,100%{box-shadow:0 0 0 0 #8b6cffaa,0 0 24px #8b6cffaa}50%{box-shadow:0 0 0 10px #8b6cff00,0 0 30px #8b6cffcc}}
+.cue-swipe.on svg{animation:cueArrow 1.5s ease-in-out infinite}
+@keyframes cueArrow{0%,100%{transform:translateY(4px)}50%{transform:translateY(-4px)}}
 .g-restart{margin-top:12px;height:40px;padding:0 16px;border-radius:12px;background:var(--flick);color:#fff;font-weight:700;font-size:13.5px;display:inline-flex;align-items:center;gap:8px}
 </style>
 </head>
@@ -432,21 +411,7 @@ svg{display:block}
 
       <div class="cue-ring" id="cueRing"></div>
       <div class="cue-dot" id="cueDot"></div>
-      <div class="cue-tip" id="cueTip" role="dialog" aria-live="polite" aria-label="Guided tour">
-        <span class="arr"></span>
-        <div class="k"><svg width="12" height="12"><use href="#i-spark"/></svg>Guided tour<span class="n" id="cueN"></span></div>
-        <b id="cueT"></b><p id="cueD"></p>
-        <div class="acts"><button class="skip" id="cueSkip">Skip tour</button><button class="nx" id="cueNext"></button></div>
-        <div class="bar"><i id="cueBar"></i></div>
-      </div>
-      <div class="cue-final" id="cueFinal" role="dialog" aria-label="Tour complete">
-        <div class="card">
-          <span class="chip flick"><svg width="11" height="11"><use href="#i-spark"/></svg>Flam Flicks</span>
-          <h3>That's the full journey</h3>
-          <p>A micro-drama in 4 languages, product swaps inside Tadka shorts, a native in-feed unit, and a Flicks moment inside a playing episode. No ad breaks anywhere.</p>
-          <div class="row2"><button class="b" id="cueDone">Explore freely</button><button class="a" id="cueRestart">Restart tour</button></div>
-        </div>
-      </div>
+      <button class="cue-swipe" id="cueSwipe" aria-label="Next scene"><svg width="22" height="22"><use href="#i-up"/></svg></button>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
       <div class="sheet-bg" id="sheetBg">
         <div class="sheet" role="dialog" aria-label="Prototype guide">
@@ -723,7 +688,7 @@ function renderGuide(target){
   '<ol class="g-steps">'+STEPS.map(function(s,i){
     return '<li><button class="g-step" data-step="'+s.id+'"><span class="g-num">'+(i+1)+'</span><span><span class="g-st">'+esc(s.t)+(s.tag?'<span class="g-tag '+(s.cls||'')+'">'+esc(s.tag)+'</span>':'')+'</span><span class="g-sd">'+esc(s.d)+'</span></span></button></li>';
   }).join('')+'</ol>'+
-  '<button class="g-restart" data-tour-restart>'+icon('spark',14)+'Start guided tour</button>'+
+  '<button class="g-restart" data-tour-restart>'+icon('spark',14)+'Restart on-screen cues</button>'+
   '<div class="g-tools"><button class="switch" role="switch" aria-checked="false" data-hl aria-label="Show what Flicks adds"></button>Show what Flicks adds</div>'+
   '<div class="g-cmp"><div class="g-box"><h4>Today</h4><ul><li>Marketplace tie-ins built per show (e.g. a shop-the-look beside a reality series)</li><li>Viewer leaves the scene to shop</li><li>Ads break the content</li></ul></div>'+
   '<div class="g-box new"><h4>With Flicks</h4><ul><li>One HTML tag or SDK call, any title, any brand</li><li>The swap happens in the running scene</li><li>Micro-dramas switch audio language live</li></ul></div></div>'+
@@ -824,7 +789,7 @@ function activateFeed(i){
   if(!slot.dataset.mounted){
     if(it.type==='micro') mountMicro(slot,$('.md-ui',el)); else mountFlick(slot,it.key);
     var c=$('.coach',el), g=mediaGen;
-    setTimeout(function(){ if(g===mediaGen && tadkaIdx===i && route.name==='tadka' && !(window.TOURREADY && TOUR.active)) c.classList.add('show') },1800);
+    setTimeout(function(){ if(g===mediaGen && tadkaIdx===i && route.name==='tadka' && false) c.classList.add('show') },1800);
     setTimeout(function(){ if(g===mediaGen && tadkaIdx===i) c.classList.remove('show') },9000);
   }
 }
@@ -891,129 +856,79 @@ $('#pl').addEventListener('click',function(e){ if(e.target===this||e.target.clos
 $('#splash').addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go({name:'home'}); } });
 $('#sheetBg').addEventListener('click',function(e){ if(e.target.id==='sheetBg') e.currentTarget.classList.remove('on'); });
 
-/* ================= ON-SCREEN GUIDED TOUR ================= */
+/* ================= ON-SCREEN CUES (glow only, no text) ================= */
 var TOUR=(function(){
+  // each step glows the one thing to tap next; swipe steps show a small arrow
   var S=[
-    {screen:'home', sel:'#slotTadkaBanner .banner', scroll:true, dim:true, t:'Start here: Tadka micro-drama', d:'Tap this banner to watch a micro-drama you can switch between 4 languages.'},
-    {screen:'tadka', idx:0, sel:'#feed .fi[data-i="0"] .langs', adv:'lang', t:'Switch the audio language', d:'Tap 日本語, ಕನ್ನಡ or Español. The audio changes at the same second, with no restart.'},
-    {screen:'tadka', idx:0, sel:'#feed .fi[data-i="0"] .swipe-hint', btn:'Next scene', feedTo:1, t:'Next: a Flicks scene', d:'Swipe up, or tap Next scene, for a short where you swap products inside the video.'},
-    {screen:'tadka', idx:1, sel:'#feed .fi[data-i="1"] .media-slot > div', big:true, btn:'Next scene', feedTo:2, t:'Swap the necklace, live', d:'Use the options inside the video to change the jewellery while the scene keeps playing.'},
-    {screen:'tadka', idx:2, sel:'#feed .fi[data-i="2"] .media-slot > div', big:true, btn:'Next', feedTo:3, t:'Restyle the Gucci look', d:'Change the outfit in the running scene, then tap through to the product.'},
-    {screen:'tadka', idx:3, sel:'#feed .end-card [data-go="home"]', t:'Back to Home', d:'Two more Flicks placements live on the home page.'},
-    {screen:'home', sel:'#slotNative .box', scroll:true, dim:true, big:true, btn:'Next', t:'Native Flicks unit in the feed', d:'This West Elm unit plays only while it is on screen. Try a swap, then scroll on and it stops.'},
-    {screen:'home', sel:'#hsButcher', scroll:true, dim:true, t:'Open a title', d:"Tap The Butcher's Blade to watch an episode with a Flicks moment inside it."},
-    {screen:'detail', sel:'#shotDetail .hs[aria-label="Watch Now"]', dim:true, t:'Start the episode', d:'Tap Watch Now.'},
-    {screen:'player', flicking:false, sel:'#fmChip', wait:'#fmChip.show', waitSel:'#pl', waitT:'Watch the episode…', waitD:'A Flicks moment appears inside the player in a few seconds. Keep watching.', t:'A Flicks moment appears', d:'Tap it. The same player becomes the interactive scene, with no ad break.'},
-    {screen:'player', flicking:true, sel:'#backEp', t:'Swap the dungaree in the scene', d:'Change the Levi’s dungaree right inside the video. Tap Back to episode to resume where you left off.'},
-    {final:true}
+    {screen:'home', sel:'#slotTadkaBanner .banner', scroll:true},
+    {screen:'tadka', idx:0, sel:'#feed .fi[data-i="0"] .langs', adv:'lang', delay:1200},
+    {screen:'tadka', idx:0, swipe:1, delay:2500},
+    {screen:'tadka', idx:1, swipe:2, delay:5000},
+    {screen:'tadka', idx:2, swipe:3, delay:5000},
+    {screen:'tadka', idx:3, sel:'#feed .end-card [data-go="home"]'},
+    {screen:'home', sel:'#hsButcher', scroll:true},
+    {screen:'detail', sel:'#shotDetail .hs[aria-label="Watch Now"]'},
+    {screen:'player', flicking:false, sel:'#fmChip', wait:'#fmChip.show'},
+    {screen:'player', flicking:true, sel:'#backEp', delay:8000},
+    {end:true}
   ];
-  var i=0, active=true, lastAct=-1, raf=0, finalShown=false;
-  var pos={key:'',x:0,y:0};
-  var ring=$('#cueRing'), dot=$('#cueDot'), tip=$('#cueTip'), app=$('#app');
+  var i=0, active=true, lastAct=-1, raf=0, since=0;
+  var ring=$('#cueRing'), dot=$('#cueDot'), sw=$('#cueSwipe'), app=$('#app');
   function flicking(){ return $('#pl').classList.contains('flicking'); }
   function matches(s){
-    if(s.final) return true;
+    if(s.end) return false;
     if(s.screen!==route.name) return false;
     if(s.idx!=null && s.idx!==tadkaIdx) return false;
     if(s.flicking!=null && s.flicking!==flicking()) return false;
     return true;
   }
   function sync(){
-    if(!active || route.name==='splash'){ hide(); return; }
+    if(!active || route.name==='splash' || S[i].end){ hide(); return; }
     if(!matches(S[i])){
       var j=-1, k;
-      for(k=i+1;k<S.length-1;k++) if(matches(S[k])){ j=k; break; }
-      if(j<0) for(k=0;k<S.length-1;k++) if(matches(S[k])){ j=k; break; }
+      for(k=i+1;k<S.length;k++) if(matches(S[k])){ j=k; break; }
+      if(j<0) for(k=0;k<S.length;k++) if(matches(S[k])){ j=k; break; }
       if(j<0){ hide(); return; }
       i=j;
     }
-    activate();
-  }
-  function activate(){
-    var s=S[i];
-    if(s.final){ hide(); if(!finalShown){ finalShown=true; $('#cueFinal').classList.add('on'); } return; }
     if(lastAct!==i){
-      lastAct=i;
+      lastAct=i; since=Date.now(); hide();
+      var s=S[i];
       if(s.scroll && route.name==='home'){
         setTimeout(function(){ var el=$(s.sel), sc=$('#homeScroll'); if(!el) return;
           var top=el.getBoundingClientRect().top-sc.getBoundingClientRect().top+sc.scrollTop;
-          sc.scrollTo({top:Math.max(0,top-sc.clientHeight*0.3),behavior:'smooth'}); },60);
+          sc.scrollTo({top:Math.max(0,top-sc.clientHeight*0.35),behavior:'smooth'}); },60);
       }
     }
     loop();
   }
-  function hide(){ ring.classList.remove('on'); dot.classList.remove('on'); tip.classList.remove('on'); cancelAnimationFrame(raf); raf=0; }
+  function hide(){ ring.classList.remove('on'); dot.classList.remove('on'); sw.classList.remove('on'); }
   function loop(){ cancelAnimationFrame(raf); var f=function(){ place(); raf=requestAnimationFrame(f); }; raf=requestAnimationFrame(f); }
   function place(){
-    var s=S[i]; if(!active||s.final||!matches(s)){ hide(); return; }
-    var waiting = s.wait && !$(s.wait);
-    var el=$(waiting? s.waitSel : s.sel);
-    if(!el){ ring.classList.remove('on'); dot.classList.remove('on'); tip.classList.remove('on'); return; }
+    var s=S[i];
+    if(!active||s.end||!matches(s)||Date.now()-since<(s.delay||0)||(s.wait&&!$(s.wait))){ hide(); return; }
+    if(s.swipe!=null){ ring.classList.remove('on'); dot.classList.remove('on'); sw.classList.add('on'); return; }
+    sw.classList.remove('on');
+    var el=$(s.sel); if(!el){ hide(); return; }
     var A=app.getBoundingClientRect(), r=el.getBoundingClientRect();
-    var x=r.left-A.left, y=r.top-A.top, w=r.width, h=r.height;
-    var big = s.big || waiting;
-    var pad = big? -6 : 6;
-    // clip to the visible app area
+    var x=r.left-A.left, y=r.top-A.top, w=r.width, h=r.height, pad=5;
     var vy0=Math.max(y,0), vy1=Math.min(y+h,A.height);
-    if(vy1-vy0<16 || w<4){ ring.classList.remove('on'); dot.classList.remove('on'); tip.classList.remove('on'); return; }
+    if(vy1-vy0<16||w<4){ hide(); return; }
     ring.style.left=(x-pad)+'px'; ring.style.top=(vy0-pad)+'px'; ring.style.width=(w+pad*2)+'px'; ring.style.height=(vy1-vy0+pad*2)+'px';
-    ring.classList.toggle('dim', !!s.dim && !waiting);
+    ring.style.borderRadius=(parseFloat(getComputedStyle(el).borderRadius)||10)+pad+'px';
     ring.classList.add('on');
-    var clickable = !s.btn && !waiting && !big && s.adv!=='lang';
-    dot.classList.toggle('on', clickable || s.adv==='lang');
-    // sit on the target's bottom-right corner so it never covers the label
     dot.style.left=(x+w-Math.min(16,w/4))+'px'; dot.style.top=(vy1-Math.min(12,(vy1-vy0)/4))+'px';
-    // tooltip text
-    var steps=S.length-1;
-    $('#cueN').textContent=(i+1)+' of '+steps;
-    $('#cueT').textContent= waiting? s.waitT : s.t;
-    $('#cueD').textContent= waiting? s.waitD : s.d;
-    $('#cueBar').style.width=((i+1)/steps*100)+'%';
-    var nx=$('#cueNext');
-    if(s.btn && !waiting){ nx.style.display='flex'; nx.innerHTML=esc(s.btn)+' <svg width="13" height="13" style="transform:rotate(180deg)"><use href="#i-back"/></svg>'; }
-    else nx.style.display='none';
-    // tooltip position
-    var tw=tip.offsetWidth, th=tip.offsetHeight, gap=14, below;
-    var cy=(vy0+vy1)/2;
-    var ty, cls='';
-    if(big){ ty=Math.min(vy1-th-16, A.height-th-20); ty=Math.max(ty, vy0+16); }
-    else {
-      below = cy < A.height*0.5;
-      if(below && vy1+pad+gap+th > A.height-8) below=false;
-      if(!below && vy0-pad-gap-th < 8) below=true;
-      cls=below?'below':'above';
-      ty=below? vy1+pad+gap : vy0-pad-gap-th;
-    }
-    var tx=Math.min(Math.max(12, x+w/2-tw/2), A.width-tw-12);
-    // hold still unless the target really moved (keeps buttons tappable next to animated targets)
-    var key=i+':'+cls+':'+(waiting?1:0);
-    if(key!==pos.key || Math.abs(ty-pos.y)>14 || Math.abs(tx-pos.x)>14){
-      pos={key:key,x:tx,y:ty};
-      tip.classList.remove('above','below'); if(cls) tip.classList.add(cls);
-      $('.arr',tip).style.display=big?'none':'';
-      tip.style.top=Math.round(ty)+'px'; tip.style.left=Math.round(tx)+'px';
-      tip.style.setProperty('--ax', Math.round(Math.min(Math.max(18, x+w/2-tx), tw-18))+'px');
-    }
-    tip.classList.add('on');
+    dot.classList.add('on');
   }
-  // advance when the highlighted thing is used (runs before the app's own click handler)
+  // move on when the glowing thing is used (runs before the app's own click handler)
   document.addEventListener('click',function(e){
-    if(!active) return; var s=S[i]; if(s.final||!matches(s)) return;
-    if(e.target.closest('#cueTip,#cueFinal')) return;
+    if(!active) return; var s=S[i]; if(s.end||!matches(s)) return;
     if(s.adv==='lang'){ if(e.target.closest('[data-lang]')){ i++; lastAct=-1; setTimeout(sync,0); } return; }
-    if(s.btn||s.wait&&!$(s.wait)) return;
+    if(s.swipe!=null||!s.sel) return;
     var el=$(s.sel); if(el && el.contains(e.target)){ i++; lastAct=-1; setTimeout(sync,0); }
   },true);
-  $('#cueNext').addEventListener('click',function(){
-    var s=S[i];
-    if(s.feedTo!=null){ var f=$('#feed'); f.scrollTo({top:s.feedTo*f.clientHeight,behavior:'smooth'}); return; }
-    i++; lastAct=-1; sync();
-  });
-  $('#cueSkip').addEventListener('click',function(){ active=false; hide(); toast('Tour off. Tap ✦ above the menu to restart it.'); });
-  $('#cueDone').addEventListener('click',function(){ $('#cueFinal').classList.remove('on'); active=false; hide(); });
-  function restart(){ $('#cueFinal').classList.remove('on'); $('#sheetBg').classList.remove('on'); active=true; finalShown=false; i=0; lastAct=-1; go({name:'home',step:'top'}); }
-  $('#cueRestart').addEventListener('click',restart);
-  window.addEventListener('resize',function(){ if(active) place(); });
+  sw.addEventListener('click',function(){ var s=S[i]; if(s.swipe==null) return; var f=$('#feed'); f.scrollTo({top:s.swipe*f.clientHeight,behavior:'smooth'}); });
+  function restart(){ $('#sheetBg').classList.remove('on'); active=true; i=0; lastAct=-1; go({name:'home',step:'top'}); }
   return {sync:sync, restart:restart, get active(){return active}};
 })();
 document.addEventListener('click',function(e){ if(e.target.closest('[data-tour-restart]')) TOUR.restart(); });
