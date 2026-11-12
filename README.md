@@ -11,6 +11,8 @@ A concept prototype by Flam showing Flicks (real-time product, scene and model s
 3. Necklace Swap and Gucci flicks as vertical Tadka scenes.
 4. A Flicks moment inside a playing episode (Levi's denim dungaree swap).
 
+A guided tour runs on screen on both phone and desktop: a pulsing ring and tooltip point at the next thing to tap, with a step counter, Next and Skip. It moves on automatically as you tap, and can be restarted from the ✦ button or the desktop guide.
+
 Only one video or flick plays at a time; it is removed when you go back, swipe or scroll away, or switch tabs.
 
 ## Hosting
