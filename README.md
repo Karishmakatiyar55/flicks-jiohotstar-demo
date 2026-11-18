@@ -1,23 +1,42 @@
 # Flicks × JioHotstar demo
 
-A concept prototype by Flam showing Flicks (real-time product, scene and model swaps) inside the JioHotstar viewing journey.
+A working replica of the JioHotstar app with Flicks (Flam's interactive video ads) placed in it. Built the same way as the bigbasket and noon demos.
 
-- **On a phone** it opens full screen, like the app.
-- **On desktop** it shows a phone frame with a step-by-step guide.
+- **On a phone** it opens full screen, like the app. The rose "Ad slots" button lists every placement and jumps to it.
+- **On desktop** it shows a framed phone with the list of ad slots beside it.
 
-## What's in the journey
-1. Real JioHotstar home with four added slots: a Tadka multi-language banner, a "Shop the Scene" rail, a native West Elm Flicks unit and a Tadka micro-drama rail.
-2. Tadka micro-drama with live audio switching (English, Kannada, Japanese, Spanish).
-3. Necklace Swap and Gucci flicks as vertical Tadka scenes.
-4. A Flicks moment inside a playing episode (Levi's denim dungaree swap).
+## Where the Flicks sit (25 slots)
 
-On-screen cues guide the journey on phone and desktop alike: the next thing to tap glows and pulses, and swipe screens show a small glowing arrow. No text overlays. The cues move on as you tap and can be restarted from the ✦ button or the desktop guide.
+| Group | Slots |
+|---|---|
+| Ad breaks in the stream | Pre-roll before the episode, mid-roll at the marker on the timeline, pause ad, companion ad under the player |
+| Shop the look | In the player (a chip at the scene opens a sheet), on the title page, a rail on Home |
+| Tadka micro-dramas | Two sponsored videos in the Tadka feed, a full-screen ad between episodes, shop the look inside a micro-drama |
+| Swipeable banners | Masthead and For You carousel on Home, TV, Movies and Sports |
+| Billboards between rails | Home, Movies, Sports |
+| Search | A sponsored tile in Popular Searches, a sponsored result at the top (try "cricket", "romance", "comedy") |
 
-Only one video or flick plays at a time; it is removed when you go back, swipe or scroll away, or switch tabs.
+Fashion, beauty, audio and home Flicks can be bought inside the app (product page, bag). Food, drinks, luxury and cars hand over to the advertiser through a "You're leaving JioHotstar" sheet.
 
-## Hosting
-A single static `index.html` with every image built in. Deploy on Vercel with no build step (Framework preset: Other).
+## What is real and what is not
 
-External content loaded at runtime: flicks from `flicks.flamapp.live` and the micro-drama videos from `microdrama-audio-diff.vercel.app`.
+- The app's screens are cuts from a screen recording of the JioHotstar iOS app (18 Nov 2026): header, banners, For You cards, posters, sports clips, Tadka cards, the Heart Beat title page.
+- The Flicks are live ad tags from the saved `flicks-ad-tags` codes, loaded from `flicks.flamapp.live`, `native-ads-dev.appless.workers.dev` and `native-ads.appless.workers.dev`.
+- **The episode in the player is not video.** JioHotstar blocks screen recording of its player, so the stream is a set of stills from the title moved along a real timeline. Ad breaks, the pause ad and the scene chip are driven by that timeline.
+- The one real video is the Tadka micro-drama "Bahu Ka Badla", played from `microdrama-audio-diff.vercel.app` with four audio languages. Bahu Ka Badla, My Secret CEO and Red Silk are Flam's own posters, not JioHotstar titles.
+- Rupee prices, product names for Flicks whose brand is not known (Outfit Swap, Get Ready With Me, Style Swap, Puffer Jacket) and option names shown as "Look 1", "Shade 2" are illustrative.
+- Payment, login, casting, downloads and advertiser sites say they are outside the demo.
 
-Concept prototype by Flam. Not an official JioHotstar build.
+## Sound
+
+A Flick is silent unless at least half of it is on screen, in front, with the tab visible, and only one Flick can be heard at a time. Leaving a screen removes its Flicks and its video.
+
+## Build
+
+Edit the files in `src/`, then:
+
+    python3 scripts/build.py
+
+This writes the single self-contained `index.html` that Vercel serves (no build step on Vercel; Framework preset: Other).
+
+Concept prototype by Flam. Not an official JioHotstar build, and not affiliated with or endorsed by JioHotstar or the brands shown.
