@@ -454,6 +454,7 @@ const JHLOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfoAAACMCAIAAAAbe/
    button, follow its options and control its sound.
    kind:  shop  = the app sells it (product page, bag)
           visit = the app hands over to the advertiser (leave sheet)
+          watch = the app's own content: the button opens the micro-drama
    named:false = option names are not known here, so the UI shows the unit
    and a number ("Shade 2") instead of a name.
    Rupee prices are illustrative.
@@ -464,28 +465,26 @@ const BRANDS = {
     head:"The necklace from tonight's scene", prod:"Layered Pendant Necklace", cat:"Jewellery", sizes:null,
     desc:"Three ways to wear the necklace from the scene. Switch the style inside the video, then add the one you like.",
     variants:[{p:2499},{p:2999},{p:3499}] },
-  outfit:{ name:"Outfit Swap", av:"OS", avc:"#b0457a", src:T2+"dox37k/ad.js", kind:"shop", cta:"Shop Now", unit:"Look",
-    head:"Wear what she wore", prod:"The On-Screen Outfit", cat:"Women's fashion", sizes:["XS","S","M","L","XL"],
-    desc:"The outfit from the show, in three looks. Switch the look inside the video to see it on.",
-    variants:[{p:2499},{p:2799},{p:3199}] },
+  outfit:{ name:"Levi's", av:"L", avc:"#c41230", src:T2+"dox37k/ad.js", kind:"shop", cta:"Shop Now", unit:"Look",
+    head:"Wear what she wore", prod:"Levi's Denim Dungarees", cat:"Women's fashion", sizes:["XS","S","M","L","XL"],
+    desc:"The dungarees from the show, in three looks. Switch the look inside the video to see it on.",
+    variants:[{p:4299},{p:4299},{p:4599}] },
   gucci:{ name:"Gucci", av:"G", avc:"#1c3a2a", src:T2+"ocbyu3/ad.js", tall:true, kind:"visit", cta:"Explore", unit:"Look", site:"gucci.com",
     head:"The new collection", variants:[{},{},{}] },
   zara:{ name:"Zara", av:"Z", avc:"#111", src:T1+"zara/ad.js", tall:true, kind:"shop", cta:"Shop Now", unit:"Look", bg:"#fff",
     head:"New season, three looks", prod:"Zara New Season Look", cat:"Women's fashion", sizes:["XS","S","M","L"],
     desc:"Three looks from the new season. Switch the look inside the video.",
     variants:[{p:3990},{p:4590},{p:5990}] },
-  jacket:{ name:"Puffer Jacket", av:"PJ", avc:"#33507a", src:T1+"flicks2-jacket-p1/ad.js", tall:true, kind:"shop", cta:"Shop Now", unit:"Colour",
+  jacket:{ name:"Puffer Jacket", av:"PJ", avc:"#33507a", src:T1+"flicks2-jacket-p1/ad.js", tall:true, kind:"shop", cta:"Shop Now", unit:"Colour", named:true,
     head:"Winter's here. Pick your puffer", prod:"Quilted Puffer Jacket", cat:"Winter wear", sizes:["S","M","L","XL"],
     desc:"A warm quilted puffer in three colours. Switch the colour inside the video.",
-    variants:[{p:4999},{p:4999},{p:5499}] },
-  grwm:{ name:"Get Ready With Me", av:"GR", avc:"#c0477f", src:T1+"flicks1-grwm/ad.js", tall:true, kind:"shop", cta:"Shop the Look", unit:"Look",
-    head:"Get ready with me", prod:"The Get Ready With Me Edit", cat:"Women's fashion", sizes:["XS","S","M","L"],
-    desc:"Three complete looks from the video. Switch the look inside the video.",
-    variants:[{p:1999},{p:2299},{p:2599}] },
-  ugc:{ name:"Style Swap", av:"SS", avc:"#6a4bc4", src:T1+"flicks4-ugc-p1/ad.js", tall:true, kind:"shop", cta:"Shop the Look", unit:"Look",
-    head:"One creator, three looks", prod:"The Creator Edit", cat:"Women's fashion", sizes:["XS","S","M","L"],
-    desc:"The looks from the video. Switch the look inside the video.",
-    variants:[{p:2299},{p:2499},{p:2899}] },
+    variants:[{n:"Red",p:4999},{n:"Yellow",p:4999},{n:"Green Check",p:5499}] },
+  grwm:{ name:"Get Ready With Me", av:"GR", avc:"#c0477f", src:T1+"flicks1-grwm/ad.js", tall:true, kind:"shop", cta:"Shop the Look", unit:"Dress", named:true,
+    head:"Get ready with me", prod:"Party Dress", cat:"Women's fashion", sizes:["XS","S","M","L"],
+    desc:"Three dresses from the video. Switch the dress inside the video to see it on.",
+    variants:[{n:"Red",p:1999},{n:"Blue",p:2299},{n:"Black",p:2599}] },
+  ugc:{ name:"Tadka Originals", av:"T", avc:"#e3138b", src:T1+"flicks4-ugc-p1/ad.js", kind:"watch", cta:"Watch Now", unit:"Lead", label:"Promoted",
+    head:"Pick who plays the lead", variants:[{},{}] },
   lip:{ name:"Ulta Beauty", av:"U", avc:"#e9552b", src:T2+"onflg2/ad.js", kind:"shop", cta:"Shop Now", unit:"Shade",
     head:"Her lip shade, in three tones", prod:"Satin Lipstick", cat:"Beauty", sizes:null,
     desc:"A satin-finish lipstick in three shades. Switch the shade inside the video to see it on.",
@@ -498,10 +497,10 @@ const BRANDS = {
     head:"The denim everyone's wearing", prod:"Levi's Denim", cat:"Denim", sizes:["26","28","30","32","34"],
     desc:"Three denim styles. Switch the style inside the video.",
     variants:[{p:3299},{p:3599},{p:3999}] },
-  nike:{ name:"Nike", av:"N", avc:"#111", src:T1+"6a97885c9e74536944d35d53_dsefds/ad.js", kind:"shop", cta:"Shop Now", unit:"Colour",
-    head:"Train like match day", prod:"Nike Training Gear", cat:"Sportswear", sizes:["S","M","L","XL"],
-    desc:"Training gear in three colours. Switch the colour inside the video.",
-    variants:[{p:2995},{p:2995},{p:3295}] },
+  nike:{ name:"Nike", av:"N", avc:"#111", src:T1+"6a97885c9e74536944d35d53_dsefds/ad.js", kind:"shop", cta:"Shop Now", unit:"Colour", named:true,
+    head:"Own your movement", prod:"Nike Training Set", cat:"Sportswear", sizes:["XS","S","M","L","XL"],
+    desc:"A training set in three colours. Switch the colour inside the video.",
+    variants:[{n:"Black",p:2995},{n:"Red",p:2995},{n:"Lilac",p:3295}] },
   sony:{ name:"Sony", av:"SONY", avc:"#111", src:T1+"6a96c6969e74536944c4167f_dj5rq6/ad.js", kind:"shop", cta:"Shop Now", unit:"Colour", named:true,
     head:"Movie-night sound, no interruptions", prod:"Sony WH-CH720N Noise Cancelling Headphones", cat:"Audio", sizes:null,
     desc:"Lightweight over-ear headphones with noise cancelling and up to 35 hours of battery.",
@@ -812,7 +811,10 @@ setInterval(audit, 1200);
 
 /* ================= what the app's button for a Flick does ================= */
 function ctaGo(id){ const s = SLOTS[id]; if(!s) return; const b = BRANDS[s.brand];
-  if(b.kind === "shop") go(`#/p/${s.brand}/${s.v}`); else leaveSheet(s.brand, s.v); }
+  if(b.kind === "shop") go(`#/p/${s.brand}/${s.v}`); else if(b.kind === "watch") go("#/reel/bahu"); else leaveSheet(s.brand, s.v); }
+// A Flick with two options shows two dots: the dots are matched to the Flick once its slot is known.
+function fixDots(){ $$("[data-sd]", APP).forEach(d=>{ const s = SLOTS[d.dataset.sd]; if(!s) return; const n = BRANDS[s.brand].variants.length; if(d.children.length === n) return;
+  d.innerHTML = Array.from({length:n},(_,i)=>`<i class="${i===s.v?"on":""}"></i>`).join(""); }); }
 function pickOrOpen(id, i){ const s = SLOTS[id]; if(!s) return; if(s.v === i) ctaGo(id); else setVariant(id, i); }
 
 /* ================= building blocks ================= */
@@ -865,7 +867,7 @@ const minis = (id,k) => `<div class="minis">${BRANDS[k].variants.map((_,i)=>mini
 const HOME = {
   home: () => `
     ${mast("m-home",[mastFlick("mast","outfit","mast"), mastFlick("mast2","eye","mast2"), mastCut("m_tv","out('JioHotstar on TV')","Explore Now"), mastCut("m_mahabharat","out('The teaser')","Teaser")])}
-    ${fy("f-home",[fyCut("h_biggboss","biggboss"), fyFlick("fy","lip","fy"), fyClip("h_bumrah","l_wtc"), fyCut("h_moana","moana","Subscribe to Watch"), fyFlick("fy2","levis","fy2"), fyCut("h_queen","queen"), fyCut("h_apsara","apsara")])}
+    ${fy("f-home",[fyCut("h_biggboss","biggboss"), fyFlick("fy","lip","fy"), fyClip("h_bumrah","l_wtc"), fyCut("h_moana","moana","Subscribe to Watch"), fyFlick("fy2","nike","fy2"), fyCut("h_queen","queen"), fyCut("h_apsara","apsara")])}
     ${rail("New on JioHotstar",["office","chiranjeevi","dilwaniya","hanuman","imgame","roslin"])}
     ${slice("k_free",[[3,49,31,47,"go('#/t/biggboss')","Bigg Boss"],[35,49,31,47,"go('#/t/yehrishta')","Yeh Rishta Kya Kehlata Hai"],[67,49,31,47,"go('#/t/anupamaa')","Anupamaa"]])}
     ${sec("Shop the Look", `<div class="row looks">${lookCard("shop","neck","shop")}${lookCard("shop2","gucci")}${lookCard("shop3","zara")}${lookCard("shop4","jacket")}</div>`, "Sponsored · Styles from the shows you watch")}
@@ -925,7 +927,7 @@ function tkCard(x, i){
   if(x.cut) return `<div class="tkc">${slice(x.img,[[0,0,100,100,`go('#/reel/${x.id}')`,x.n]])}</div>`;
   return `<button class="tkc own" onclick="go('#/reel/${x.id}')" aria-label="${esc(x.n)}">${pic(x.img,x.n)}${x.badge?`<span class="bdg">${x.badge}</span>`:""}<i class="pl">${I.play}</i></button>`; }
 function tkAd(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
-  return `<div class="tkc ad" data-anchor="${anchor}"><div class="tkh">${av(k)}<div><b>${esc(b.name)}</b><span>Sponsored</span></div>${dots(id)}</div><div class="tkf">${flick(id,k)}</div>
+  return `<div class="tkc ad" data-anchor="${anchor}"><div class="tkh">${av(k)}<div><b>${esc(b.name)}</b><span>${b.label||"Sponsored"}</span></div>${dots(id)}</div><div class="tkf">${flick(id,k)}</div>
   <div class="tkb" data-spop="${id}"><span><em data-sv="${id}">${esc(vshort(k,0))}</em>${v.p?` · <b data-sp="${id}">${priceHTML(v.p)}</b>`:""}</span><button class="wbtn sm" onclick="ctaGo('${id}')">${esc(b.cta)}</button></div></div>`; }
 function tadkaScreen(){ const c = TADKA.map(tkCard);
   return `<div class="screen tadka">${stpad()}${header("tadka")}<div class="scr" id="scr">
@@ -1177,6 +1179,7 @@ function render(anim=true){
   document.body.classList.toggle("toppill", name === "reel");
   lastHash = h;
   Object.values(SLOTS).forEach(s=>{ if(s.v) applyVariant(s.id, s.v); });
+  fixDots();
   refreshBag(); $$(".hero[data-hero]", VIEW).forEach(bindHero);
   if(dir === "enter-back" && SCROLL[h] && sc) sc.scrollTop = SCROLL[h];
   const anc = pendingAnchor; pendingAnchor = null;
@@ -1190,6 +1193,7 @@ function render(anim=true){
   if(name === "search" && !r.a && anim && !anc && !matchMedia("(pointer: coarse)").matches) setTimeout(()=>$("#q")?.focus({preventScroll:true}), 300);
   audit(); buildGuide();
 }
+setInterval(fixDots, 400);
 addEventListener("hashchange", ()=>render(true));
 function flash(sel){ setTimeout(()=>{ const el = typeof sel === "string" ? $(sel, VIEW) : sel; if(!el) return; $$(".pulse").forEach(e=>e.classList.remove("pulse")); void el.offsetWidth; el.classList.add("pulse"); }, 380); }
 

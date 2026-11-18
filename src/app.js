@@ -37,7 +37,10 @@ function wlToggle(id, ev){ if(ev) ev.stopPropagation(); const on = !WL.has(id); 
 
 /* ================= what the app's button for a Flick does ================= */
 function ctaGo(id){ const s = SLOTS[id]; if(!s) return; const b = BRANDS[s.brand];
-  if(b.kind === "shop") go(`#/p/${s.brand}/${s.v}`); else leaveSheet(s.brand, s.v); }
+  if(b.kind === "shop") go(`#/p/${s.brand}/${s.v}`); else if(b.kind === "watch") go("#/reel/bahu"); else leaveSheet(s.brand, s.v); }
+// A Flick with two options shows two dots: the dots are matched to the Flick once its slot is known.
+function fixDots(){ $$("[data-sd]", APP).forEach(d=>{ const s = SLOTS[d.dataset.sd]; if(!s) return; const n = BRANDS[s.brand].variants.length; if(d.children.length === n) return;
+  d.innerHTML = Array.from({length:n},(_,i)=>`<i class="${i===s.v?"on":""}"></i>`).join(""); }); }
 function pickOrOpen(id, i){ const s = SLOTS[id]; if(!s) return; if(s.v === i) ctaGo(id); else setVariant(id, i); }
 
 /* ================= building blocks ================= */
@@ -90,7 +93,7 @@ const minis = (id,k) => `<div class="minis">${BRANDS[k].variants.map((_,i)=>mini
 const HOME = {
   home: () => `
     ${mast("m-home",[mastFlick("mast","outfit","mast"), mastFlick("mast2","eye","mast2"), mastCut("m_tv","out('JioHotstar on TV')","Explore Now"), mastCut("m_mahabharat","out('The teaser')","Teaser")])}
-    ${fy("f-home",[fyCut("h_biggboss","biggboss"), fyFlick("fy","lip","fy"), fyClip("h_bumrah","l_wtc"), fyCut("h_moana","moana","Subscribe to Watch"), fyFlick("fy2","levis","fy2"), fyCut("h_queen","queen"), fyCut("h_apsara","apsara")])}
+    ${fy("f-home",[fyCut("h_biggboss","biggboss"), fyFlick("fy","lip","fy"), fyClip("h_bumrah","l_wtc"), fyCut("h_moana","moana","Subscribe to Watch"), fyFlick("fy2","nike","fy2"), fyCut("h_queen","queen"), fyCut("h_apsara","apsara")])}
     ${rail("New on JioHotstar",["office","chiranjeevi","dilwaniya","hanuman","imgame","roslin"])}
     ${slice("k_free",[[3,49,31,47,"go('#/t/biggboss')","Bigg Boss"],[35,49,31,47,"go('#/t/yehrishta')","Yeh Rishta Kya Kehlata Hai"],[67,49,31,47,"go('#/t/anupamaa')","Anupamaa"]])}
     ${sec("Shop the Look", `<div class="row looks">${lookCard("shop","neck","shop")}${lookCard("shop2","gucci")}${lookCard("shop3","zara")}${lookCard("shop4","jacket")}</div>`, "Sponsored · Styles from the shows you watch")}
@@ -150,7 +153,7 @@ function tkCard(x, i){
   if(x.cut) return `<div class="tkc">${slice(x.img,[[0,0,100,100,`go('#/reel/${x.id}')`,x.n]])}</div>`;
   return `<button class="tkc own" onclick="go('#/reel/${x.id}')" aria-label="${esc(x.n)}">${pic(x.img,x.n)}${x.badge?`<span class="bdg">${x.badge}</span>`:""}<i class="pl">${I.play}</i></button>`; }
 function tkAd(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
-  return `<div class="tkc ad" data-anchor="${anchor}"><div class="tkh">${av(k)}<div><b>${esc(b.name)}</b><span>Sponsored</span></div>${dots(id)}</div><div class="tkf">${flick(id,k)}</div>
+  return `<div class="tkc ad" data-anchor="${anchor}"><div class="tkh">${av(k)}<div><b>${esc(b.name)}</b><span>${b.label||"Sponsored"}</span></div>${dots(id)}</div><div class="tkf">${flick(id,k)}</div>
   <div class="tkb" data-spop="${id}"><span><em data-sv="${id}">${esc(vshort(k,0))}</em>${v.p?` · <b data-sp="${id}">${priceHTML(v.p)}</b>`:""}</span><button class="wbtn sm" onclick="ctaGo('${id}')">${esc(b.cta)}</button></div></div>`; }
 function tadkaScreen(){ const c = TADKA.map(tkCard);
   return `<div class="screen tadka">${stpad()}${header("tadka")}<div class="scr" id="scr">
@@ -402,6 +405,7 @@ function render(anim=true){
   document.body.classList.toggle("toppill", name === "reel");
   lastHash = h;
   Object.values(SLOTS).forEach(s=>{ if(s.v) applyVariant(s.id, s.v); });
+  fixDots();
   refreshBag(); $$(".hero[data-hero]", VIEW).forEach(bindHero);
   if(dir === "enter-back" && SCROLL[h] && sc) sc.scrollTop = SCROLL[h];
   const anc = pendingAnchor; pendingAnchor = null;
@@ -415,6 +419,7 @@ function render(anim=true){
   if(name === "search" && !r.a && anim && !anc && !matchMedia("(pointer: coarse)").matches) setTimeout(()=>$("#q")?.focus({preventScroll:true}), 300);
   audit(); buildGuide();
 }
+setInterval(fixDots, 400);
 addEventListener("hashchange", ()=>render(true));
 function flash(sel){ setTimeout(()=>{ const el = typeof sel === "string" ? $(sel, VIEW) : sel; if(!el) return; $$(".pulse").forEach(e=>e.classList.remove("pulse")); void el.offsetWidth; el.classList.add("pulse"); }, 380); }
 

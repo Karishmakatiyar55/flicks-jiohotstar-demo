@@ -24,7 +24,8 @@ Fashion, beauty, audio and home Flicks can be bought inside the app (product pag
 - The Flicks are live ad tags from the saved `flicks-ad-tags` codes, loaded from `flicks.flamapp.live`, `native-ads-dev.appless.workers.dev` and `native-ads.appless.workers.dev`.
 - **The episode in the player is not video.** JioHotstar blocks screen recording of its player, so the stream is a set of stills from the title moved along a real timeline. Ad breaks, the pause ad and the scene chip are driven by that timeline.
 - The one real video is the Tadka micro-drama "Bahu Ka Badla", played from `microdrama-audio-diff.vercel.app` with four audio languages. Bahu Ka Badla, My Secret CEO and Red Silk are Flam's own posters, not JioHotstar titles.
-- Rupee prices, product names for Flicks whose brand is not known (Outfit Swap, Get Ready With Me, Style Swap, Puffer Jacket) and option names shown as "Look 1", "Shade 2" are illustrative.
+- Rupee prices, the product names of the Get Ready With Me and Puffer Jacket Flicks (their brand is not known) and option names shown as "Look 1", "Shade 2" are illustrative.
+- The second sponsored video in the Tadka feed is a content Flick (the viewer picks who plays the lead); its button opens the micro-drama.
 - Payment, login, casting, downloads and advertiser sites say they are outside the demo.
 
 ## Sound
