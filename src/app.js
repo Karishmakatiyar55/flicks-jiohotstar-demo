@@ -150,10 +150,12 @@ const homeScreen = tab => `<div class="screen">${stpad()}${header("home")}<div c
 /* ---- Tadka: the micro-drama feed ---- */
 // Tadka feed cards behave like the app's own: the cover shows for a second, then the card plays by itself, silent; the play button opens it full screen.
 function tkCard(x, i){ const pv = x.preview ? ` data-pv="${x.preview}"` : "", hold = x.preview ? `<span class="tkv"></span>` : "";
-  if(x.frame) return `<button class="tkc own fr"${pv} onclick="go('#/reel/${x.id}')" aria-label="${esc(x.n)}"><span class="frt"><b>${esc(x.n)}</b><em>${esc(x.meta)}</em></span><img src="${x.poster}" alt="" onerror="this.remove()" draggable="false">${hold}<span class="bdg">${x.badge}</span><i class="pl">${I.play}</i></button>`;
+  if(x.frame) return `<button class="tkc own fr"${pv} onclick="tkOpen('${x.id}',this)" aria-label="${esc(x.n)}"><span class="frt"><b>${esc(x.n)}</b><em>${esc(x.meta)}</em></span><img src="${x.poster}" alt="" onerror="this.remove()" draggable="false">${hold}<span class="bdg">${x.badge}</span><i class="pl">${I.play}</i></button>`;
   if(x.cut) return `<div class="tkc">${slice(x.img,[[0,0,100,100,`go('#/reel/${x.id}')`,x.n]])}</div>`;
-  return `<button class="tkc own"${pv} onclick="go('#/reel/${x.id}')" aria-label="${esc(x.n)}">${pic(x.img,x.n)}${hold}${x.badge?`<span class="bdg">${x.badge}</span>`:""}${x.video?`<span class="tkn"><b>${esc(x.n)}</b><em>${esc(x.meta)} · ${esc(x.tags)}</em></span>`:""}<i class="pl">${I.play}</i></button>`; }
+  return `<button class="tkc own"${pv} onclick="tkOpen('${x.id}',this)" aria-label="${esc(x.n)}">${pic(x.img,x.n)}${hold}${x.badge?`<span class="bdg">${x.badge}</span>`:""}${x.video?`<span class="tkn"><b>${esc(x.n)}</b><em>${esc(x.meta)} · ${esc(x.tags)}</em></span>`:""}<i class="pl">${I.play}</i></button>`; }
 let FEEDCUR = null, FEEDSINCE = 0;
+const RSTART = {};   // where each micro-drama's preview had got to when it was opened
+function tkOpen(id, c){ const v = c.querySelector(".tkv video"); if(v && !v.error && v.currentTime > 0){ RSTART[id] = v.currentTime; if(TADKA.find(t=>t.id===id).frame) BCT = v.currentTime; } go("#/reel/"+id); }
 function feedStop(c){ const h = c.querySelector(".tkv"); if(!h || !h.firstChild) return; $$("video", h).forEach(reelDrop); h.classList.remove("live"); }
 function feedStart(c){ const h = c.querySelector(".tkv"); if(!h || h.firstChild) return;
   const v = document.createElement("video"); v.muted = true; v.defaultMuted = true; v.playsInline = true; v.loop = true; v.preload = "auto"; v.setAttribute("muted",""); v.setAttribute("playsinline",""); v.src = c.dataset.pv;
@@ -170,7 +172,7 @@ setInterval(feedAuto, 200);
 function tkAd(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
   return `<div class="tkc ad" data-anchor="${anchor}"><div class="tkh">${av(k)}<div><b>${esc(b.name)}</b><span>${b.label||"Sponsored"}</span></div>${dots(id)}</div><div class="tkf">${flick(id,k)}</div>
   <div class="tkb" data-spop="${id}"><span><em data-sv="${id}">${esc(vshort(k,0))}</em>${v.p?` · <b data-sp="${id}">${priceHTML(v.p)}</b>`:""}</span><button class="wbtn sm" onclick="ctaGo('${id}')">${esc(b.cta)}</button></div></div>`; }
-function tadkaScreen(){ const c = TADKA.map(tkCard);
+function tadkaScreen(){ const c = TADKA.map(tkCard); bcFetch();
   return `<div class="screen tadka">${stpad()}${header("tadka")}<div class="scr" id="scr">
   ${c[0]}${tkAd("tk1","grwm","tk1")}${c[1]}${c[2]}${c[3]}${tkAd("tk2","ugc","tk2")}${c[4]}${c[5]}${c[6]}
   ${sec("Latest on Tadka", `<div class="row">${[["tr_reality","reality"],["tr_shehzada","ceo"],["tr_saanp","redsilk"]].map(([k,id])=>`<button class="po tall" onclick="go('#/reel/${id}')">${pic(k)}</button>`).join("")}${["delivery","ceo","redsilk"].map(id=>`<button class="po tall" onclick="go('#/reel/${id}')">${pic("o_"+id)}</button>`).join("")}</div>`)}
@@ -180,7 +182,7 @@ function tadkaScreen(){ const c = TADKA.map(tkCard);
 const REEL_ADS = ["gucci","neck","jacket"];
 function reelSlides(){ const s = []; let n = 0; TADKA.forEach(x=>{ s.push({md:x}); if(!x.frame && n < REEL_ADS.length){ s.push({ad:REEL_ADS[n], anchor:"r"+(n+1)}); n++; } }); return s; }
 let RS = [], RCUR = -1, RLANG = "English", RMUTED = false, RLIKE = {};
-function reelScreen(id){ RS = reelSlides(); RCUR = -1;
+function reelScreen(id){ RS = reelSlides(); RCUR = -1; bcFetch();
   return `<div class="screen reel"><button class="rback" onclick="back()" aria-label="Back">${I.back}</button><div class="pager" id="pager">${RS.map((s,i)=> s.ad ? reelAd(s,i) : reelMd(s.md,i)).join("")}</div></div>`; }
 function reelMd(x, i){
   if(x.frame) return `<section class="rs md fr" data-i="${i}" data-md="${x.id}" data-anchor="bc"><div class="rfr"></div></section>`;
@@ -199,7 +201,7 @@ function reelActivate(){ const p = $("#pager"); if(!p) return; const i = Math.ro
     const fr = sn.querySelector(".rfr"); if(fr){ reelFrame(fr, on); return; }
     const hold = sn.querySelector(".rvid"); if(!hold) return;
     if(!on){ killVideo(hold); return; }
-    const x = TADKA.find(t=>t.id===sn.dataset.md); if(x && x.video) reelPlay(hold); });
+    const x = TADKA.find(t=>t.id===sn.dataset.md); if(x && x.video){ const at = RSTART[x.id] || 0; delete RSTART[x.id]; reelPlay(hold, at); } });
   const id = RS[i].md ? RS[i].md.id : null; if(id) keepHash("#/reel/"+id);
   const bare = !!(RS[i].md && RS[i].md.frame); $(".screen.reel", VIEW).classList.toggle("bare", bare); document.body.classList.toggle("nopill", bare);
   reelQuiet(false);
@@ -211,11 +213,35 @@ function reelQuiet(q){ clearTimeout(RQT); const sn = $(".rs.md.on:not(.fr)", VIE
   if(sn && q) sn.classList.add("quiet"); scn.classList.toggle("quiet", !!(sn && q)); if(sn) document.body.classList.toggle("nopill", !!q);
   if(sn && !q) RQT = setTimeout(()=>{ if(!OVER.classList.contains("on")) reelQuiet(true); }, 3000); }
 function reelTap(e){ if(e.target.closest("button")) { reelQuiet(false); return; } const sn = e.currentTarget; reelQuiet(!sn.classList.contains("quiet")); }
-addEventListener("message", e=>{ const x = TADKA.find(t=>t.frame); if(!x || !e.data || e.data.type !== "flicks:close") return; let ok = false; try{ ok = e.origin === new URL(x.frame).origin; }catch(err){} if(ok && $(".rs.fr.on", VIEW)) back(); });
+addEventListener("message", e=>{ if(!e.data || e.data.type !== "flicks:close") return; const x = TADKA.find(t=>t.frame), f = $(".rs.fr.on .rfr iframe", VIEW); if(!x || !f) return;
+  let ok = e.source === f.contentWindow; if(!ok) try{ ok = e.origin === new URL(x.frame).origin; }catch(err){} if(ok){ bcSave(); back(); } });
 // Blank Cheque runs in its own frame, which the app cannot mute from outside. So the frame exists only while its episode is the one on screen with nothing over it.
+// The page is loaded as it is published (its HTML fetched and put in the frame with its own address as the base), which lets the app start it and move it
+// to a moment through the page's own controls, and never changes what it shows. If the HTML cannot be fetched the page is framed directly and starts on its own start screen.
+let BCHTML = null, BCP = null, BCT = 0;
+function bcFetch(){ const x = TADKA.find(t=>t.frame); if(BCP || !x) return BCP;
+  BCP = fetch(x.frame, {credentials:"omit"}).then(r=>r.ok ? r.text() : Promise.reject()).then(t=>{ BCHTML = t; }).catch(()=>{ BCHTML = false; }); return BCP; }
+function bcDoc(x){ // the page's music runs through an audio graph, which stays silent for another site's files unless they are asked for with CORS
+  const shim = `<base href="${x.frame}"><script>(function(){var A=window.Audio;function F(s){var a=s===undefined?new A():new A(s);a.crossOrigin="anonymous";return a}F.prototype=A.prototype;window.Audio=F})()<\/script>`;
+  return /<head[^>]*>/i.test(BCHTML) ? BCHTML.replace(/<head[^>]*>/i, m=>m+shim) : shim+BCHTML; }
+const bcWin = () => { const f = $(".rs.on .rfr iframe", VIEW); try{ return f && f.contentWindow && f.contentWindow.__fp ? f : null; }catch(e){ return null; } };
 function reelFrame(fr, on){ const x = TADKA.find(t=>t.frame); on = on && !document.hidden && !OVER.classList.contains("on");
-  if(!on){ fr.innerHTML = ""; return; } if(fr.firstChild) return;
-  const f = document.createElement("iframe"); f.title = x.n; f.setAttribute("allow","autoplay; fullscreen; encrypted-media"); f.src = x.frame; fr.appendChild(f); }
+  if(!on){ bcSave(); fr.innerHTML = ""; return; } if(fr.firstChild) return;
+  if(BCHTML === null){ bcFetch().then(()=>{ if(fr.isConnected && !fr.firstChild && fr.closest(".rs.on")) reelFrame(fr, true); }); return; }   // wait for the page's HTML, a moment at most
+  const f = document.createElement("iframe"); f.title = x.n; f.setAttribute("allow","autoplay; fullscreen; encrypted-media");
+  if(BCHTML){ f.addEventListener("load", ()=>bcStart(f)); f.srcdoc = bcDoc(x); } else f.src = x.frame;
+  fr.appendChild(f); }
+// Opening the episode carries on from the moment the card's preview had reached: the page's own Play is pressed for the viewer and its own seek moves it there.
+function bcStart(f){ let n = 0;
+  const go = () => { if(!f.isConnected) return; let w, d, b; try{ w = f.contentWindow; d = f.contentDocument; b = d && d.querySelector("#cvBtns button"); }catch(e){ return; }
+    if(!w || !w.__fp || !b){ if(n++ < 50) setTimeout(go, 100); return; }
+    if(w.__fp.phase !== "cover") return;
+    b.click(); if(BCT > .3) try{ w.__fp.seek(BCT); }catch(e){}
+    // a browser that refuses sound without a fresh tap: start it silent through the page's own mute and play controls
+    setTimeout(()=>{ try{ const m = d.getElementById("main"); if(f.isConnected && m && m.paused && w.__fp.phase === "play"){ if(!m.muted) d.dispatchEvent(new w.KeyboardEvent("keydown",{key:"m",bubbles:true})); const pb = d.getElementById("bPlay"); if(pb) pb.click(); } }catch(e){} }, 1200); };
+  go(); }
+function bcSave(){ const f = bcWin(); if(!f) return; try{ const fp = f.contentWindow.__fp; if(fp.phase !== "cover" && fp.t > 0) BCT = fp.t; }catch(e){} }
+setInterval(bcSave, 500);
 // A video is removed, not just paused, when its episode is no longer the one on screen, so it can never be heard from another screen.
 function killVideo(hold){ if(!hold) return; $$("video", hold).forEach(reelDrop); hold.innerHTML = ""; }
 function reelPlay(hold, at){ killVideo(hold);
