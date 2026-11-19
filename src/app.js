@@ -34,10 +34,23 @@ function wlToggle(id, ev){ if(ev) ev.stopPropagation(); const on = !WL.has(id); 
 /* ================= what the app's button for a Flick does ================= */
 function ctaGo(id, url){ const s = SLOTS[id]; if(!s) return; const b = BRANDS[s.brand];
   if(b.kind === "watch") return go("#/reel/delivery"); if(b.kind !== "site") return;
-  if(url !== undefined){ clearTimeout(s.urlT); s.asked = 0; return openSite(s.brand, url || b.home); }      // the Flick answered with its own link
+  const key = s.brand + "|" + s.v, fixed = b.pages && b.pages[s.v];
+  if(url !== undefined){                                   // the Flick answered with its own link
+    clearTimeout(s.urlT); const u = url || b.home; URLC[s.brand + "|" + (s.askV === undefined ? s.v : s.askV)] = u;
+    if(s.probe){ s.probe = false; return; }                // a quiet look-up, nobody pressed anything
+    s.asked = 0; return leave(s.brand, fixed || u); }
+  if(fixed) return leave(s.brand, fixed);
+  if(URLC[key]) return leave(s.brand, URLC[key]);          // already known: open at once, inside the tap
   // Ask the Flick for its own link by pressing its own (hidden) button for the option on screen; it answers through the same message a tap on it would send.
-  s.asked = Date.now(); const pressed = pressOwn(id); clearTimeout(s.urlT);
-  s.urlT = setTimeout(()=>{ if(s.asked){ s.asked = 0; openSite(s.brand, b.home); } }, pressed ? 800 : 0); }
+  s.asked = Date.now(); s.probe = false; s.askV = s.v; const pressed = pressOwn(id); clearTimeout(s.urlT);
+  s.urlT = setTimeout(()=>{ if(s.asked){ s.asked = 0; leave(s.brand, URLC[key] || b.home); } }, pressed ? 800 : 0); }
+const URLC = {};   // links the Flicks have reported, by brand and option
+// Where the link opens: the in-app browser, or for a brand marked direct the phone's own browser. If the browser refuses the new tab, the in-app browser offers the link instead.
+function leave(k, url){ if(BRANDS[k].direct){ let w = null; try{ w = window.open(url, "_blank"); if(w) w.opener = null; }catch(e){} if(w) return; }
+  openSite(k, url); }
+// A brand that opens in a new tab needs its link before the tap, or the browser treats the tab as a pop-up. So its Flicks are asked quietly once they are ready.
+setInterval(()=>{ Object.values(SLOTS).forEach(s=>{ const b = BRANDS[s.brand]; if(!b.direct || !s.ready || !s.mounted || s.asked || s.probe || URLC[s.brand+"|"+s.v] || Date.now() - (s.probeAt||0) < 1200) return;
+  s.probeAt = Date.now(); s.probe = true; s.askV = s.v; if(!pressOwn(s.id)) s.probe = false; }); }, 900);
 function pressOwn(id){ try{ const f = $(`.flick[data-slot="${id}"] iframe`, APP), w = f.contentWindow, d = f.contentDocument;
     const find = root => { for(const e of root.querySelectorAll("*")){ if(e.tagName === "VERTEX-PLAYER" && e.shadowRoot) return e; if(e.shadowRoot){ const x = find(e.shadowRoot); if(x) return x; } } return null; };
     const vp = find(d); if(!vp) return false; const r = vp.shadowRoot;

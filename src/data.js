@@ -9,6 +9,8 @@
    button under a Flick opens the brand's own page in the in-app browser, and
    the address is the one built into the Flick (its own Shop now link, for the
    option on screen). `home` is only used if a Flick hands back no address.
+   direct:true = the button opens the brand's page straight in the phone's browser (a new tab), not in the in-app browser. Used for Levi's.
+   pages = the page to open per option, where the tag's own link does not show what the option shows (see the notes on each).
    kind:  site  = the Flick carries a link to the brand's site
           none  = the Flick carries no link, so the app shows no button
           watch = the app's own content: the button opens the micro-drama
@@ -17,13 +19,18 @@
 const T1 = "https://native-ads-dev.appless.workers.dev/", T2 = "https://flicks.flamapp.live/", T3 = "https://native-ads.appless.workers.dev/";
 const BRANDS = {
   neck:{ name:"David Yurman", av:"DY", avc:"#8a6a2f", src:T2+"ikutv6/ad.js", tall:true, kind:"site", cta:"Shop Now", unit:"Style", home:"https://www.davidyurman.com/",
-    head:"The necklace from tonight's scene", variants:[{},{},{}] },
-  outfit:{ name:"Levi's", av:"L", avc:"#c41230", src:T2+"dox37k/ad.js", kind:"site", cta:"Shop Now", unit:"Look", home:"https://www.levi.com/",
+    head:"The necklace from tonight's scene", variants:[{},{},{}],
+    // The tag carries one link for all three styles (the first style's page). The other two were matched by eye on davidyurman.com on 19 Nov 2026 and are not from the tag.
+    pages:[null, "https://www.davidyurman.com/womens/necklaces/dy-mercer-petite-toggle-chain-necklace-in-18k-yellow-gold-with-diamonds-4.5mm-N18458D88.html", "https://www.davidyurman.com/womens/necklaces/starburst-cluster-necklace-in-18k-yellow-gold-with-diamonds-66mm-N16078D88.html"] },
+  outfit:{ name:"Levi's", av:"L", avc:"#c41230", src:T2+"dox37k/ad.js", kind:"site", direct:true, cta:"Shop Now", unit:"Look", home:"https://www.levi.com/",
     head:"Wear what she wore", variants:[{},{},{}] },
   gucci:{ name:"Gucci", av:"G", avc:"#1c3a2a", src:T2+"ocbyu3/ad.js", tall:true, kind:"site", cta:"Explore", unit:"Look", home:"https://www.gucci.com/",
     head:"The new collection", variants:[{},{},{}] },
   zara:{ name:"Zara", av:"Z", avc:"#111", src:T1+"zara/ad.js", tall:true, kind:"site", cta:"Shop Now", unit:"Look", bg:"#fff", home:"https://www.zara.com/",
-    head:"New season, three looks", variants:[{},{},{}] },
+    head:"New season, three looks", variants:[{},{},{}],
+    // The tag's own links are these same three pages, but its first two do not show the jacket the option shows: the first option (ecru check) is the page of
+    // the second link, and the second option (red check) is the red colour on the page of the first link. Ordered here by what each option shows.
+    pages:["https://www.zara.com/us/en/plaid-bomber-jacket-p03046210.html", "https://www.zara.com/us/en/checked-bomber-jacket-p06318268.html", "https://www.zara.com/us/en/polka-dot-bomber-jacket-p08372236.html"] },
   grwm:{ name:"Get Ready With Me", av:"GR", avc:"#c0477f", src:T1+"flicks1-grwm/ad.js", tall:true, kind:"none", unit:"Dress", named:true,
     head:"Get ready with me", variants:[{n:"Red"},{n:"Blue"},{n:"Black"}] },
   ugc:{ name:"Tadka Originals", av:"T", avc:"#e3138b", src:T1+"flicks4-ugc-p1/ad.js", kind:"watch", cta:"Watch Now", unit:"Lead", label:"Promoted",
@@ -32,7 +39,7 @@ const BRANDS = {
     head:"Her lip shade, in three tones", variants:[{},{},{}] },
   eye:{ name:"e.l.f.", av:"elf", avc:"#111", src:T2+"it6hi9/ad.js", kind:"site", cta:"Shop Now", unit:"Look", home:"https://elfcosmetics.com/",
     head:"The eye look from the episode", variants:[{},{},{}] },
-  levis:{ name:"Levi's", av:"L", avc:"#c41230", src:T1+"6a96c6969e74536944c4167f_z64116/ad.js", kind:"site", cta:"Shop Now", unit:"Style", home:"https://www.levi.com/",
+  levis:{ name:"Levi's", av:"L", avc:"#c41230", src:T1+"6a96c6969e74536944c4167f_z64116/ad.js", kind:"site", direct:true, cta:"Shop Now", unit:"Style", home:"https://www.levi.com/",
     head:"The denim everyone's wearing", variants:[{},{},{}] },
   nike:{ name:"Nike", av:"N", avc:"#111", src:T1+"6a97885c9e74536944d35d53_dsefds/ad.js", kind:"site", cta:"Shop Now", unit:"Colour", named:true, home:"https://www.nike.in/",
     head:"Own your movement", variants:[{n:"Black"},{n:"Red"},{n:"Lilac"}] },
@@ -52,7 +59,7 @@ const FRAME_OK = /(^|\.)nike\.in$|(^|\.)gucci\.com$/;
 // Phone-width captures of the real page, for sites that refuse to be shown inside another page. Matched on part of host + path. Taken 19 Nov 2026.
 const CAPS = [
   ["zara.com/us/en/checked-bomber-jacket-p06318268","w_zara0"], ["zara.com/us/en/plaid-bomber-jacket-p03046210","w_zara1"], ["zara.com/us/en/polka-dot-bomber-jacket-p08372236","w_zara2"],
-  ["davidyurman.com/womens/necklaces/sculpted-cable-linked-necklace","w_dy"],
+  ["davidyurman.com/womens/necklaces/sculpted-cable-linked-necklace","w_dy"], ["davidyurman.com/womens/necklaces/dy-mercer-petite-toggle-chain-necklace-in-18k-yellow-gold","w_dy1"], ["davidyurman.com/womens/necklaces/starburst-cluster-necklace","w_dy2"],
   ["ulta.com/p/macximal-silky-matte-lipstick","w_ulta0"], ["ulta.com/p/almost-lipstick","w_ulta1"], ["ulta.com/p/hot-lips-lipstick-2","w_ulta2"],
   ["doritos.com/products/doritos-salsa-verde","w_dor"] ];
 // Config lines that some saved tags carry ahead of their script, kept exactly as saved.
