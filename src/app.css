@@ -353,6 +353,14 @@ button.watch span{font-weight:500;color:#333}
 .lvh{display:flex;align-items:center;gap:10px;font-size:14px}
 .leave h3{font-size:18px}.leave p{font-size:13px;color:var(--tx2);line-height:1.5;margin-bottom:6px}.leave p b{color:#fff}
 
+/* launch screen */
+#splash{position:absolute;inset:0;z-index:300;display:grid;place-items:center;overflow:hidden;background:linear-gradient(100deg,#0b1a27 0%,#14112a 50%,#1f0e20 100%);transition:opacity .42s ease,transform .42s ease}
+#splash.out{opacity:0;transform:scale(1.04);pointer-events:none}
+#splash i{position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(closest-side,rgba(26,109,255,.42),rgba(227,19,139,.2) 55%,transparent);filter:blur(18px);animation:spglow 1.9s ease-out both}
+#splash img{position:relative;width:236px;height:auto;mix-blend-mode:screen;-webkit-mask-image:radial-gradient(ellipse 50% 50% at center,#000 62%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at center,#000 62%,transparent 100%);animation:splogo 1.5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes splogo{0%{opacity:0;transform:scale(.8)}45%{opacity:1}100%{opacity:1;transform:scale(1)}}
+@keyframes spglow{0%{opacity:0;transform:scale(.4)}50%{opacity:1}100%{opacity:.75;transform:scale(1.15)}}
+body.splash .gpill{display:none}
 #toast{position:absolute;left:50%;bottom:140px;transform:translate(-50%,20px);background:#f2f3f5;color:#111;border-radius:12px;padding:10px 14px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:.22s;z-index:120;max-width:84%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 .pulse{animation:pulsef 2.6s ease-out 1;outline:3px solid transparent;outline-offset:2px}

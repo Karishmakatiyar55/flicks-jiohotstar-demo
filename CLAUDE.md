@@ -28,6 +28,7 @@ After any change to the demo, in the same turn:
 - Full screen means nothing of the app sits over the episode. On Blank Cheque the app shows no controls at all (its own X closes it, through its `flicks:close` message) and the frame starts below the phone's status bar. On the other micro-dramas the app's controls fade out after three seconds and come back on a tap. On phones the "Ad slots" pill is hidden while they are hidden.
 - The cover of the playable micro-drama ("The Last Delivery", `o_delivery.webp`) was made with Flowy to match its video: a delivery rider in a yellow raincoat, rain, parcel lockers, a cracked phone.
 - Changing the audio language of a micro-drama must never show the cover image: the playing video stays up until the new track is playing at the same moment, then they swap.
+- The demo opens on a JioHotstar launch screen (set 19 Nov 2026): the logo alone on a dark blue-to-plum background for about two seconds, then it fades into Home. The app loads underneath and no Flick may be heard until it is gone. It shows once per page load.
 - The slots list (desktop panel and phone sheet) shows slot types only, never brand or Flick names.
 - Desktop: thin Flam x JioHotstar header, Flam dark style, slots list beside a framed phone. Phones (860 px and under): the app fills the screen; a rose "Ad slots" pill that blinks until opened once.
 - `src/engine.js` is the Flick embed, option sync and sound code shared with the bigbasket demo. Do not name a class `bar` on anything but the player's scrub bar.

@@ -140,7 +140,7 @@ function vis(h){
 function audit(){
   const ov = OVER.classList.contains("on"); let best=null, bestR=0; const list=[], cand=[];
   $$(".flick[data-slot]", APP).forEach(h=>{ const s = SLOTS[h.dataset.slot]; if(!s) return; const {ratio,dist} = vis(h); const over = !!h.closest("#over");
-    const ok = ratio >= .5 && !document.hidden && (!ov || over);
+    const ok = ratio >= .5 && !document.hidden && (!ov || over) && !document.body.classList.contains("splash");   // nothing is heard under the launch screen
     cand.push([dist - ratio*1000 - (over?5000:0), h, dist, ratio]);
     list.push([h,s]); if(ok && ratio + (over?1:0) > bestR){ bestR = ratio + (over?1:0); best = s; } });
   cand.sort((a,b)=>a[0]-b[0]).forEach(([_,h,dist,ratio],i)=>{ if(dist < 900 && (i < MAXLIVE || ratio > 0)) mount(h); else if(dist > 1500 || (i >= MAXLIVE && ratio === 0)) unmount(h); });

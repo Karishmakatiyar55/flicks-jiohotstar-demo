@@ -545,6 +545,10 @@ function fit(){ const slot = $("#phoneSlot"), phone = $("#phone");
 addEventListener("resize", fit);
 setInterval(()=>$$(".flick[data-slot]", APP).forEach(fitFlick), 700);   // slots that change size (the ad break opening up) keep their Flick fitted
 $("#flamLogo").src = FLAMLOGO; $("#jhLogo").src = JHLOGO;
+// Launch screen: the JioHotstar mark on its own for a moment, as when the app is opened. The app loads underneath, silent, and takes over.
+(function(){ const sp = $("#splash"); $("#splashLogo").src = JHLOGO;
+  setTimeout(()=>sp.classList.add("out"), 1900);
+  setTimeout(()=>{ sp.remove(); document.body.classList.remove("splash"); FEEDSINCE = Date.now(); audit(); }, 2350); })();
 fit(); render(false);
 (function(){ const list = Object.values(BRANDS).map(b=>b.src); let i = 0;
   const next = () => { if(i >= list.length) return; fetch(list[i++], {mode:"no-cors", credentials:"omit"}).catch(()=>{}).finally(()=>setTimeout(next, 250)); };
