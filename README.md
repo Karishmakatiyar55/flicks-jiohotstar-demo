@@ -5,7 +5,7 @@ A working replica of the JioHotstar app with Flicks (Flam's interactive video ad
 - **On a phone** it opens full screen, like the app. The rose "Ad slots" button lists every placement and jumps to it.
 - **On desktop** it shows a framed phone with the list of ad slots beside it.
 
-## Where the Flicks sit (26 slots)
+## Where the Flicks sit (25 slots)
 
 | Group | Slots |
 |---|---|
