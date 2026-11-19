@@ -156,6 +156,8 @@ const CLIPS = {
 };
 // Tadka micro-dramas. video:true plays the real micro-drama file; the others show their cover.
 const TADKA = [
+  // Blank Cheque is Flam's own shoppable micro-drama preview: the episode plays and the Flick comes in inside it. It is shown as it is, untouched.
+  { id:"blankcheque", n:"Blank Cheque", meta:"Episode 3", tags:"Drama · Shoppable", frame:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/", poster:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/media/poster.jpg", badge:"Shop while you watch" },
   { id:"bahu", n:"Bahu Ka Badla", meta:"60 Eps · 4 Languages", tags:"Family · Revenge", img:"o_bahu", video:true, badge:"New Episodes Daily" },
   { id:"reality", n:"Reality Check", meta:"10 Eps · Hindi", tags:"Celebrities · Reality", img:"tk_reality", cut:true },
   { id:"rizz", n:"Rizz Master", meta:"375 Eps · Hindi", tags:"Looking for Love · Reality", img:"tk_rizz", cut:true },

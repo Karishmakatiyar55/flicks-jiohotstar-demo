@@ -132,9 +132,9 @@ svg{display:block}input{font:inherit;color:inherit}em{font-style:normal}h1,h2,h3
 .l2{display:flex;justify-content:space-between;font-size:12px;color:var(--tx2)}.l2 b{color:#fff}
 .lb .wbtn.sm{width:100%}
 .minis{display:flex;gap:6px;padding:10px 0}
-.mini{flex:1;min-width:0;border-radius:8px;background:var(--card2);padding:7px 8px;display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--tx2);box-shadow:0 0 0 1px transparent inset;transition:.15s}
+.mini{flex:1;min-width:0;border-radius:8px;background:none;cursor:default;opacity:.62;padding:7px 8px;display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--tx2);box-shadow:0 0 0 1px transparent inset;transition:.15s}
 .mini b{color:#fff;font-size:12.5px}
-.mini.on{box-shadow:0 0 0 1.5px #fff inset;color:#fff;background:#2f323c}
+.mini.on{box-shadow:0 0 0 1px rgba(255,255,255,.5) inset;color:#fff;background:#2a2c35;opacity:1}
 
 /* bottom bar and the floating filter */
 .nav{position:absolute;left:0;right:0;bottom:0;height:78px;padding:0 4px 22px;display:flex;align-items:center;background:linear-gradient(rgba(15,16,20,.86),#0f1014 60%);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:20}
@@ -157,7 +157,7 @@ svg{display:block}input{font:inherit;color:inherit}em{font-style:normal}h1,h2,h3
 .tkc{display:block;width:calc(100% - 24px);margin:0 12px 10px;border-radius:16px;overflow:hidden;position:relative;background:var(--card)}
 .tkc.own{aspect-ratio:1134/1582}
 .tkc.own img{width:100%;height:100%;object-fit:cover}
-.tkc.own::after{content:"";position:absolute;inset:55% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.85))}
+.tkc.own:not(.fr)::after{content:"";position:absolute;inset:55% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.85))}
 .bdg{position:absolute;left:10px;top:10px;background:rgba(20,20,26,.66);backdrop-filter:blur(6px);border-radius:7px;padding:4px 9px;font-size:11px;font-weight:600;z-index:2}
 .tki{position:absolute;left:12px;bottom:12px;display:flex;flex-direction:column;gap:5px;z-index:2;font-size:11px}
 .tki b{font-weight:600}.tki em{color:#e1e2e8}
@@ -167,7 +167,13 @@ svg{display:block}input{font:inherit;color:inherit}em{font-style:normal}h1,h2,h3
 .tkf{padding:0 34px}.tkf .flick{border-radius:12px}
 .tkb{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px 12px;font-size:12.5px;color:var(--tx2)}.tkb b{color:#fff}
 
+.tkc.fr{background:linear-gradient(160deg,#3a1420,#120a14 60%)}
+.tkc.fr img{position:absolute;inset:0}
+.frt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:20px}
+.frt b{font-size:30px;font-weight:800;letter-spacing:-.5px}.frt em{font-size:13px;color:var(--tx2)}
 /* Tadka player */
+.rfr{position:absolute;inset:0;background:#000}.rfr iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.rnext{position:absolute;left:10px;top:98px;z-index:30;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.4);display:grid;place-items:center}
 .reel{background:#000}
 .rback{position:absolute;left:10px;top:54px;z-index:30;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.4);display:grid;place-items:center}
 .pager{position:absolute;inset:0;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior:contain}
@@ -177,7 +183,8 @@ svg{display:block}input{font:inherit;color:inherit}em{font-style:normal}h1,h2,h3
 .rs.on .rbg img{animation:kb 16s ease-in-out infinite alternate}
 @keyframes kb{from{transform:scale(1)}to{transform:scale(1.12) translateY(-1.5%)}}
 .rvid{position:absolute;inset:0;opacity:0;transition:opacity .3s}.rvid.live{opacity:1}
-.rvid video{width:100%;height:100%;object-fit:cover;background:#000;display:block}
+.rvid video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;display:block}
+.rvid video.nx{opacity:0;pointer-events:none}
 .verr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(0,0,0,.6);font-size:13px;opacity:1}
 .rvid:has(.verr){opacity:1}
 .verr button{background:#fff;color:#111;border-radius:999px;padding:7px 16px;font-weight:700;font-size:12.5px}
@@ -315,9 +322,10 @@ button.watch span{font-weight:500;color:#333}
 .pprice{display:flex;align-items:baseline;gap:8px}.pprice b{font-size:21px}.pprice span{font-size:11px;color:var(--tx3)}
 .pbody h4{font-size:12px;color:var(--tx2);font-weight:600;margin:16px 0 8px}
 .opts{display:flex;gap:8px;flex-wrap:wrap}
-.opts button{height:36px;padding:0 14px;border-radius:8px;background:var(--card);font-size:12.5px;box-shadow:0 0 0 1px var(--line) inset}
-.opts button.on{box-shadow:0 0 0 1.5px #fff inset;font-weight:700}
-.opts.sz button{min-width:44px;padding:0 10px;text-align:center}
+.opts>*{height:36px;padding:0 14px;border-radius:8px;background:var(--card);font-size:12.5px;box-shadow:0 0 0 1px var(--line) inset;display:inline-flex;align-items:center;justify-content:center}
+.opts.ro>*{color:var(--tx3);transition:.15s;background:none;cursor:default}.opts.ro>.on{color:#fff}
+.opts>.on{box-shadow:0 0 0 1.5px #fff inset;font-weight:700}
+.opts.sz>*{min-width:44px;padding:0 10px;text-align:center}
 .pbody .tdesc{padding:16px 0 0}
 .seen{display:flex;gap:8px;align-items:center;margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--card);font-size:11.5px;color:var(--tx2)}.seen svg{width:16px;height:16px;flex:none;color:#fff}
 .buybar{flex:none;display:flex;gap:8px;padding:10px 12px 26px;background:var(--bg);border-top:1px solid var(--line)}
@@ -390,6 +398,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background:ra
   .stpad{height:env(safe-area-inset-top)}
   .thero{margin-top:calc(10px + env(safe-area-inset-top))}
   .rback{top:calc(10px + env(safe-area-inset-top))}
+  .rnext{top:calc(54px + env(safe-area-inset-top))}
   .rs.ad{padding-top:calc(6px + env(safe-area-inset-top))}
   .nav{height:calc(58px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom)}
   .fpill{bottom:calc(68px + env(safe-area-inset-bottom))}
@@ -604,6 +613,8 @@ const CLIPS = {
 };
 // Tadka micro-dramas. video:true plays the real micro-drama file; the others show their cover.
 const TADKA = [
+  // Blank Cheque is Flam's own shoppable micro-drama preview: the episode plays and the Flick comes in inside it. It is shown as it is, untouched.
+  { id:"blankcheque", n:"Blank Cheque", meta:"Episode 3", tags:"Drama · Shoppable", frame:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/", poster:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/media/poster.jpg", badge:"Shop while you watch" },
   { id:"bahu", n:"Bahu Ka Badla", meta:"60 Eps · 4 Languages", tags:"Family · Revenge", img:"o_bahu", video:true, badge:"New Episodes Daily" },
   { id:"reality", n:"Reality Check", meta:"10 Eps · Hindi", tags:"Celebrities · Reality", img:"tk_reality", cut:true },
   { id:"rizz", n:"Rizz Master", meta:"375 Eps · Hindi", tags:"Looking for Love · Reality", img:"tk_rizz", cut:true },
@@ -815,7 +826,6 @@ function ctaGo(id){ const s = SLOTS[id]; if(!s) return; const b = BRANDS[s.brand
 // A Flick with two options shows two dots: the dots are matched to the Flick once its slot is known.
 function fixDots(){ $$("[data-sd]", APP).forEach(d=>{ const s = SLOTS[d.dataset.sd]; if(!s) return; const n = BRANDS[s.brand].variants.length; if(d.children.length === n) return;
   d.innerHTML = Array.from({length:n},(_,i)=>`<i class="${i===s.v?"on":""}"></i>`).join(""); }); }
-function pickOrOpen(id, i){ const s = SLOTS[id]; if(!s) return; if(s.v === i) ctaGo(id); else setVariant(id, i); }
 
 /* ================= building blocks ================= */
 const stpad = () => `<div class="stpad"></div>`;
@@ -859,8 +869,8 @@ const banner = (k, fn) => `<button class="ban" onclick="${fn}">${pic(k)}</button
 // Shop the Look: a rail of vertical videos, each one a look that can be bought.
 function lookCard(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
   return `<div class="lcard" ${anchor?`data-anchor="${anchor}"`:""}>${flick(id,k)}<div class="lb" data-spop="${id}"><div class="l1">${av(k)}<b>${esc(b.name)}</b>${dots(id)}</div><div class="l2"><em data-sv="${id}">${esc(vshort(k,0))}</em>${v.p?`<b data-sp="${id}">${priceHTML(v.p)}</b>`:""}</div><button class="wbtn sm" onclick="ctaGo('${id}')">${esc(b.cta)}</button></div></div>`; }
-// The three options of a Flick as tappable rows under it.
-const mini = (id,k,i) => { const v = BRANDS[k].variants[i]; return `<button class="mini ${i?"":"on"}" data-sync="${id}" data-i="${i}" onclick="pickOrOpen('${id}',${i})"><span>${esc(vshort(k,i))}</span>${v.p?`<b>${priceHTML(v.p)}</b>`:""}</button>`; };
+// The options of a Flick as name and price under it. They only show which one the Flick is on: the option is changed inside the Flick, never from here.
+const mini = (id,k,i) => { const v = BRANDS[k].variants[i]; return `<div class="mini ${i?"":"on"}" data-sync="${id}" data-i="${i}"><span>${esc(vshort(k,i))}</span>${v.p?`<b>${priceHTML(v.p)}</b>`:""}</div>`; };
 const minis = (id,k) => `<div class="minis">${BRANDS[k].variants.map((_,i)=>mini(id,k,i)).join("")}</div>`;
 
 /* ================= screens ================= */
@@ -924,6 +934,7 @@ const homeScreen = tab => `<div class="screen">${stpad()}${header("home")}<div c
 
 /* ---- Tadka: the micro-drama feed ---- */
 function tkCard(x, i){
+  if(x.frame) return `<button class="tkc own fr" onclick="go('#/reel/${x.id}')" aria-label="${esc(x.n)}"><span class="frt"><b>${esc(x.n)}</b><em>${esc(x.meta)}</em></span><img src="${x.poster}" alt="" onerror="this.remove()" draggable="false"><span class="bdg">${x.badge}</span><i class="pl">${I.play}</i></button>`;
   if(x.cut) return `<div class="tkc">${slice(x.img,[[0,0,100,100,`go('#/reel/${x.id}')`,x.n]])}</div>`;
   return `<button class="tkc own" onclick="go('#/reel/${x.id}')" aria-label="${esc(x.n)}">${pic(x.img,x.n)}${x.badge?`<span class="bdg">${x.badge}</span>`:""}<i class="pl">${I.play}</i></button>`; }
 function tkAd(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
@@ -937,11 +948,12 @@ function tadkaScreen(){ const c = TADKA.map(tkCard);
 
 /* ---- Tadka player: full-screen vertical episodes, with a full-screen ad between them ---- */
 const REEL_ADS = ["gucci","neck","jacket"];
-function reelSlides(){ const s = []; TADKA.forEach((x,i)=>{ s.push({md:x}); if(i < REEL_ADS.length) s.push({ad:REEL_ADS[i], anchor:"r"+(i+1)}); }); return s; }
+function reelSlides(){ const s = []; let n = 0; TADKA.forEach(x=>{ s.push({md:x}); if(!x.frame && n < REEL_ADS.length){ s.push({ad:REEL_ADS[n], anchor:"r"+(n+1)}); n++; } }); return s; }
 let RS = [], RCUR = -1, RLANG = "English", RMUTED = false, RLIKE = {};
 function reelScreen(id){ RS = reelSlides(); RCUR = -1;
   return `<div class="screen reel"><button class="rback" onclick="back()" aria-label="Back">${I.back}</button><div class="pager" id="pager">${RS.map((s,i)=> s.ad ? reelAd(s,i) : reelMd(s.md,i)).join("")}</div></div>`; }
 function reelMd(x, i){
+  if(x.frame) return `<section class="rs md fr" data-i="${i}" data-md="${x.id}" data-anchor="bc"><div class="rfr"></div><button class="rnext" onclick="reelGo(${i+1})" aria-label="Next">${I.down}</button></section>`;
   return `<section class="rs md" data-i="${i}" data-md="${x.id}"><div class="rbg ${x.cut?"cutbg":""}">${pic(x.img)}</div><div class="rvid"></div><div class="rshade"></div>
   <div class="rrail"><button onclick="reelLike('${x.id}',this)" class="${RLIKE[x.id]?"on":""}">${I.heart}<span>${RLIKE[x.id]?"12.5K":"12.4K"}</span></button><button onclick="out('Sharing')">${I.share}<span>Share</span></button>${x.video?`<button data-rmute onclick="reelMute()">${RMUTED?I.mute:I.vol}<span>Sound</span></button>`:""}</div>
   <div class="rinfo"><button class="shopchip" data-anchor="rshop-${i}" onclick="openScene('neck','${esc(x.n)}')">${I.tag} Shop the look</button><h3>${esc(x.n)}</h3><p>Ep 1 · ${esc(x.meta)} · ${esc(x.tags)}</p>
@@ -954,13 +966,18 @@ function reelFit(){ $$(".rs.ad", VIEW).forEach(s=>{ const box = s.querySelector(
 function reelGo(i){ const p = $("#pager"); if(!p) return; i = Math.max(0, Math.min(RS.length-1, i)); p.scrollTo({top:i*p.clientHeight, behavior:"smooth"}); }
 function reelActivate(){ const p = $("#pager"); if(!p) return; const i = Math.round(p.scrollTop / (p.clientHeight||1)); if(i === RCUR) return; RCUR = i;
   $$(".rs", p).forEach(sn=>{ const on = +sn.dataset.i === i; sn.classList.toggle("on", on);
+    const fr = sn.querySelector(".rfr"); if(fr){ reelFrame(fr, on); return; }
     const hold = sn.querySelector(".rvid"); if(!hold) return;
     if(!on){ killVideo(hold); return; }
     const x = TADKA.find(t=>t.id===sn.dataset.md); if(x && x.video) reelPlay(hold); });
   const id = RS[i].md ? RS[i].md.id : null; if(id) keepHash("#/reel/"+id);
   audit(); }
+// Blank Cheque runs in its own frame, which the app cannot mute from outside. So the frame exists only while its episode is the one on screen with nothing over it.
+function reelFrame(fr, on){ const x = TADKA.find(t=>t.frame); on = on && !document.hidden && !OVER.classList.contains("on");
+  if(!on){ fr.innerHTML = ""; return; } if(fr.firstChild) return;
+  const f = document.createElement("iframe"); f.title = x.n; f.setAttribute("allow","autoplay; fullscreen; encrypted-media"); f.src = x.frame; fr.appendChild(f); }
 // A video is removed, not just paused, when its episode is no longer the one on screen, so it can never be heard from another screen.
-function killVideo(hold){ const v = hold && hold.querySelector("video"); if(!v) return; try{ v.pause(); v.muted = true; v.removeAttribute("src"); v.load(); }catch(e){} hold.innerHTML = ""; }
+function killVideo(hold){ if(!hold) return; $$("video", hold).forEach(reelDrop); hold.innerHTML = ""; }
 function reelPlay(hold, at){ killVideo(hold);
   const v = document.createElement("video"); v.playsInline = true; v.loop = true; v.preload = "auto"; v.muted = RMUTED; v.src = MD_BASE + encodeURIComponent(RLANG) + ".mp4";
   v.addEventListener("loadedmetadata", ()=>{ if(at) try{ v.currentTime = Math.min(at, (v.duration||at)-.2); }catch(e){} });
@@ -969,14 +986,25 @@ function reelPlay(hold, at){ killVideo(hold);
   v.addEventListener("error", ()=>{ hold.classList.remove("live"); hold.innerHTML = `<div class="verr"><b>The episode didn't load</b><button onclick="reelRetry()">Retry</button></div>`; });
   hold.classList.remove("live"); hold.appendChild(v);
   const p = v.play(); if(p && p.catch) p.catch(err=>{ if(err && err.name === "NotAllowedError" && !v.muted){ RMUTED = true; v.muted = true; reelMuteUI(); v.play().catch(()=>{}); toast("Tap Sound to hear the episode"); } }); }
-const reelVideo = () => $(".rs.on .rvid video", VIEW);
+const reelVideo = () => $(".rs.on .rvid video:not(.nx)", VIEW);
 function reelRetry(){ const h = $(".rs.on .rvid", VIEW); if(h) reelPlay(h); }
 function reelMuteUI(){ $$("[data-rmute]").forEach(b=>b.innerHTML = `${RMUTED?I.mute:I.vol}<span>Sound</span>`); }
 function reelMute(){ RMUTED = !RMUTED; const v = reelVideo(); if(v){ v.muted = RMUTED; if(v.paused) v.play().catch(()=>{}); } reelMuteUI(); }
-function reelLang(id){ if(id === RLANG) return; RLANG = id; $$("[data-lang]").forEach(b=>b.classList.toggle("on", b.dataset.lang===id)); const v = reelVideo(), h = $(".rs.on .rvid", VIEW); if(h) reelPlay(h, v ? v.currentTime : 0); }
+function reelLang(id){ if(id === RLANG) return; RLANG = id; $$("[data-lang]").forEach(b=>b.classList.toggle("on", b.dataset.lang===id));
+  const hold = $(".rs.on .rvid", VIEW), old = reelVideo(); if(!hold) return; if(!old || old.error || !old.duration) return reelPlay(hold);
+  $$("video", hold).forEach(v=>{ if(v !== old) reelDrop(v); });          // a switch that was still loading is dropped
+  const v = document.createElement("video"); v.playsInline = true; v.loop = true; v.preload = "auto"; v.muted = true; v.className = "nx"; v.src = MD_BASE + encodeURIComponent(id) + ".mp4";
+  let done = false;
+  const swap = () => { if(done || !v.isConnected) return; done = true; v.muted = RMUTED; v.classList.remove("nx"); reelDrop(old); reelWire(v, hold); };
+  v.addEventListener("loadedmetadata", ()=>{ try{ v.currentTime = Math.min(old.currentTime + .15, (v.duration||1e9) - .2); }catch(e){} v.play().catch(()=>{}); });
+  v.addEventListener("playing", ()=>{ const d = old.currentTime - v.currentTime; if(Math.abs(d) > .35 && !v._re){ v._re = 1; try{ v.currentTime = old.currentTime + .1; }catch(e){} v.addEventListener("seeked", swap, {once:true}); } else swap(); });
+  v.addEventListener("error", ()=>{ if(done) return; done = true; reelDrop(v); toast("That language didn't load"); const was = LANGS.find(l=>(old.src||"").includes(encodeURIComponent(l[0]))); if(was) RLANG = was[0]; $$("[data-lang]").forEach(b=>b.classList.toggle("on", b.dataset.lang===RLANG)); });
+  hold.appendChild(v); }
+function reelDrop(v){ try{ v.pause(); v.muted = true; v.removeAttribute("src"); v.load(); }catch(e){} v.remove(); }
+function reelWire(v, hold){ v.addEventListener("timeupdate", ()=>{ const b = hold.parentElement.querySelector(".rprog i"); if(b && v.duration) b.style.width = (v.currentTime/v.duration*100)+"%"; }); }
 function reelLike(id, el){ RLIKE[id] = !RLIKE[id]; el.classList.toggle("on", RLIKE[id]); el.querySelector("span").textContent = RLIKE[id] ? "12.5K" : "12.4K"; }
 // The episode stops while anything is open over it, and whenever the tab is hidden.
-function reelHold(stop){ const v = reelVideo(); if(!v) return; if(stop) v.pause(); else v.play().catch(()=>{}); }
+function reelHold(stop){ const fr = $(".rs.on .rfr", VIEW); if(fr) reelFrame(fr, !stop); const v = reelVideo(); if(!v) return; if(stop) v.pause(); else v.play().catch(()=>{}); }
 document.addEventListener("visibilitychange", ()=>{ reelHold(document.hidden || OVER.classList.contains("on")); if(document.hidden) plPause(true); });
 
 /* ---- search ---- */
@@ -1130,7 +1158,7 @@ function productScreen(k, i){ const b = BRANDS[k]; if(!b || b.kind !== "shop") r
   return `<div class="screen prod">${stpad()}<div class="top hbar"><button onclick="back()" aria-label="Back">${I.back}</button><b>${esc(b.name)}</b><button class="bagb" onclick="go('#/bag')" aria-label="Bag">${I.bag}<i data-bagn hidden>0</i></button></div>
   <div class="scr" id="scr"><div class="pmedia ${b.tall?"tall":""}" data-anchor="pdp">${flick("pdp",k,{v:i, on:(n,ch)=>{ if(ch) keepHash(`#/p/${k}/${n}`); }})}</div>
   <div class="pbody" data-spop="pdp"><span class="pcat">${esc(b.cat)} · ${esc(b.name)}</span><h1 data-sn="pdp">${esc(vname(k,i))}</h1><div class="pprice"><b data-sp="pdp">${priceHTML(v.p)}</b><span>Inclusive of all taxes</span></div>
-  <h4>${esc(b.unit)}</h4><div class="opts">${b.variants.map((_,j)=>`<button class="${j===i?"on":""}" data-sync="pdp" data-i="${j}" onclick="setVariant('pdp',${j})">${esc(vshort(k,j))}</button>`).join("")}</div>
+  <h4>${esc(b.unit)}</h4><div class="opts ro">${b.variants.map((_,j)=>`<span class="${j===i?"on":""}" data-sync="pdp" data-i="${j}">${esc(vshort(k,j))}</span>`).join("")}</div>
   ${b.sizes?`<h4>Size</h4><div class="opts sz">${b.sizes.map(z=>`<button class="${z===PSIZE?"on":""}" onclick="PSIZE='${z}';chipOn2(this)">${z}</button>`).join("")}</div>`:""}
   <p class="tdesc">${esc(b.desc)}</p><div class="seen">${I.star}<span>Seen while watching on JioHotstar. Free delivery, easy returns.</span></div></div></div>
   <div class="buybar"><button class="wbtn ghost" onclick="pdpAdd('${k}')">Add to Bag</button><button class="wbtn" onclick="pdpAdd('${k}',1)">Buy Now</button></div></div>`; }
@@ -1168,7 +1196,7 @@ function render(anim=true){
   if(NAV.length > 1 && NAV[NAV.length-2] === h){ NAV.pop(); dir = "enter-back"; } else if(NAV[NAV.length-1] !== h) NAV.push(h);
   closeOver(true);
   // Leaving a screen removes its Flicks and its videos outright, so nothing can keep playing behind the next screen.
-  $$(".flick[data-slot]", VIEW).forEach(unmount); $$(".rvid", VIEW).forEach(killVideo); plStop(); SLOTS = {}; CURH = h;
+  $$(".flick[data-slot]", VIEW).forEach(unmount); $$(".rvid", VIEW).forEach(killVideo); $$(".rfr", VIEW).forEach(f=>f.innerHTML = ""); plStop(); SLOTS = {}; CURH = h;
   const S = {home:()=>homeScreen("home"), tv:()=>homeScreen("tv"), movies:()=>homeScreen("movies"), sports:()=>homeScreen("sports"), tadka:tadkaScreen, reel:()=>reelScreen(r.a),
     search:()=>searchScreen(r.a), space:spaceScreen, t:()=>titleScreen(r.a), watch:()=>watchScreen(r.a), p:()=>productScreen(r.a, +r.b||0), bag:bagScreen};
   const name = S[r.name] ? r.name : "home";
@@ -1186,9 +1214,10 @@ function render(anim=true){
   if(name === "watch") plInit(r.a, anc);
   else if(name === "reel"){ const p = $("#pager"); reelFit(); let i = RS.findIndex(s=>s.md && s.md.id === r.a); if(i < 0) i = 0;
     if(anc && /^r\d/.test(anc)) i = RS.findIndex(s=>s.anchor === anc);
+    if(anc === "bc") i = RS.findIndex(s=>s.md && s.md.frame);
     p.scrollTop = i * p.clientHeight; p.addEventListener("scroll", ()=>{ clearTimeout(p._t); p._t = setTimeout(reelActivate, 110); }, {passive:true}); reelActivate();
     if(anc === "rshop"){ const nm = RS[i].md.n; setTimeout(()=>openScene("neck", nm), 450); }
-    else if(anc) flash(`.rs[data-anchor="${anc}"] .rfl`); }
+    else if(anc && anc !== "bc") flash(`.rs[data-anchor="${anc}"] .rfl`); }
   else if(anc) setTimeout(()=>scrollToAnchor(anc), 80);
   if(name === "search" && !r.a && anim && !anc && !matchMedia("(pointer: coarse)").matches) setTimeout(()=>$("#q")?.focus({preventScroll:true}), 300);
   audit(); buildGuide();
@@ -1201,7 +1230,7 @@ function flash(sel){ setTimeout(()=>{ const el = typeof sel === "string" ? $(sel
 const GUIDE = [
   ["Ad breaks in the stream", [["Pre-roll: before the episode starts","#/watch/heartbeat","pre"],["Mid-roll: ad break inside the episode","#/watch/heartbeat","mid"],["Pause ad","#/watch/heartbeat","pause"],["Companion ad under the player","#/watch/heartbeat","comp"]]],
   ["Shop the look", [["In the player: shop the scene","#/watch/heartbeat","scene"],["Title page: shop the look","#/t/heartbeat","look"],["Home: Shop the Look rail","#/home","shop"]]],
-  ["Tadka micro-dramas", [["Sponsored video in the Tadka feed","#/tadka","tk1"],["Tadka feed: second sponsored video","#/tadka","tk2"],["Full-screen ad between episodes","#/reel/bahu","r1"],["Shop the look inside a micro-drama","#/reel/bahu","rshop"]]],
+  ["Tadka micro-dramas", [["Sponsored video in the Tadka feed","#/tadka","tk1"],["Tadka feed: second sponsored video","#/tadka","tk2"],["Flick inside a micro-drama episode","#/reel/blankcheque","bc"],["Full-screen ad between episodes","#/reel/bahu","r1"],["Shop the look inside a micro-drama","#/reel/bahu","rshop"]]],
   ["Swipeable banners", [["Home: masthead","#/home","mast"],["Home: For You carousel","#/home","fy"],["TV: masthead","#/tv","mast"],["TV: For You carousel","#/tv","fy"],["Movies: masthead","#/movies","mast"],["Movies: For You carousel","#/movies","fy"],["Sports: masthead","#/sports","mast"],["Sports: For You carousel","#/sports","fy"]]],
   ["Billboards between rails", [["Home: billboard","#/home","bill"],["Movies: billboard","#/movies","bill"],["Sports: billboard","#/sports","bill"]]],
   ["Search", [["Sponsored tile in Popular Searches","#/search","stile"],["Sponsored result at the top","#/search/cricket","sres"]]]
@@ -1214,7 +1243,7 @@ function buildGuide(){ let n = 0;
 let guideAt = 0;
 function pick(si, ii){ if(Date.now() - guideAt < 500) return;   // the tap that opened the list must not also pick from it
   const it = GUIDE[si][1][ii]; curPick = si+"-"+ii; toggleGuide(false);
-  const have = location.hash || "#/home", rep = OVSTATE, same = have === it[1] || (it[1].startsWith("#/reel/") && have.startsWith("#/reel/"));
+  const have = location.hash || "#/home", rep = OVSTATE, same = have === it[1];
   if(it[1] === "#/search") SCHIP = "India";
   closeOver(true); pendingAnchor = it[2];
   if(same){ if(rep) history.back(); setTimeout(()=>render(false), rep ? 60 : 0); }

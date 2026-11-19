@@ -21,6 +21,9 @@ After any change to the demo, in the same turn:
 - No audio leaks: a Flick is silenced unless at least half of it is on screen; leaving a screen removes every Flick and video on it.
 - Flicks saved as web embeds run as their ad tag (`https://flicks.flamapp.live/<id>/ad.js`).
 - No button inside a Flick where the app shows its own; never hide the option switcher (do not blanket-hide `[data-vertex-trigger]`).
+- Options are changed only inside the Flick (set 19 Nov 2026). Nothing outside a Flick may switch its option: the rows and chips under or beside a Flick show the option name and price and highlight the one the Flick is on, and are not buttons. Do not bring back `setVariant` calls from the app's own UI.
+- Blank Cheque (Tadka, `#/reel/blankcheque`) is Flam's own shoppable micro-drama preview, shown in a frame exactly as it is. Do not overlay or alter it. The app cannot mute that frame, so the frame is removed whenever its slide is not the one on screen, a sheet is open, or the tab is hidden.
+- Changing the audio language of a micro-drama must never show the cover image: the playing video stays up until the new track is playing at the same moment, then they swap.
 - The slots list (desktop panel and phone sheet) shows slot types only, never brand or Flick names.
 - Desktop: thin Flam x JioHotstar header, Flam dark style, slots list beside a framed phone. Phones (860 px and under): the app fills the screen; a rose "Ad slots" pill that blinks until opened once.
 - `src/engine.js` is the Flick embed, option sync and sound code shared with the bigbasket demo. Do not name a class `bar` on anything but the player's scrub bar.
