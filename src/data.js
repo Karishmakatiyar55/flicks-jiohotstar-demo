@@ -41,8 +41,11 @@ const BRANDS = {
     head:"The eye look from the episode", variants:[{},{},{}] },
   levis:{ name:"Levi's", av:"L", avc:"#c41230", src:T1+"6a96c6969e74536944c4167f_z64116/ad.js", kind:"site", direct:true, cta:"Shop Now", unit:"Style", home:"https://www.levi.com/",
     head:"The denim everyone's wearing", variants:[{},{},{}] },
-  nike:{ name:"Nike", av:"N", avc:"#111", src:T1+"6a97885c9e74536944d35d53_dsefds/ad.js", kind:"site", cta:"Shop Now", unit:"Colour", named:true, home:"https://www.nike.in/",
-    head:"Own your movement", variants:[{n:"Black"},{n:"Red"},{n:"Lilac"}] },
+  nike:{ name:"Nike", av:"N", avc:"#111", src:T1+"6a97885c9e74536944d35d53_dsefds/ad.js", kind:"site", direct:true, cta:"Shop Now", unit:"Colour", named:true, home:"https://www.nike.in/",
+    head:"Own your movement", variants:[{n:"Black"},{n:"Red"},{n:"Lilac"}],
+    // The tag's link for the second option (.../nike-universa-women-s-medium-support-padded-sports-bra/p/26040433) answered "404, page not found" on nike.in on 19 Nov 2026.
+    // This is the same product's current page, found by search; its lead colour may differ from the Flick's. The first and third options use the tag's own links.
+    pages:[null, "https://www.nike.in/nike-universa-women-s-medium-support-padded-sport-bra/p/29384005", null] },
   westelm:{ name:"West Elm", av:"WE", avc:"#3d4a3f", src:T2+"c5htms/ad.js", kind:"site", cta:"Shop Now", unit:"Chair", home:"https://www.westelm.com/",
     head:"The accent chair from the set", variants:[{},{},{}] },
   can:{ name:"Coca-Cola", av:"C", avc:"#e41e2b", src:T2+"n0489i/ad.js", kind:"site", cta:"Explore", unit:"Flavour", named:true, home:"https://www.coca-cola.com/",
@@ -54,8 +57,9 @@ const BRANDS = {
   merc:{ name:"Mercedes-Benz", av:"MB", avc:"#111", src:T3+"6a9bc07393e71f3ec9b12c81_i3pdeq/ad.js", kind:"site", cta:"Explore", unit:"Model", home:"https://www.mbusa.com/",
     head:"Pick the one that moves you", variants:[{},{},{}] }
 };
-// In-app browser. A web page can only show another site inside itself if that site allows it; of the sites the Flicks link to, these do (checked 19 Nov 2026).
-const FRAME_OK = /(^|\.)nike\.in$|(^|\.)gucci\.com$/;
+// In-app browser. A web page can only show another site inside itself if that site allows it; of the sites the Flicks link to, gucci.com does (checked 19 Nov 2026).
+// nike.in allows it too but must not be embedded: inside a frame its bot protection reloads the page over and over (seen as flicker) and then answers "Access Denied". Nike opens in a new tab instead.
+const FRAME_OK = /(^|\.)gucci\.com$/;
 // Phone-width captures of the real page, for sites that refuse to be shown inside another page. Matched on part of host + path. Taken 19 Nov 2026.
 const CAPS = [
   ["zara.com/us/en/checked-bomber-jacket-p06318268","w_zara0"], ["zara.com/us/en/plaid-bomber-jacket-p03046210","w_zara1"], ["zara.com/us/en/polka-dot-bomber-jacket-p08372236","w_zara2"],

@@ -18,9 +18,9 @@ A working replica of the JioHotstar app with Flicks (Flam's interactive video ad
 
 Nothing is sold inside JioHotstar. The app's button under a Flick opens the brand's own page in an in-app browser, at the address built into that Flick for the option on screen.
 
-- nike.in and gucci.com allow being shown inside another page, so they load live.
+- gucci.com allows being shown inside another page, so it loads live.
 - Zara, David Yurman, Ulta and Doritos show a phone-width capture of the real page for the option on screen.
-- Levi's opens levi.com straight in the phone's browser, in a new tab.
+- Levi's and Nike open the brand's page straight in the phone's browser, in a new tab.
 - The other brand sites refuse to be shown inside another web page (a real app's browser has no such limit). For those the in-app browser shows the brand, the real address and an "Open" link to it.
 
 ## What is real and what is not
