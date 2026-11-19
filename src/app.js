@@ -37,7 +37,7 @@ function wlToggle(id, ev){ if(ev) ev.stopPropagation(); const on = !WL.has(id); 
 
 /* ================= what the app's button for a Flick does ================= */
 function ctaGo(id){ const s = SLOTS[id]; if(!s) return; const b = BRANDS[s.brand];
-  if(b.kind === "shop") go(`#/p/${s.brand}/${s.v}`); else if(b.kind === "watch") go("#/reel/bahu"); else leaveSheet(s.brand, s.v); }
+  if(b.kind === "shop") go(`#/p/${s.brand}/${s.v}`); else if(b.kind === "watch") go("#/reel/delivery"); else leaveSheet(s.brand, s.v); }
 // A Flick with two options shows two dots: the dots are matched to the Flick once its slot is known.
 function fixDots(){ $$("[data-sd]", APP).forEach(d=>{ const s = SLOTS[d.dataset.sd]; if(!s) return; const n = BRANDS[s.brand].variants.length; if(d.children.length === n) return;
   d.innerHTML = Array.from({length:n},(_,i)=>`<i class="${i===s.v?"on":""}"></i>`).join(""); }); }
@@ -148,17 +148,32 @@ const HOME = {
 const homeScreen = tab => `<div class="screen">${stpad()}${header("home")}<div class="scr" id="scr">${HOME[tab]()}</div>${nav(tab, tab==="home"?null:tab)}</div>`;
 
 /* ---- Tadka: the micro-drama feed ---- */
-function tkCard(x, i){
-  if(x.frame) return `<button class="tkc own fr" onclick="go('#/reel/${x.id}')" aria-label="${esc(x.n)}"><span class="frt"><b>${esc(x.n)}</b><em>${esc(x.meta)}</em></span><img src="${x.poster}" alt="" onerror="this.remove()" draggable="false"><span class="bdg">${x.badge}</span><i class="pl">${I.play}</i></button>`;
+// Tadka feed cards behave like the app's own: the cover shows for a second, then the card plays by itself, silent; the play button opens it full screen.
+function tkCard(x, i){ const pv = x.preview ? ` data-pv="${x.preview}"` : "", hold = x.preview ? `<span class="tkv"></span>` : "";
+  if(x.frame) return `<button class="tkc own fr"${pv} onclick="go('#/reel/${x.id}')" aria-label="${esc(x.n)}"><span class="frt"><b>${esc(x.n)}</b><em>${esc(x.meta)}</em></span><img src="${x.poster}" alt="" onerror="this.remove()" draggable="false">${hold}<span class="bdg">${x.badge}</span><i class="pl">${I.play}</i></button>`;
   if(x.cut) return `<div class="tkc">${slice(x.img,[[0,0,100,100,`go('#/reel/${x.id}')`,x.n]])}</div>`;
-  return `<button class="tkc own" onclick="go('#/reel/${x.id}')" aria-label="${esc(x.n)}">${pic(x.img,x.n)}${x.badge?`<span class="bdg">${x.badge}</span>`:""}<i class="pl">${I.play}</i></button>`; }
+  return `<button class="tkc own"${pv} onclick="go('#/reel/${x.id}')" aria-label="${esc(x.n)}">${pic(x.img,x.n)}${hold}${x.badge?`<span class="bdg">${x.badge}</span>`:""}${x.video?`<span class="tkn"><b>${esc(x.n)}</b><em>${esc(x.meta)} · ${esc(x.tags)}</em></span>`:""}<i class="pl">${I.play}</i></button>`; }
+let FEEDCUR = null, FEEDSINCE = 0;
+function feedStop(c){ const h = c.querySelector(".tkv"); if(!h || !h.firstChild) return; $$("video", h).forEach(reelDrop); h.classList.remove("live"); }
+function feedStart(c){ const h = c.querySelector(".tkv"); if(!h || h.firstChild) return;
+  const v = document.createElement("video"); v.muted = true; v.defaultMuted = true; v.playsInline = true; v.loop = true; v.preload = "auto"; v.setAttribute("muted",""); v.setAttribute("playsinline",""); v.src = c.dataset.pv;
+  v.addEventListener("playing", ()=>h.classList.add("live")); v.addEventListener("error", ()=>{ h.classList.remove("live"); });
+  h.appendChild(v); v.play().catch(()=>{}); }
+function feedAuto(){ const sc = $(".tadka #scr", VIEW); if(!sc){ FEEDCUR = null; return; }
+  const cards = $$(".tkc[data-pv]", sc), sr = sc.getBoundingClientRect(); let best = null, bv = 0;
+  cards.forEach(c=>{ const r = c.getBoundingClientRect(), v = Math.max(0, Math.min(r.bottom, sr.bottom) - Math.max(r.top, sr.top)) / (r.height||1); if(v > bv){ bv = v; best = c; } });
+  if(bv < .6 || document.hidden || OVER.classList.contains("on")) best = null;
+  cards.forEach(c=>{ if(c !== best) feedStop(c); });
+  if(best !== FEEDCUR){ FEEDCUR = best; FEEDSINCE = Date.now(); return; }
+  if(best && Date.now() - FEEDSINCE >= 1000) feedStart(best); }
+setInterval(feedAuto, 200);
 function tkAd(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
   return `<div class="tkc ad" data-anchor="${anchor}"><div class="tkh">${av(k)}<div><b>${esc(b.name)}</b><span>${b.label||"Sponsored"}</span></div>${dots(id)}</div><div class="tkf">${flick(id,k)}</div>
   <div class="tkb" data-spop="${id}"><span><em data-sv="${id}">${esc(vshort(k,0))}</em>${v.p?` · <b data-sp="${id}">${priceHTML(v.p)}</b>`:""}</span><button class="wbtn sm" onclick="ctaGo('${id}')">${esc(b.cta)}</button></div></div>`; }
 function tadkaScreen(){ const c = TADKA.map(tkCard);
   return `<div class="screen tadka">${stpad()}${header("tadka")}<div class="scr" id="scr">
   ${c[0]}${tkAd("tk1","grwm","tk1")}${c[1]}${c[2]}${c[3]}${tkAd("tk2","ugc","tk2")}${c[4]}${c[5]}${c[6]}
-  ${sec("Latest on Tadka", `<div class="row">${[["tr_reality","reality"],["tr_shehzada","ceo"],["tr_saanp","redsilk"]].map(([k,id])=>`<button class="po tall" onclick="go('#/reel/${id}')">${pic(k)}</button>`).join("")}${["bahu","ceo","redsilk"].map(id=>`<button class="po tall" onclick="go('#/reel/${id}')">${pic("o_"+id)}</button>`).join("")}</div>`)}
+  ${sec("Latest on Tadka", `<div class="row">${[["tr_reality","reality"],["tr_shehzada","ceo"],["tr_saanp","redsilk"]].map(([k,id])=>`<button class="po tall" onclick="go('#/reel/${id}')">${pic(k)}</button>`).join("")}${["delivery","ceo","redsilk"].map(id=>`<button class="po tall" onclick="go('#/reel/${id}')">${pic("o_"+id)}</button>`).join("")}</div>`)}
   </div>${nav("tadka")}</div>`; }
 
 /* ---- Tadka player: full-screen vertical episodes, with a full-screen ad between them ---- */
@@ -168,8 +183,8 @@ let RS = [], RCUR = -1, RLANG = "English", RMUTED = false, RLIKE = {};
 function reelScreen(id){ RS = reelSlides(); RCUR = -1;
   return `<div class="screen reel"><button class="rback" onclick="back()" aria-label="Back">${I.back}</button><div class="pager" id="pager">${RS.map((s,i)=> s.ad ? reelAd(s,i) : reelMd(s.md,i)).join("")}</div></div>`; }
 function reelMd(x, i){
-  if(x.frame) return `<section class="rs md fr" data-i="${i}" data-md="${x.id}" data-anchor="bc"><div class="rfr"></div><button class="rnext" onclick="reelGo(${i+1})" aria-label="Next">${I.down}</button></section>`;
-  return `<section class="rs md" data-i="${i}" data-md="${x.id}"><div class="rbg ${x.cut?"cutbg":""}">${pic(x.img)}</div><div class="rvid"></div><div class="rshade"></div>
+  if(x.frame) return `<section class="rs md fr" data-i="${i}" data-md="${x.id}" data-anchor="bc"><div class="rfr"></div></section>`;
+  return `<section class="rs md" data-i="${i}" data-md="${x.id}" onclick="reelTap(event)"><div class="rbg ${x.cut?"cutbg":""}">${pic(x.img)}</div><div class="rvid"></div><div class="rshade"></div>
   <div class="rrail"><button onclick="reelLike('${x.id}',this)" class="${RLIKE[x.id]?"on":""}">${I.heart}<span>${RLIKE[x.id]?"12.5K":"12.4K"}</span></button><button onclick="out('Sharing')">${I.share}<span>Share</span></button>${x.video?`<button data-rmute onclick="reelMute()">${RMUTED?I.mute:I.vol}<span>Sound</span></button>`:""}</div>
   <div class="rinfo"><button class="shopchip" data-anchor="rshop-${i}" onclick="openScene('neck','${esc(x.n)}')">${I.tag} Shop the look</button><h3>${esc(x.n)}</h3><p>Ep 1 · ${esc(x.meta)} · ${esc(x.tags)}</p>
   ${x.video?`<div class="langs">${LANGS.map(([id,l])=>`<button class="${id===RLANG?"on":""}" data-lang="${id}" onclick="reelLang('${id}')">${l}</button>`).join("")}</div>`:""}
@@ -186,7 +201,17 @@ function reelActivate(){ const p = $("#pager"); if(!p) return; const i = Math.ro
     if(!on){ killVideo(hold); return; }
     const x = TADKA.find(t=>t.id===sn.dataset.md); if(x && x.video) reelPlay(hold); });
   const id = RS[i].md ? RS[i].md.id : null; if(id) keepHash("#/reel/"+id);
+  const bare = !!(RS[i].md && RS[i].md.frame); $(".screen.reel", VIEW).classList.toggle("bare", bare); document.body.classList.toggle("nopill", bare);
+  reelQuiet(false);
   audit(); }
+// Full screen means the episode and nothing else: the app's own controls step back after three seconds and come back on a tap.
+let RQT = 0;
+function reelQuiet(q){ clearTimeout(RQT); const sn = $(".rs.md.on:not(.fr)", VIEW), scn = $(".screen.reel", VIEW); if(!scn) return;
+  $$(".rs.quiet", VIEW).forEach(e=>{ if(e !== sn || !q) e.classList.remove("quiet"); });
+  if(sn && q) sn.classList.add("quiet"); scn.classList.toggle("quiet", !!(sn && q)); if(sn) document.body.classList.toggle("nopill", !!q);
+  if(sn && !q) RQT = setTimeout(()=>{ if(!OVER.classList.contains("on")) reelQuiet(true); }, 3000); }
+function reelTap(e){ if(e.target.closest("button")) { reelQuiet(false); return; } const sn = e.currentTarget; reelQuiet(!sn.classList.contains("quiet")); }
+addEventListener("message", e=>{ const x = TADKA.find(t=>t.frame); if(!x || !e.data || e.data.type !== "flicks:close") return; let ok = false; try{ ok = e.origin === new URL(x.frame).origin; }catch(err){} if(ok && $(".rs.fr.on", VIEW)) back(); });
 // Blank Cheque runs in its own frame, which the app cannot mute from outside. So the frame exists only while its episode is the one on screen with nothing over it.
 function reelFrame(fr, on){ const x = TADKA.find(t=>t.frame); on = on && !document.hidden && !OVER.classList.contains("on");
   if(!on){ fr.innerHTML = ""; return; } if(fr.firstChild) return;
@@ -411,7 +436,7 @@ function render(anim=true){
   if(NAV.length > 1 && NAV[NAV.length-2] === h){ NAV.pop(); dir = "enter-back"; } else if(NAV[NAV.length-1] !== h) NAV.push(h);
   closeOver(true);
   // Leaving a screen removes its Flicks and its videos outright, so nothing can keep playing behind the next screen.
-  $$(".flick[data-slot]", VIEW).forEach(unmount); $$(".rvid", VIEW).forEach(killVideo); $$(".rfr", VIEW).forEach(f=>f.innerHTML = ""); plStop(); SLOTS = {}; CURH = h;
+  $$(".flick[data-slot]", VIEW).forEach(unmount); $$(".rvid", VIEW).forEach(killVideo); $$(".rfr", VIEW).forEach(f=>f.innerHTML = ""); $$(".tkc[data-pv]", VIEW).forEach(feedStop); FEEDCUR = null; clearTimeout(RQT); document.body.classList.remove("nopill"); plStop(); SLOTS = {}; CURH = h;
   const S = {home:()=>homeScreen("home"), tv:()=>homeScreen("tv"), movies:()=>homeScreen("movies"), sports:()=>homeScreen("sports"), tadka:tadkaScreen, reel:()=>reelScreen(r.a),
     search:()=>searchScreen(r.a), space:spaceScreen, t:()=>titleScreen(r.a), watch:()=>watchScreen(r.a), p:()=>productScreen(r.a, +r.b||0), bag:bagScreen};
   const name = S[r.name] ? r.name : "home";
@@ -445,7 +470,7 @@ function flash(sel){ setTimeout(()=>{ const el = typeof sel === "string" ? $(sel
 const GUIDE = [
   ["Ad breaks in the stream", [["Pre-roll: before the episode starts","#/watch/heartbeat","pre"],["Mid-roll: ad break inside the episode","#/watch/heartbeat","mid"],["Pause ad","#/watch/heartbeat","pause"],["Companion ad under the player","#/watch/heartbeat","comp"]]],
   ["Shop the look", [["In the player: shop the scene","#/watch/heartbeat","scene"],["Title page: shop the look","#/t/heartbeat","look"],["Home: Shop the Look rail","#/home","shop"]]],
-  ["Tadka micro-dramas", [["Sponsored video in the Tadka feed","#/tadka","tk1"],["Tadka feed: second sponsored video","#/tadka","tk2"],["Flick inside a micro-drama episode","#/reel/blankcheque","bc"],["Full-screen ad between episodes","#/reel/bahu","r1"],["Shop the look inside a micro-drama","#/reel/bahu","rshop"]]],
+  ["Tadka micro-dramas", [["Sponsored video in the Tadka feed","#/tadka","tk1"],["Tadka feed: second sponsored video","#/tadka","tk2"],["Flick inside a micro-drama episode","#/reel/blankcheque","bc"],["Full-screen ad between episodes","#/reel/delivery","r1"],["Shop the look inside a micro-drama","#/reel/delivery","rshop"]]],
   ["Swipeable banners", [["Home: masthead","#/home","mast"],["Home: For You carousel","#/home","fy"],["TV: masthead","#/tv","mast"],["TV: For You carousel","#/tv","fy"],["Movies: masthead","#/movies","mast"],["Movies: For You carousel","#/movies","fy"],["Sports: masthead","#/sports","mast"],["Sports: For You carousel","#/sports","fy"]]],
   ["Billboards between rails", [["Home: billboard","#/home","bill"],["Movies: billboard","#/movies","bill"],["Sports: billboard","#/sports","bill"]]],
   ["Search", [["Sponsored tile in Popular Searches","#/search","stile"],["Sponsored result at the top","#/search/cricket","sres"]]]

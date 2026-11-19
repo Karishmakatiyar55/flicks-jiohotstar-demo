@@ -154,11 +154,12 @@ const CLIPS = {
   l_t10a:["UAE Bulls vs Royal Desert Champions: Highlights","13m"], l_t10b:["Yas Lions vs Arabian Aces: Highlights","14m"],
   l_supersinger:["Star Vijay Super Singer","LIVE"], l_kalakkal:["Star Vijay Kalakkal Comedy","LIVE"]
 };
-// Tadka micro-dramas. video:true plays the real micro-drama file; the others show their cover.
+const MD_BASE = "https://microdrama-audio-diff.vercel.app/videos/", MD_PREVIEW = MD_BASE + "English.mp4";
+// Tadka micro-dramas. preview = the video a card plays by itself in the feed, silent. video:true plays the real micro-drama file; the others show their cover.
 const TADKA = [
   // Blank Cheque is Flam's own shoppable micro-drama preview: the episode plays and the Flick comes in inside it. It is shown as it is, untouched.
-  { id:"blankcheque", n:"Blank Cheque", meta:"Episode 3", tags:"Drama · Shoppable", frame:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/", poster:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/media/poster.jpg", badge:"Shop while you watch" },
-  { id:"bahu", n:"Bahu Ka Badla", meta:"60 Eps · 4 Languages", tags:"Family · Revenge", img:"o_bahu", video:true, badge:"New Episodes Daily" },
+  { id:"blankcheque", n:"Blank Cheque", meta:"Episode 3", tags:"Drama · Shoppable", frame:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/", poster:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/media/poster.jpg", preview:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/media/main.mp4", badge:"Shop while you watch" },
+  { id:"delivery", n:"The Last Delivery", meta:"24 Eps · 4 Languages", tags:"Thriller · Mystery", img:"o_delivery", video:true, preview:MD_PREVIEW, badge:"New Episodes Daily" },
   { id:"reality", n:"Reality Check", meta:"10 Eps · Hindi", tags:"Celebrities · Reality", img:"tk_reality", cut:true },
   { id:"rizz", n:"Rizz Master", meta:"375 Eps · Hindi", tags:"Looking for Love · Reality", img:"tk_rizz", cut:true },
   { id:"ceo", n:"My Secret CEO", meta:"80 Eps · 2 Languages", tags:"Rich vs Poor · Romance", img:"o_ceo", badge:"New Episodes Added" },
@@ -166,7 +167,6 @@ const TADKA = [
   { id:"redsilk", n:"Red Silk", meta:"42 Eps · Hindi", tags:"Fashion · Drama", img:"o_redsilk" },
   { id:"heartbeatmd", n:"Heart Beat", meta:"117 Eps · Tamil", tags:"Medical · Drama", img:"tk_heartbeat", cut:true }
 ];
-const MD_BASE = "https://microdrama-audio-diff.vercel.app/videos/";
 const LANGS = [["English","English"],["Kannada","ಕನ್ನಡ"],["Japanese","日本語"],["Spanish","Español"]];
 // search: words that bring up a sponsored result
 const SPON = [[/cricket|sport|ipl|match|dhoni|kohli|fitness/i,"nike"],[/roman|love|wedding|date|drama|shaadi/i,"neck"],[/comedy|fun|party|snack|laugh/i,"dor"],[/fashion|style|look|outfit|dress/i,"outfit"],[/beauty|makeup|lip/i,"lip"],[/music|song|sing|audio/i,"sony"]];

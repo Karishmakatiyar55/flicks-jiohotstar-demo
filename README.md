@@ -25,7 +25,8 @@ Fashion, beauty, audio and home Flicks can be bought inside the app (product pag
 - **The episode in the player is not video.** JioHotstar blocks screen recording of its player, so the stream is a set of stills from the title moved along a real timeline. Ad breaks, the pause ad and the scene chip are driven by that timeline.
 - Blank Cheque in Tadka is Flam's shoppable micro-drama preview (`flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/`), shown in a frame as it is.
 - Options are switched only inside a Flick. The names and prices under a Flick follow it and are not buttons.
-- The other real video is the Tadka micro-drama "Bahu Ka Badla", played from `microdrama-audio-diff.vercel.app` with four audio languages. Bahu Ka Badla, My Secret CEO and Red Silk are Flam's own posters, not JioHotstar titles.
+- The other real video is the Tadka micro-drama shown as "The Last Delivery" (a title made up for the demo), played from `microdrama-audio-diff.vercel.app` with four audio languages. Its cover was generated with Flowy to match the video. My Secret CEO and Red Silk are Flam's own posters, not JioHotstar titles.
+- In the Tadka feed, Blank Cheque and The Last Delivery play by themselves, silent, a second after they come on screen.
 - Rupee prices, the product names of the Get Ready With Me and Puffer Jacket Flicks (their brand is not known) and option names shown as "Look 1", "Shade 2" are illustrative.
 - The second sponsored video in the Tadka feed is a content Flick (the viewer picks who plays the lead); its button opens the micro-drama.
 - Payment, login, casting, downloads and advertiser sites say they are outside the demo.
