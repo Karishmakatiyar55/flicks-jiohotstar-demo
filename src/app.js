@@ -2,7 +2,7 @@
 const $ = (s,r=document) => r.querySelector(s), $$ = (s,r=document) => Array.from(r.querySelectorAll(s));
 const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const num = n => Number(n).toLocaleString("en-IN");
-const priceHTML = p => `₹${num(p)}`;
+const priceHTML = p => "";
 const sv = (d,w=20,sw=1.9) => `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 const fl = (d,w=18) => `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${d}</svg>`;
 const I = {
@@ -13,7 +13,7 @@ const I = {
   cast:sv('<path d="M3 8V6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-6"/><path d="M3 12a7 7 0 0 1 7 7M3 16a3 3 0 0 1 3 3"/>',20,1.7), bag:sv('<path d="M6 8h12l1 12H5zM9 8V6a3 3 0 0 1 6 0v2"/>',20),
   heart:sv('<path d="M12 20s-7-4.400-7-10a4 4 0 0 1 7-2.600A4 4 0 0 1 19 10c0 5.600-7 10-7 10z"/>',22), dl:sv('<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',20), smile:sv('<circle cx="12" cy="12" r="9"/><path d="M8.500 14a4 4 0 0 0 7 0M9 9.500h.01M15 9.500h.01"/>',20),
   play:fl('<path d="M8 5v14l11-7z"/>'), pause:fl('<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>'), vol:sv('<path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.500 9a4 4 0 0 1 0 6M19 6.500a8 8 0 0 1 0 11"/>',20), mute:sv('<path d="M4 10v4h4l5 4V6L8 10z"/><path d="M17 9.500l5 5M22 9.500l-5 5"/>',20),
-  rw:sv('<path d="M11 7L6 12l5 5M18 7l-5 5 5 5"/>',22), ff:sv('<path d="M13 7l5 5-5 5M6 7l5 5-5 5"/>',22), tag:sv('<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.500" cy="8.500" r="1.200"/>',15),
+  rw:sv('<path d="M11 7L6 12l5 5M18 7l-5 5 5 5"/>',22), ff:sv('<path d="M13 7l5 5-5 5M6 7l5 5-5 5"/>',22), lock:sv('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',11,2.2), reload:sv('<path d="M20 12a8 8 0 1 1-2.300-5.600M20 4v5h-5"/>',18), tag:sv('<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.500" cy="8.500" r="1.200"/>',15),
   star:`<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1.500l1.500 7.200 5.700-4.200-3.600 5.800 6.900 1.700-6.900 1.700 2.100 4.600-4.600-2.900L12 22.500l-1.100-7.100-4.600 2.900 2.100-4.600L1.500 12l6.900-1.700-3.600-5.800 5.700 4.200z"/></svg>`
 };
 const APP = $("#app"), VIEW = $("#view"), OVER = $("#over");
@@ -23,12 +23,8 @@ function toast(t){ const el=$("#toast"); el.textContent=t; el.classList.add("on"
 const out = what => toast(`${what} is outside this demo`);
 const pic = (k,alt="") => IMG[k] ? `<img src="${IMG[k][2]}" width="${IMG[k][0]}" height="${IMG[k][1]}" alt="${esc(alt)}" draggable="false" loading="lazy">` : "";
 
-/* ================= bag and watchlist ================= */
-const BAG = {}, WL = new Set();
-const bagCount = () => Object.values(BAG).reduce((a,b)=>a+b,0);
-const bagTotal = () => Object.keys(BAG).reduce((a,id)=>{ const [k,i] = id.split("|"); return a + BRANDS[k].variants[+i].p*BAG[id]; },0);
-function bagAdd(k, i, size, n=1){ const id = `${k}|${i}|${size||""}`; BAG[id] = Math.max(0,(BAG[id]||0)+n); if(!BAG[id]) delete BAG[id]; refreshBag(); return id; }
-function refreshBag(){ const n = bagCount(); $$("[data-bagn]").forEach(e=>{ e.textContent = n; e.hidden = !n; }); const bl = $("#baglist"); if(bl) bl.innerHTML = bagList(); }
+/* ================= watchlist ================= */
+const WL = new Set();
 function wlToggle(id, ev){ if(ev) ev.stopPropagation(); const on = !WL.has(id); on ? WL.add(id) : WL.delete(id);
   $$(`[data-wl="${id}"]`).forEach(e=>{ e.classList.toggle("on", on); const ic = e.querySelector("i"); if(ic) ic.innerHTML = on ? I.check : I.plus; });
   toast(on ? `Added to Watchlist: ${TT[id].n}` : "Removed from Watchlist"); }
@@ -36,14 +32,24 @@ function wlToggle(id, ev){ if(ev) ev.stopPropagation(); const on = !WL.has(id); 
 /*ENGINE*/
 
 /* ================= what the app's button for a Flick does ================= */
-function ctaGo(id){ const s = SLOTS[id]; if(!s) return; const b = BRANDS[s.brand];
-  if(b.kind === "shop") go(`#/p/${s.brand}/${s.v}`); else if(b.kind === "watch") go("#/reel/delivery"); else leaveSheet(s.brand, s.v); }
+function ctaGo(id, url){ const s = SLOTS[id]; if(!s) return; const b = BRANDS[s.brand];
+  if(b.kind === "watch") return go("#/reel/delivery"); if(b.kind !== "site") return;
+  if(url !== undefined){ clearTimeout(s.urlT); s.asked = 0; return openSite(s.brand, url || b.home); }      // the Flick answered with its own link
+  // Ask the Flick for its own link by pressing its own (hidden) button for the option on screen; it answers through the same message a tap on it would send.
+  s.asked = Date.now(); const pressed = pressOwn(id); clearTimeout(s.urlT);
+  s.urlT = setTimeout(()=>{ if(s.asked){ s.asked = 0; openSite(s.brand, b.home); } }, pressed ? 800 : 0); }
+function pressOwn(id){ try{ const f = $(`.flick[data-slot="${id}"] iframe`, APP), w = f.contentWindow, d = f.contentDocument;
+    const find = root => { for(const e of root.querySelectorAll("*")){ if(e.tagName === "VERTEX-PLAYER" && e.shadowRoot) return e; if(e.shadowRoot){ const x = find(e.shadowRoot); if(x) return x; } } return null; };
+    const vp = find(d); if(!vp) return false; const r = vp.shadowRoot;
+    const ts = Array.from(r.querySelectorAll("[data-vertex-trigger]")).filter(e=>!e.matches(".vx-swatch,[data-vertex-diff]") && !e.closest(".vx-picker"));
+    const t = ts.find(e=>w.getComputedStyle(e).display !== "none") || ts[0]; if(!t) return false; t.click(); return true; }catch(e){ return false; } }
 // A Flick with two options shows two dots: the dots are matched to the Flick once its slot is known.
 function fixDots(){ $$("[data-sd]", APP).forEach(d=>{ const s = SLOTS[d.dataset.sd]; if(!s) return; const n = BRANDS[s.brand].variants.length; if(d.children.length === n) return;
   d.innerHTML = Array.from({length:n},(_,i)=>`<i class="${i===s.v?"on":""}"></i>`).join(""); }); }
 
 /* ================= building blocks ================= */
 const stpad = () => `<div class="stpad"></div>`;
+const ctaBtn = (id,k,cls) => { const b = BRANDS[k]; return b.kind === "none" ? "" : `<button class="${cls}" onclick="ctaGo('${id}')">${esc(b.cta)}</button>`; };
 // A cut from the real app shown as it is, with tap areas over its buttons. zones: [left%, top%, width%, height%, handler, label]
 const slice = (k, zones, anchor, cls="") => `<div class="slice ${cls}" ${anchor?`data-anchor="${anchor}"`:""} style="aspect-ratio:${IMG[k][0]}/${IMG[k][1]}"><img src="${IMG[k][2]}" alt="" draggable="false">${(zones||[]).map(z=>`<button class="hs" style="left:${z[0]}%;top:${z[1]}%;width:${z[2]}%;height:${z[3]}%" onclick="${z[4]}" aria-label="${esc(z[5]||"Open")}"></button>`).join("")}</div>`;
 const header = on => `<div class="top">${slice(on==="tadka"?"hd_tadka":"hd_home",[[3,8,46,84,"go('#/home')","JioHotstar"],[51,8,46,84,"go('#/tadka')","Tadka"]])}</div>`;
@@ -66,7 +72,7 @@ const hdots = (id, n) => `<div class="hdots" data-hd="${id}">${Array.from({lengt
 
 // Masthead: the swipeable banner at the top of a tab. A Flick card or one of the app's own banners.
 function mastFlick(id, k, anchor){ const b = BRANDS[k];
-  return `<div class="mcard" data-anchor="${anchor}">${flick(id,k)}<div class="mstrip" data-spop="${id}">${av(k)}<div class="mt"><b>${esc(b.head)}</b><span>Sponsored · ${esc(b.name)} · <em data-sv="${id}">${esc(vshort(k,0))}</em></span></div><button class="mbtn" onclick="ctaGo('${id}')">${esc(b.cta)}</button></div></div>`; }
+  return `<div class="mcard" data-anchor="${anchor}">${flick(id,k)}<div class="mstrip" data-spop="${id}">${av(k)}<div class="mt"><b>${esc(b.head)}</b><span>Sponsored · ${esc(b.name)} · <em data-sv="${id}">${esc(vshort(k,0))}</em></span></div>${ctaBtn(id,k,"mbtn")}</div></div>`; }
 const mastCut = (k, fn, label) => `<div class="mcard cut">${slice(k,[[0,0,100,82,fn,label],[66,84,32,14,fn,label]])}</div>`;
 const mast = (id, cards) => `<div class="hero mast" data-hero="${id}">${cards.join("")}</div>${hdots(id, cards.length)}`;
 // For You: the tall swipeable cards. A cut of the app's card with its buttons live, or a Flick card of the same size.
@@ -74,18 +80,18 @@ const fyCut = (k, id, label) => `<div class="fcard">${slice(k,[[0,0,100,84,`go('
 const fyClip = (k, clip) => `<div class="fcard">${slice(k,[[0,0,100,84,`go('#/watch/${clip}')`,"Watch"],[3,86,94,12,`go('#/watch/${clip}')`,"Watch Now"]])}</div>`;
 function fyFlick(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
   return `<div class="fcard ad" data-anchor="${anchor}">${flick(id,k)}<div class="fb" data-spop="${id}"><div class="fl1"><span class="spill">Sponsored</span>${av(k)}<b>${esc(b.name)}</b>${dots(id)}</div>
-  <div class="fl2"><span><em data-sv="${id}">${esc(vshort(k,0))}</em>${v.p?` · <b data-sp="${id}">${priceHTML(v.p)}</b>`:""}</span></div>
-  <button class="wbtn" onclick="ctaGo('${id}')">${esc(b.cta)}</button></div></div>`; }
+  <div class="fl2"><span><em data-sv="${id}">${esc(vshort(k,0))}</em></span></div>
+  ${ctaBtn(id,k,"wbtn")}</div></div>`; }
 const fy = (id, cards) => `<div class="fyh"><h2>For You</h2><button onclick="out('Casting')" aria-label="Cast">${I.cast}</button></div><div class="hero fy" data-hero="${id}">${cards.join("")}</div>`;
 // Billboard: a full-width banner between two rails.
 function bill(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
-  return `<div class="bill" data-anchor="${anchor}">${flick(id,k)}<div class="mstrip" data-spop="${id}">${av(k)}<div class="mt"><b>${esc(b.head)}</b><span>Sponsored · ${esc(b.name)} · <em data-sv="${id}">${esc(vshort(k,0))}</em>${v.p?` · <em data-sp="${id}">${priceHTML(v.p)}</em>`:""}</span></div><button class="mbtn" onclick="ctaGo('${id}')">${esc(b.cta)}</button></div></div>`; }
+  return `<div class="bill" data-anchor="${anchor}">${flick(id,k)}<div class="mstrip" data-spop="${id}">${av(k)}<div class="mt"><b>${esc(b.head)}</b><span>Sponsored · ${esc(b.name)} · <em data-sv="${id}">${esc(vshort(k,0))}</em></span></div>${ctaBtn(id,k,"mbtn")}</div></div>`; }
 const banner = (k, fn) => `<button class="ban" onclick="${fn}">${pic(k)}</button>`;
 // Shop the Look: a rail of vertical videos, each one a look that can be bought.
 function lookCard(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
-  return `<div class="lcard" ${anchor?`data-anchor="${anchor}"`:""}>${flick(id,k)}<div class="lb" data-spop="${id}"><div class="l1">${av(k)}<b>${esc(b.name)}</b>${dots(id)}</div><div class="l2"><em data-sv="${id}">${esc(vshort(k,0))}</em>${v.p?`<b data-sp="${id}">${priceHTML(v.p)}</b>`:""}</div><button class="wbtn sm" onclick="ctaGo('${id}')">${esc(b.cta)}</button></div></div>`; }
+  return `<div class="lcard" ${anchor?`data-anchor="${anchor}"`:""}>${flick(id,k)}<div class="lb" data-spop="${id}"><div class="l1">${av(k)}<b>${esc(b.name)}</b>${dots(id)}</div><div class="l2"><em data-sv="${id}">${esc(vshort(k,0))}</em></div>${ctaBtn(id,k,"wbtn sm")}</div></div>`; }
 // The options of a Flick as name and price under it. They only show which one the Flick is on: the option is changed inside the Flick, never from here.
-const mini = (id,k,i) => { const v = BRANDS[k].variants[i]; return `<div class="mini ${i?"":"on"}" data-sync="${id}" data-i="${i}"><span>${esc(vshort(k,i))}</span>${v.p?`<b>${priceHTML(v.p)}</b>`:""}</div>`; };
+const mini = (id,k,i) => { const v = BRANDS[k].variants[i]; return `<div class="mini ${i?"":"on"}" data-sync="${id}" data-i="${i}"><span>${esc(vshort(k,i))}</span></div>`; };
 const minis = (id,k) => `<div class="minis">${BRANDS[k].variants.map((_,i)=>mini(id,k,i)).join("")}</div>`;
 
 /* ================= screens ================= */
@@ -95,7 +101,7 @@ const HOME = {
     ${fy("f-home",[fyCut("h_biggboss","biggboss"), fyFlick("fy","lip","fy"), fyClip("h_bumrah","l_wtc"), fyCut("h_moana","moana","Subscribe to Watch"), fyFlick("fy2","nike","fy2"), fyCut("h_queen","queen"), fyCut("h_apsara","apsara")])}
     ${rail("New on JioHotstar",["office","chiranjeevi","dilwaniya","hanuman","imgame","roslin"])}
     ${slice("k_free",[[3,49,31,47,"go('#/t/biggboss')","Bigg Boss"],[35,49,31,47,"go('#/t/yehrishta')","Yeh Rishta Kya Kehlata Hai"],[67,49,31,47,"go('#/t/anupamaa')","Anupamaa"]])}
-    ${sec("Shop the Look", `<div class="row looks">${lookCard("shop","neck","shop")}${lookCard("shop2","gucci")}${lookCard("shop3","zara")}${lookCard("shop4","jacket")}</div>`, "Sponsored · Styles from the shows you watch")}
+    ${sec("Shop the Look", `<div class="row looks">${lookCard("shop","neck","shop")}${lookCard("shop2","gucci")}${lookCard("shop3","zara")}</div>`, "Sponsored · Styles from the shows you watch")}
     ${banner("b_biggboss","go('#/t/biggboss')")}
     ${top10("Top 10 in India Today",["biggboss","dhamaal","roadies","anupamaa","yehrishta","laughterchefs"],["All","Hindi","English","Tamil","Telugu","Malayalam"])}
     ${bill("bill","can","bill")}
@@ -119,7 +125,7 @@ const HOME = {
     ${rail("House of Dramas",["heartbeat","roslin","sangamarmar","draarohi","fitoor"])}
     ${rail("The House of Bigg Boss!",["biggboss","bbkannada","bbtamil","bbtelugu"])}`,
   movies: () => `
-    ${mast("m-mov",[mastFlick("mast","sony","mast"), mastCut("m_mahabharat","out('The teaser')","Teaser")])}
+    ${mast("m-mov",[mastFlick("mast","can","mast"), mastCut("m_mahabharat","out('The teaser')","Teaser")])}
     ${fy("f-mov",[fyCut("h_bethlehem","bethlehem"), fyFlick("fy","dor","fy"), fyCut("h_obsession","obsession","Subscribe to Watch"), fyCut("h_moana","moana","Subscribe to Watch")])}
     ${banner("b_karan","go('#/t/koffee')")}
     ${rail("Hahaha Loading...",["wolf","dhadkan","beautifuldisaster","welcomejungle"])}
@@ -171,7 +177,7 @@ function feedAuto(){ const sc = $(".tadka #scr", VIEW); if(!sc){ FEEDCUR = null;
 setInterval(feedAuto, 200);
 function tkAd(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
   return `<div class="tkc ad" data-anchor="${anchor}"><div class="tkh">${av(k)}<div><b>${esc(b.name)}</b><span>${b.label||"Sponsored"}</span></div>${dots(id)}</div><div class="tkf">${flick(id,k)}</div>
-  <div class="tkb" data-spop="${id}"><span><em data-sv="${id}">${esc(vshort(k,0))}</em>${v.p?` · <b data-sp="${id}">${priceHTML(v.p)}</b>`:""}</span><button class="wbtn sm" onclick="ctaGo('${id}')">${esc(b.cta)}</button></div></div>`; }
+  <div class="tkb" data-spop="${id}"><span><em data-sv="${id}">${esc(vshort(k,0))}</em></span>${ctaBtn(id,k,"wbtn sm")}</div></div>`; }
 function tadkaScreen(){ const c = TADKA.map(tkCard); bcFetch();
   return `<div class="screen tadka">${stpad()}${header("tadka")}<div class="scr" id="scr">
   ${c[0]}${tkAd("tk1","grwm","tk1")}${c[1]}${c[2]}${c[3]}${tkAd("tk2","ugc","tk2")}${c[4]}${c[5]}${c[6]}
@@ -179,7 +185,7 @@ function tadkaScreen(){ const c = TADKA.map(tkCard); bcFetch();
   </div>${nav("tadka")}</div>`; }
 
 /* ---- Tadka player: full-screen vertical episodes, with a full-screen ad between them ---- */
-const REEL_ADS = ["gucci","neck","jacket"];
+const REEL_ADS = ["gucci","neck","zara"];
 function reelSlides(){ const s = []; let n = 0; TADKA.forEach(x=>{ s.push({md:x}); if(!x.frame && n < REEL_ADS.length){ s.push({ad:REEL_ADS[n], anchor:"r"+(n+1)}); n++; } }); return s; }
 let RS = [], RCUR = -1, RLANG = "English", RMUTED = false, RLIKE = {};
 function reelScreen(id){ RS = reelSlides(); RCUR = -1; bcFetch();
@@ -193,7 +199,7 @@ function reelMd(x, i){
   <div class="rprog"><i></i></div></div></section>`; }
 function reelAd(s, i){ const k = s.ad, b = BRANDS[k], id = "reel-"+k, v = b.variants[0];
   return `<section class="rs ad" data-i="${i}" data-anchor="${s.anchor}"><div class="rah">${av(k)}<div><b>${esc(b.name)}</b><span>Sponsored</span></div>${dots(id)}</div><div class="rfl">${flick(id,k)}</div>
-  <div class="raf" data-spop="${id}"><span class="rv"><em data-sv="${id}">${esc(vshort(k,0))}</em>${v.p?` · <b data-sp="${id}">${priceHTML(v.p)}</b>`:""}</span><div class="rbt"><button class="wbtn" onclick="ctaGo('${id}')">${esc(b.cta)}</button><button class="wbtn ghost" onclick="reelGo(${i+1})">Next episode ${I.down}</button></div></div></section>`; }
+  <div class="raf" data-spop="${id}"><span class="rv"><em data-sv="${id}">${esc(vshort(k,0))}</em></span><div class="rbt">${ctaBtn(id,k,"wbtn")}<button class="wbtn ghost" onclick="reelGo(${i+1})">Next episode ${I.down}</button></div></div></section>`; }
 function reelFit(){ $$(".rs.ad", VIEW).forEach(s=>{ const box = s.querySelector(".rfl"), f = box.querySelector(".flick"); const w = Math.floor(Math.min(box.clientWidth, box.clientHeight*9/16)); f.style.width = w+"px"; fitFlick(f); }); }
 function reelGo(i){ const p = $("#pager"); if(!p) return; i = Math.max(0, Math.min(RS.length-1, i)); p.scrollTo({top:i*p.clientHeight, behavior:"smooth"}); }
 function reelActivate(){ const p = $("#pager"); if(!p) return; const i = Math.round(p.scrollTop / (p.clientHeight||1)); if(i === RCUR) return; RCUR = i;
@@ -283,7 +289,7 @@ const SGRID = {
 };
 let SCHIP = "India";
 function sgrid(){ return SGRID[SCHIP].map(x=>{
-  if(x === "AD"){ const k = "levis", b = BRANDS[k], id = "stile"; return `<div class="sad" data-anchor="stile">${flick(id,k)}<div class="sab" data-spop="${id}"><div><b>${esc(b.name)}</b><span>Sponsored · <em data-sv="${id}">${esc(vshort(k,0))}</em> · <em data-sp="${id}">${priceHTML(b.variants[0].p)}</em></span></div><button class="mbtn" onclick="ctaGo('${id}')">${esc(b.cta)}</button></div></div>`; }
+  if(x === "AD"){ const k = "levis", b = BRANDS[k], id = "stile"; return `<div class="sad" data-anchor="stile">${flick(id,k)}<div class="sab" data-spop="${id}"><div><b>${esc(b.name)}</b><span>Sponsored · <em data-sv="${id}">${esc(vshort(k,0))}</em></span></div>${ctaBtn(id,k,"mbtn")}</div></div>`; }
   return x.startsWith("L:") ? poster(x.slice(2),"big") : poster(x); }).join(""); }
 function setChip(c){ SCHIP = c; render(false); }
 function searchScreen(q){
@@ -304,7 +310,6 @@ function doSearch(){ const v = $("#q").value.trim(); go(v ? `#/search/${encodeUR
 /* ---- My Space ---- */
 function spaceScreen(){ const wl = Array.from(WL);
   return `<div class="screen">${stpad()}<div class="scr" id="scr">${slice("sp_login",[[30,62,40,10,"out('Log in')","Log In"],[66,0,34,8,"out('Help and settings')","Help & Settings"]])}
-  <button class="srow big" onclick="go('#/bag')"><span class="ic">${I.bag}</span><span><b>Your Bag</b><em>${bagCount()?`${bagCount()} item${bagCount()>1?"s":""} · ${priceHTML(bagTotal())}`:"Things you add while you watch"}</em></span>${I.right}</button>
   ${wl.length ? rail("Watchlist", wl) : `<section class="sec"><h2>Watchlist</h2><div class="sub">Titles you add with + show up here.</div></section>`}
   </div>${nav("space")}</div>`; }
 
@@ -410,34 +415,23 @@ function openScene(k, from){ const b = BRANDS[k];
   reelHold(true);
   openOver(`<div class="scrim" onclick="closeOver()"></div><div class="sheet"><div class="grab"></div><button class="shx" onclick="closeOver()" aria-label="Close">${I.x}</button>
   <div class="shh">${av(k)}<div><b>${esc(b.head)}</b><span>Sponsored · ${esc(b.name)}${from?` · seen in ${esc(from)}`:""}</span></div></div>
-  <div class="shb"><div class="shf">${flick("scene",k)}</div><div class="shr">${minis("scene",k)}<div class="shp" data-spop="scene"><em data-sn="scene">${esc(vname(k,0))}</em><b data-sp="scene">${priceHTML(b.variants[0].p)}</b></div><button class="wbtn" onclick="sceneAdd()">Add to Bag</button><button class="wbtn ghost" onclick="ctaGo('scene')">View Product</button></div></div></div>`); }
-function sceneAdd(){ const s = SLOTS.scene; if(!s) return; const b = BRANDS[s.brand]; bagAdd(s.brand, s.v, b.sizes ? b.sizes[Math.floor(b.sizes.length/2)] : ""); toast(`Added to Bag: ${vname(s.brand, s.v)}`); }
-function leaveSheet(k, i){ const b = BRANDS[k];
+  <div class="shb"><div class="shf">${flick("scene",k)}</div><div class="shr">${minis("scene",k)}<div class="shp" data-spop="scene"><em data-sn="scene">${esc(vname(k,0))}</em></div><button class="wbtn" onclick="ctaGo('scene')">${esc(b.cta)}</button></div></div></div>`); }
+/* ---- in-app browser: the brand's own page opens inside the app, as it does in other apps ---- */
+function openSite(k, url){ const b = BRANDS[k]; let u; try{ u = new URL(url); }catch(e){ u = new URL(b.home); }
+  const host = u.host.replace(/^www\./,""), key = u.host + u.pathname, cap = CAPS[key], live = FRAME_OK.test(u.hostname);
+  const path = (u.pathname === "/" ? "" : u.pathname).replace(/\/$/,"");
+  const body = live ? `<iframe class="iabf" title="${esc(b.name)}" src="${esc(u.href)}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" referrerpolicy="no-referrer"></iframe>`
+    : cap ? `<div class="iabcap">${pic(cap, b.name)}</div>`
+    : `<div class="iabh">${av(k)}<b>${esc(b.name)}</b><span>${esc(host + path)}</span><a class="wbtn" href="${esc(u.href)}" target="_blank" rel="noopener noreferrer">Open ${esc(host)}</a></div>`;
   reelHold(true);
-  openOver(`<div class="scrim" onclick="closeOver()"></div><div class="sheet leave"><div class="grab"></div><div class="lvh">${av(k)}<b>${esc(b.name)}</b></div><h3>You're leaving JioHotstar</h3><p>${esc(b.cta)} opens ${esc(b.site)} for <b>${esc(vname(k,i))}</b>. Your episode stays where you left it.</p>
-  <button class="wbtn" onclick="closeOver();toast('${esc(b.site)} opens outside this demo')">Continue to ${esc(b.site)}</button><button class="wbtn ghost" onclick="closeOver()">Stay</button></div>`); }
-
-/* ---- product page and bag ---- */
-let PSIZE = "";
-function productScreen(k, i){ const b = BRANDS[k]; if(!b || b.kind !== "shop") return homeScreen("home"); i = Math.max(0, Math.min(2, i|0)); const v = b.variants[i];
-  if(b.sizes && !b.sizes.includes(PSIZE)) PSIZE = b.sizes[Math.floor(b.sizes.length/2)]; if(!b.sizes) PSIZE = "";
-  return `<div class="screen prod">${stpad()}<div class="top hbar"><button onclick="back()" aria-label="Back">${I.back}</button><b>${esc(b.name)}</b><button class="bagb" onclick="go('#/bag')" aria-label="Bag">${I.bag}<i data-bagn hidden>0</i></button></div>
-  <div class="scr" id="scr"><div class="pmedia ${b.tall?"tall":""}" data-anchor="pdp">${flick("pdp",k,{v:i, on:(n,ch)=>{ if(ch) keepHash(`#/p/${k}/${n}`); }})}</div>
-  <div class="pbody" data-spop="pdp"><span class="pcat">${esc(b.cat)} · ${esc(b.name)}</span><h1 data-sn="pdp">${esc(vname(k,i))}</h1><div class="pprice"><b data-sp="pdp">${priceHTML(v.p)}</b><span>Inclusive of all taxes</span></div>
-  <h4>${esc(b.unit)}</h4><div class="opts ro">${b.variants.map((_,j)=>`<span class="${j===i?"on":""}" data-sync="pdp" data-i="${j}">${esc(vshort(k,j))}</span>`).join("")}</div>
-  ${b.sizes?`<h4>Size</h4><div class="opts sz">${b.sizes.map(z=>`<button class="${z===PSIZE?"on":""}" onclick="PSIZE='${z}';chipOn2(this)">${z}</button>`).join("")}</div>`:""}
-  <p class="tdesc">${esc(b.desc)}</p><div class="seen">${I.star}<span>Seen while watching on JioHotstar. Free delivery, easy returns.</span></div></div></div>
-  <div class="buybar"><button class="wbtn ghost" onclick="pdpAdd('${k}')">Add to Bag</button><button class="wbtn" onclick="pdpAdd('${k}',1)">Buy Now</button></div></div>`; }
-function pdpAdd(k, buy){ const s = SLOTS.pdp, i = s ? s.v : 0; bagAdd(k, i, PSIZE); if(buy) go("#/bag"); else toast(`Added to Bag: ${vname(k,i)}`); }
-function bagList(){ const ids = Object.keys(BAG); if(!ids.length) return `<div class="empty"><i>${I.bag}</i><b>Your bag is empty</b><span>Add a look from a Flick while you watch.</span><button class="wbtn" onclick="go('#/home')">Back to JioHotstar</button></div>`;
-  return ids.map(id=>{ const [k,i,z] = id.split("|"), b = BRANDS[k], v = b.variants[+i];
-    return `<div class="bline">${av(k)}<div class="bi"><b>${esc(vname(k,+i))}</b><span>${esc(b.name)}${z?` · Size ${z}`:""}</span><em>${priceHTML(v.p)}</em></div><div class="step"><button onclick="bagAdd('${k}',${i},'${z}',-1)" aria-label="Remove one">${I.minus}</button><span>${BAG[id]}</span><button onclick="bagAdd('${k}',${i},'${z}',1)" aria-label="Add one">${I.plus}</button></div></div>`; }).join("")
-    + `<div class="btot"><span>Total (${bagCount()} item${bagCount()>1?"s":""})</span><b>${priceHTML(bagTotal())}</b></div><button class="wbtn" onclick="out('Payment')">Place Order</button>`; }
-const bagScreen = () => `<div class="screen prod">${stpad()}<div class="top hbar"><button onclick="back()" aria-label="Back">${I.back}</button><b>Your Bag</b><span></span></div><div class="scr" id="scr"><div id="baglist">${bagList()}</div></div></div>`;
+  openOver(`<div class="iab" data-url="${esc(u.href)}"><div class="iabt"><button onclick="closeOver()" aria-label="Close">${I.x}</button><div class="iabu"><b>${I.lock}${esc(host)}</b><span>${esc(b.name)}</span></div><button onclick="iabReload()" aria-label="Reload">${I.reload}</button><button onclick="out('Sharing')" aria-label="Share">${I.share}</button></div><div class="iabp"><i></i></div><div class="iabc shb">${body}</div></div>`); }
+function iabReload(){ const f = $(".iabf", OVER), p = $(".iabp i", OVER); if(p){ p.style.animation = "none"; void p.offsetWidth; p.style.animation = ""; } if(f) f.src = f.src; }
 
 /* ================= overlays ================= */
 let OVSTATE = false;
-function openOver(html){ OVER.innerHTML = html; OVER.classList.add("on"); document.body.classList.add("ovon"); try{ history.pushState({ov:1}, ""); OVSTATE = true; }catch(e){} sizeOver(); audit(); }
+function openOver(html){ const was = OVER.classList.contains("on");   // a sheet handing over to the browser: one layer, one Back step
+  $$(".flick[data-slot]", OVER).forEach(h=>{ unmount(h); delete SLOTS[h.dataset.slot]; });
+  OVER.innerHTML = html; OVER.classList.add("on"); document.body.classList.add("ovon"); if(!was) try{ history.pushState({ov:1}, ""); OVSTATE = true; }catch(e){} sizeOver(); audit(); }
 function closeOver(silent){ if(!OVER.classList.contains("on")) return; $$(".flick[data-slot]", OVER).forEach(h=>{ unmount(h); delete SLOTS[h.dataset.slot]; });
   OVER.classList.remove("on"); OVER.innerHTML = ""; document.body.classList.remove("ovon"); if(OVSTATE && !silent){ OVSTATE = false; try{ history.back(); }catch(e){} } OVSTATE = false; reelHold(false); audit(); }
 addEventListener("popstate", ()=>{ if(OVER.classList.contains("on")){ OVSTATE = false; closeOver(true); } });
@@ -464,7 +458,7 @@ function render(anim=true){
   // Leaving a screen removes its Flicks and its videos outright, so nothing can keep playing behind the next screen.
   $$(".flick[data-slot]", VIEW).forEach(unmount); $$(".rvid", VIEW).forEach(killVideo); $$(".rfr", VIEW).forEach(f=>f.innerHTML = ""); $$(".tkc[data-pv]", VIEW).forEach(feedStop); FEEDCUR = null; clearTimeout(RQT); document.body.classList.remove("nopill"); plStop(); SLOTS = {}; CURH = h;
   const S = {home:()=>homeScreen("home"), tv:()=>homeScreen("tv"), movies:()=>homeScreen("movies"), sports:()=>homeScreen("sports"), tadka:tadkaScreen, reel:()=>reelScreen(r.a),
-    search:()=>searchScreen(r.a), space:spaceScreen, t:()=>titleScreen(r.a), watch:()=>watchScreen(r.a), p:()=>productScreen(r.a, +r.b||0), bag:bagScreen};
+    search:()=>searchScreen(r.a), space:spaceScreen, t:()=>titleScreen(r.a), watch:()=>watchScreen(r.a)};
   const name = S[r.name] ? r.name : "home";
   VIEW.innerHTML = S[name]();
   const scrn = $(".screen", VIEW), sc = $("#scr", VIEW);
@@ -474,7 +468,7 @@ function render(anim=true){
   lastHash = h;
   Object.values(SLOTS).forEach(s=>{ if(s.v) applyVariant(s.id, s.v); });
   fixDots();
-  refreshBag(); $$(".hero[data-hero]", VIEW).forEach(bindHero);
+  $$(".hero[data-hero]", VIEW).forEach(bindHero);
   if(dir === "enter-back" && SCROLL[h] && sc) sc.scrollTop = SCROLL[h];
   const anc = pendingAnchor; pendingAnchor = null;
   if(name === "watch") plInit(r.a, anc);

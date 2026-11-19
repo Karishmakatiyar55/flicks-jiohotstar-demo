@@ -118,7 +118,7 @@ window.addEventListener("message", e=>{
   else if(m.type==="switch"){ if(m.initial && s.want) return; applyVariant(m.slot, m.diff); }
   else if(m.type==="cta" || m.type==="tap"){ const now = Date.now(); if(now - s.lastCta < 900) return; s.lastCta = now;
     if(m.type==="tap"){ if(s.tap) ctaGo(m.slot); return; }
-    ctaGo(m.slot); }
+    ctaGo(m.slot, m.url || ""); }
 });
 
 /* ---- mount and sound control ----

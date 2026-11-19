@@ -16,7 +16,11 @@ A working replica of the JioHotstar app with Flicks (Flam's interactive video ad
 | Billboards between rails | Home, Movies, Sports |
 | Search | A sponsored tile in Popular Searches, a sponsored result at the top (try "cricket", "romance", "comedy") |
 
-Fashion, beauty, audio and home Flicks can be bought inside the app (product page, bag). Food, drinks, luxury and cars hand over to the advertiser through a "You're leaving JioHotstar" sheet.
+Nothing is sold inside JioHotstar. The app's button under a Flick opens the brand's own page in an in-app browser, at the address built into that Flick for the option on screen.
+
+- nike.in and gucci.com allow being shown inside another page, so they load live.
+- zara.com and doritos.com show a phone-width capture of the real page (the first option's page for Zara).
+- The other brand sites refuse to be shown inside another web page (a real app's browser has no such limit). For those the in-app browser shows the brand, the real address and an "Open" link to it.
 
 ## What is real and what is not
 
@@ -27,9 +31,9 @@ Fashion, beauty, audio and home Flicks can be bought inside the app (product pag
 - Options are switched only inside a Flick. The names and prices under a Flick follow it and are not buttons.
 - The other real video is the Tadka micro-drama shown as "The Last Delivery" (a title made up for the demo), played from `microdrama-audio-diff.vercel.app` with four audio languages. Its cover was generated with Flowy to match the video. My Secret CEO and Red Silk are Flam's own posters, not JioHotstar titles.
 - In the Tadka feed, Blank Cheque and The Last Delivery play by themselves, silent, a second after they come on screen.
-- Rupee prices, the product names of the Get Ready With Me and Puffer Jacket Flicks (their brand is not known) and option names shown as "Look 1", "Shade 2" are illustrative.
+- Option names shown as "Look 1", "Shade 2" are placeholders where the real names are not known. The Get Ready With Me Flick carries no link, so it has no button.
 - The second sponsored video in the Tadka feed is a content Flick (the viewer picks who plays the lead); its button opens the micro-drama.
-- Payment, login, casting, downloads and advertiser sites say they are outside the demo.
+- Login, casting, downloads and sharing say they are outside the demo.
 
 ## Sound
 

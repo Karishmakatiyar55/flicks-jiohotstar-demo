@@ -4,78 +4,59 @@
    (embed.js + <flam-embed id>) run as the same Flick's own ad tag,
    https://flicks.flamapp.live/<id>/ad.js, so the app can hide the Flick's
    button, follow its options and control its sound.
-   kind:  shop  = the app sells it (product page, bag)
-          visit = the app hands over to the advertiser (leave sheet)
+
+   JioHotstar is a streaming app: it does not sell anything itself. The app's
+   button under a Flick opens the brand's own page in the in-app browser, and
+   the address is the one built into the Flick (its own Shop now link, for the
+   option on screen). `home` is only used if a Flick hands back no address.
+   kind:  site  = the Flick carries a link to the brand's site
+          none  = the Flick carries no link, so the app shows no button
           watch = the app's own content: the button opens the micro-drama
-   named:false = option names are not known here, so the UI shows the unit
-   and a number ("Shade 2") instead of a name.
-   Rupee prices are illustrative.
+   Option names that are not known show as the unit and a number ("Shade 2").
    ===================================================================== */
 const T1 = "https://native-ads-dev.appless.workers.dev/", T2 = "https://flicks.flamapp.live/", T3 = "https://native-ads.appless.workers.dev/";
 const BRANDS = {
-  neck:{ name:"DY", av:"DY", avc:"#8a6a2f", src:T2+"ikutv6/ad.js", tall:true, kind:"shop", cta:"Shop Now", unit:"Style",
-    head:"The necklace from tonight's scene", prod:"Layered Pendant Necklace", cat:"Jewellery", sizes:null,
-    desc:"Three ways to wear the necklace from the scene. Switch the style inside the video, then add the one you like.",
-    variants:[{p:2499},{p:2999},{p:3499}] },
-  outfit:{ name:"Levi's", av:"L", avc:"#c41230", src:T2+"dox37k/ad.js", kind:"shop", cta:"Shop Now", unit:"Look",
-    head:"Wear what she wore", prod:"Levi's Denim Dungarees", cat:"Women's fashion", sizes:["XS","S","M","L","XL"],
-    desc:"The dungarees from the show, in three looks. Switch the look inside the video to see it on.",
-    variants:[{p:4299},{p:4299},{p:4599}] },
-  gucci:{ name:"Gucci", av:"G", avc:"#1c3a2a", src:T2+"ocbyu3/ad.js", tall:true, kind:"visit", cta:"Explore", unit:"Look", site:"gucci.com",
+  neck:{ name:"David Yurman", av:"DY", avc:"#8a6a2f", src:T2+"ikutv6/ad.js", tall:true, kind:"site", cta:"Shop Now", unit:"Style", home:"https://www.davidyurman.com/",
+    head:"The necklace from tonight's scene", variants:[{},{},{}] },
+  outfit:{ name:"Levi's", av:"L", avc:"#c41230", src:T2+"dox37k/ad.js", kind:"site", cta:"Shop Now", unit:"Look", home:"https://www.levi.com/",
+    head:"Wear what she wore", variants:[{},{},{}] },
+  gucci:{ name:"Gucci", av:"G", avc:"#1c3a2a", src:T2+"ocbyu3/ad.js", tall:true, kind:"site", cta:"Explore", unit:"Look", home:"https://www.gucci.com/",
     head:"The new collection", variants:[{},{},{}] },
-  zara:{ name:"Zara", av:"Z", avc:"#111", src:T1+"zara/ad.js", tall:true, kind:"shop", cta:"Shop Now", unit:"Look", bg:"#fff",
-    head:"New season, three looks", prod:"Zara New Season Look", cat:"Women's fashion", sizes:["XS","S","M","L"],
-    desc:"Three looks from the new season. Switch the look inside the video.",
-    variants:[{p:3990},{p:4590},{p:5990}] },
-  jacket:{ name:"Puffer Jacket", av:"PJ", avc:"#33507a", src:T1+"flicks2-jacket-p1/ad.js", tall:true, kind:"shop", cta:"Shop Now", unit:"Colour", named:true,
-    head:"Winter's here. Pick your puffer", prod:"Quilted Puffer Jacket", cat:"Winter wear", sizes:["S","M","L","XL"],
-    desc:"A warm quilted puffer in three colours. Switch the colour inside the video.",
-    variants:[{n:"Red",p:4999},{n:"Yellow",p:4999},{n:"Green Check",p:5499}] },
-  grwm:{ name:"Get Ready With Me", av:"GR", avc:"#c0477f", src:T1+"flicks1-grwm/ad.js", tall:true, kind:"shop", cta:"Shop the Look", unit:"Dress", named:true,
-    head:"Get ready with me", prod:"Party Dress", cat:"Women's fashion", sizes:["XS","S","M","L"],
-    desc:"Three dresses from the video. Switch the dress inside the video to see it on.",
-    variants:[{n:"Red",p:1999},{n:"Blue",p:2299},{n:"Black",p:2599}] },
+  zara:{ name:"Zara", av:"Z", avc:"#111", src:T1+"zara/ad.js", tall:true, kind:"site", cta:"Shop Now", unit:"Look", bg:"#fff", home:"https://www.zara.com/",
+    head:"New season, three looks", variants:[{},{},{}] },
+  grwm:{ name:"Get Ready With Me", av:"GR", avc:"#c0477f", src:T1+"flicks1-grwm/ad.js", tall:true, kind:"none", unit:"Dress", named:true,
+    head:"Get ready with me", variants:[{n:"Red"},{n:"Blue"},{n:"Black"}] },
   ugc:{ name:"Tadka Originals", av:"T", avc:"#e3138b", src:T1+"flicks4-ugc-p1/ad.js", kind:"watch", cta:"Watch Now", unit:"Lead", label:"Promoted",
     head:"Pick who plays the lead", variants:[{},{}] },
-  lip:{ name:"Ulta Beauty", av:"U", avc:"#e9552b", src:T2+"onflg2/ad.js", kind:"shop", cta:"Shop Now", unit:"Shade",
-    head:"Her lip shade, in three tones", prod:"Satin Lipstick", cat:"Beauty", sizes:null,
-    desc:"A satin-finish lipstick in three shades. Switch the shade inside the video to see it on.",
-    variants:[{p:899},{p:899},{p:949}] },
-  eye:{ name:"e.l.f.", av:"elf", avc:"#111", src:T2+"it6hi9/ad.js", kind:"shop", cta:"Shop Now", unit:"Look",
-    head:"The eye look from the episode", prod:"e.l.f. Eyeshadow Palette", cat:"Beauty", sizes:null,
-    desc:"One palette, three eye looks. Switch the look inside the video to see it on.",
-    variants:[{p:1099},{p:1099},{p:1199}] },
-  levis:{ name:"Levi's", av:"L", avc:"#c41230", src:T1+"6a96c6969e74536944c4167f_z64116/ad.js", kind:"shop", cta:"Shop Now", unit:"Style",
-    head:"The denim everyone's wearing", prod:"Levi's Denim", cat:"Denim", sizes:["26","28","30","32","34"],
-    desc:"Three denim styles. Switch the style inside the video.",
-    variants:[{p:3299},{p:3599},{p:3999}] },
-  nike:{ name:"Nike", av:"N", avc:"#111", src:T1+"6a97885c9e74536944d35d53_dsefds/ad.js", kind:"shop", cta:"Shop Now", unit:"Colour", named:true,
-    head:"Own your movement", prod:"Nike Training Set", cat:"Sportswear", sizes:["XS","S","M","L","XL"],
-    desc:"A training set in three colours. Switch the colour inside the video.",
-    variants:[{n:"Black",p:2995},{n:"Red",p:2995},{n:"Lilac",p:3295}] },
-  sony:{ name:"Sony", av:"SONY", avc:"#111", src:T1+"6a96c6969e74536944c4167f_dj5rq6/ad.js", kind:"shop", cta:"Shop Now", unit:"Colour", named:true,
-    head:"Movie-night sound, no interruptions", prod:"Sony WH-CH720N Noise Cancelling Headphones", cat:"Audio", sizes:null,
-    desc:"Lightweight over-ear headphones with noise cancelling and up to 35 hours of battery.",
-    variants:[{n:"Black",p:7990},{n:"White",p:7990},{n:"Blue",p:8490}] },
-  westelm:{ name:"West Elm", av:"WE", avc:"#3d4a3f", src:T2+"c5htms/ad.js", kind:"shop", cta:"Shop Now", unit:"Chair",
-    head:"The accent chair from the set", prod:"West Elm Accent Chair", cat:"Home", sizes:null,
-    desc:"Three accent chairs. Switch the chair inside the video to see it in the room.",
-    variants:[{p:24999},{p:27999},{p:32999}] },
-  can:{ name:"Coca-Cola", av:"C", avc:"#e41e2b", src:T2+"n0489i/ad.js", kind:"visit", cta:"Order Now", unit:"Flavour", named:true, site:"coca-cola.com",
+  lip:{ name:"Ulta Beauty", av:"U", avc:"#e9552b", src:T2+"onflg2/ad.js", kind:"site", cta:"Shop Now", unit:"Shade", home:"https://www.ulta.com/",
+    head:"Her lip shade, in three tones", variants:[{},{},{}] },
+  eye:{ name:"e.l.f.", av:"elf", avc:"#111", src:T2+"it6hi9/ad.js", kind:"site", cta:"Shop Now", unit:"Look", home:"https://elfcosmetics.com/",
+    head:"The eye look from the episode", variants:[{},{},{}] },
+  levis:{ name:"Levi's", av:"L", avc:"#c41230", src:T1+"6a96c6969e74536944c4167f_z64116/ad.js", kind:"site", cta:"Shop Now", unit:"Style", home:"https://www.levi.com/",
+    head:"The denim everyone's wearing", variants:[{},{},{}] },
+  nike:{ name:"Nike", av:"N", avc:"#111", src:T1+"6a97885c9e74536944d35d53_dsefds/ad.js", kind:"site", cta:"Shop Now", unit:"Colour", named:true, home:"https://www.nike.in/",
+    head:"Own your movement", variants:[{n:"Black"},{n:"Red"},{n:"Lilac"}] },
+  westelm:{ name:"West Elm", av:"WE", avc:"#3d4a3f", src:T2+"c5htms/ad.js", kind:"site", cta:"Shop Now", unit:"Chair", home:"https://www.westelm.com/",
+    head:"The accent chair from the set", variants:[{},{},{}] },
+  can:{ name:"Coca-Cola", av:"C", avc:"#e41e2b", src:T2+"n0489i/ad.js", kind:"site", cta:"Explore", unit:"Flavour", named:true, home:"https://www.coca-cola.com/",
     head:"Zero Sugar. Three ways to binge", variants:[{n:"Original"},{n:"Cherry"},{n:"Vanilla"}] },
-  dor:{ name:"Doritos", av:"D", avc:"#d12a1e", src:T1+"6a96c6969e74536944c4167f_vqdcng/ad.js", kind:"visit", cta:"Order Now", unit:"Flavour", named:true, site:"doritos.com",
+  dor:{ name:"Doritos", av:"D", avc:"#d12a1e", src:T1+"6a96c6969e74536944c4167f_vqdcng/ad.js", kind:"site", cta:"Explore", unit:"Flavour", named:true, home:"https://www.doritos.com/",
     head:"Movie night needs a crunch", variants:[{n:"Cool Ranch"},{n:"Nacho Cheese"},{n:"Spicy Sweet Chili"}] },
-  bk:{ name:"Burger King", av:"BK", avc:"#d62300", src:T2+"dzvxyq/ad.js", cfg:"house", kind:"visit", cta:"Order Now", unit:"Meal", site:"burgerking.in",
+  bk:{ name:"Burger King", av:"BK", avc:"#d62300", src:T2+"dzvxyq/ad.js", cfg:"house", kind:"site", cta:"Order Now", unit:"Meal", home:"https://www.bk.com/",
     head:"Hungry? Order before you press play", variants:[{},{},{}] },
-  merc:{ name:"Mercedes-Benz", av:"MB", avc:"#111", src:T3+"6a9bc07393e71f3ec9b12c81_i3pdeq/ad.js", kind:"visit", cta:"Book a Test Drive", unit:"Model", site:"mercedes-benz.co.in",
+  merc:{ name:"Mercedes-Benz", av:"MB", avc:"#111", src:T3+"6a9bc07393e71f3ec9b12c81_i3pdeq/ad.js", kind:"site", cta:"Explore", unit:"Model", home:"https://www.mbusa.com/",
     head:"Pick the one that moves you", variants:[{},{},{}] }
 };
+// In-app browser. A web page can only show another site inside itself if that site allows it; of the sites the Flicks link to, these do (checked 19 Nov 2026).
+const FRAME_OK = /(^|\.)nike\.in$|(^|\.)gucci\.com$/;
+// Phone-width captures of the real page, for sites that refuse to be shown inside another page. Keyed by host + path.
+const CAPS = { "www.zara.com/us/en/checked-bomber-jacket-p06318268.html":"w_zara", "www.doritos.com/products/doritos-salsa-verde-flavored-tortilla-chips":"w_dor" };
 // Config lines that some saved tags carry ahead of their script, kept exactly as saved.
 const TAGCFG = {
   house:`<script>window.AD_CONFIG=window.AD_CONFIG||{};window.AD_CONFIG.dsp="house";window.AD_CONFIG.clickTracker={"mode":"exit","template":""};<\/script>`
 };
 const vshort = (k,i) => { const b = BRANDS[k], v = b.variants[i]; return v.n || `${b.unit} ${i+1}`; };
-const vname = (k,i) => { const b = BRANDS[k]; return b.prod ? `${b.prod}, ${vshort(k,i)}` : `${b.name} ${vshort(k,i)}`; };
+const vname = (k,i) => `${BRANDS[k].name} ${vshort(k,i)}`;
 
 /* =====================================================================
    TITLES: what the app plays. img = poster cut from the app.
@@ -169,4 +150,4 @@ const TADKA = [
 ];
 const LANGS = [["English","English"],["Kannada","ಕನ್ನಡ"],["Japanese","日本語"],["Spanish","Español"]];
 // search: words that bring up a sponsored result
-const SPON = [[/cricket|sport|ipl|match|dhoni|kohli|fitness/i,"nike"],[/roman|love|wedding|date|drama|shaadi/i,"neck"],[/comedy|fun|party|snack|laugh/i,"dor"],[/fashion|style|look|outfit|dress/i,"outfit"],[/beauty|makeup|lip/i,"lip"],[/music|song|sing|audio/i,"sony"]];
+const SPON = [[/cricket|sport|ipl|match|dhoni|kohli|fitness/i,"nike"],[/roman|love|wedding|date|drama|shaadi/i,"neck"],[/comedy|fun|party|snack|laugh/i,"dor"],[/fashion|style|look|outfit|dress/i,"outfit"],[/beauty|makeup|lip/i,"lip"]];
