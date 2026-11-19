@@ -49,8 +49,12 @@ const BRANDS = {
 };
 // In-app browser. A web page can only show another site inside itself if that site allows it; of the sites the Flicks link to, these do (checked 19 Nov 2026).
 const FRAME_OK = /(^|\.)nike\.in$|(^|\.)gucci\.com$/;
-// Phone-width captures of the real page, for sites that refuse to be shown inside another page. Keyed by host + path.
-const CAPS = { "www.zara.com/us/en/checked-bomber-jacket-p06318268.html":"w_zara", "www.doritos.com/products/doritos-salsa-verde-flavored-tortilla-chips":"w_dor" };
+// Phone-width captures of the real page, for sites that refuse to be shown inside another page. Matched on part of host + path. Taken 19 Nov 2026.
+const CAPS = [
+  ["zara.com/us/en/checked-bomber-jacket-p06318268","w_zara0"], ["zara.com/us/en/plaid-bomber-jacket-p03046210","w_zara1"], ["zara.com/us/en/polka-dot-bomber-jacket-p08372236","w_zara2"],
+  ["davidyurman.com/womens/necklaces/sculpted-cable-linked-necklace","w_dy"],
+  ["ulta.com/p/macximal-silky-matte-lipstick","w_ulta0"], ["ulta.com/p/almost-lipstick","w_ulta1"], ["ulta.com/p/hot-lips-lipstick-2","w_ulta2"],
+  ["doritos.com/products/doritos-salsa-verde","w_dor"] ];
 // Config lines that some saved tags carry ahead of their script, kept exactly as saved.
 const TAGCFG = {
   house:`<script>window.AD_CONFIG=window.AD_CONFIG||{};window.AD_CONFIG.dsp="house";window.AD_CONFIG.clickTracker={"mode":"exit","template":""};<\/script>`
@@ -141,12 +145,12 @@ const TADKA = [
   // Blank Cheque is Flam's own shoppable micro-drama preview: the episode plays and the Flick comes in inside it. It is shown as it is, untouched.
   { id:"blankcheque", n:"Blank Cheque", meta:"Episode 3", tags:"Drama · Shoppable", frame:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/", poster:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/media/poster.jpg", preview:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/media/main.mp4", badge:"Shop while you watch" },
   { id:"delivery", n:"The Last Delivery", meta:"24 Eps · 4 Languages", tags:"Thriller · Mystery", img:"o_delivery", video:true, preview:MD_PREVIEW, badge:"New Episodes Daily" },
-  { id:"reality", n:"Reality Check", meta:"10 Eps · Hindi", tags:"Celebrities · Reality", img:"tk_reality", cut:true },
-  { id:"rizz", n:"Rizz Master", meta:"375 Eps · Hindi", tags:"Looking for Love · Reality", img:"tk_rizz", cut:true },
-  { id:"ceo", n:"My Secret CEO", meta:"80 Eps · 2 Languages", tags:"Rich vs Poor · Romance", img:"o_ceo", badge:"New Episodes Added" },
-  { id:"pregnant", n:"Pregnant Luxury Empire Heir", meta:"47 Eps · 2 Languages", tags:"Rich vs Poor · Romance", img:"tk_pregnant", cut:true },
-  { id:"redsilk", n:"Red Silk", meta:"42 Eps · Hindi", tags:"Fashion · Drama", img:"o_redsilk" },
-  { id:"heartbeatmd", n:"Heart Beat", meta:"117 Eps · Tamil", tags:"Medical · Drama", img:"tk_heartbeat", cut:true }
+  { id:"reality", n:"Reality Check", meta:"10 Eps · Hindi", tags:"Celebrities · Reality", img:"tk_reality", cut:true, look:"zara" },
+  { id:"rizz", n:"Rizz Master", meta:"375 Eps · Hindi", tags:"Looking for Love · Reality", img:"tk_rizz", cut:true, look:"gucci" },
+  { id:"ceo", n:"My Secret CEO", meta:"80 Eps · 2 Languages", tags:"Rich vs Poor · Romance", img:"o_ceo", badge:"New Episodes Added", look:"zara" },
+  { id:"pregnant", n:"Pregnant Luxury Empire Heir", meta:"47 Eps · 2 Languages", tags:"Rich vs Poor · Romance", img:"tk_pregnant", cut:true, look:"neck" },
+  { id:"redsilk", n:"Red Silk", meta:"42 Eps · Hindi", tags:"Fashion · Drama", img:"o_redsilk", look:"gucci" },
+  { id:"heartbeatmd", n:"Heart Beat", meta:"117 Eps · Tamil", tags:"Medical · Drama", img:"tk_heartbeat", cut:true, look:"neck" }
 ];
 const LANGS = [["English","English"],["Kannada","ಕನ್ನಡ"],["Japanese","日本語"],["Spanish","Español"]];
 // search: words that bring up a sponsored result

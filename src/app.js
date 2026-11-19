@@ -42,7 +42,9 @@ function pressOwn(id){ try{ const f = $(`.flick[data-slot="${id}"] iframe`, APP)
     const find = root => { for(const e of root.querySelectorAll("*")){ if(e.tagName === "VERTEX-PLAYER" && e.shadowRoot) return e; if(e.shadowRoot){ const x = find(e.shadowRoot); if(x) return x; } } return null; };
     const vp = find(d); if(!vp) return false; const r = vp.shadowRoot;
     const ts = Array.from(r.querySelectorAll("[data-vertex-trigger]")).filter(e=>!e.matches(".vx-swatch,[data-vertex-diff]") && !e.closest(".vx-picker"));
-    const t = ts.find(e=>w.getComputedStyle(e).display !== "none") || ts[0]; if(!t) return false; t.click(); return true; }catch(e){ return false; } }
+    // One button per option: take the one for the option on screen by its place, because the app's own hiding of these buttons can make them all look alike.
+    const s = SLOTS[id], n = BRANDS[s.brand].variants.length;
+    const t = (ts.length === n && ts[s.v]) || ts.find(e=>w.getComputedStyle(e).display !== "none") || ts[0]; if(!t) return false; t.click(); return true; }catch(e){ return false; } }
 // A Flick with two options shows two dots: the dots are matched to the Flick once its slot is known.
 function fixDots(){ $$("[data-sd]", APP).forEach(d=>{ const s = SLOTS[d.dataset.sd]; if(!s) return; const n = BRANDS[s.brand].variants.length; if(d.children.length === n) return;
   d.innerHTML = Array.from({length:n},(_,i)=>`<i class="${i===s.v?"on":""}"></i>`).join(""); }); }
@@ -194,7 +196,7 @@ function reelMd(x, i){
   if(x.frame) return `<section class="rs md fr" data-i="${i}" data-md="${x.id}" data-anchor="bc"><div class="rfr"></div></section>`;
   return `<section class="rs md" data-i="${i}" data-md="${x.id}" onclick="reelTap(event)"><div class="rbg ${x.cut?"cutbg":""}">${pic(x.img)}</div><div class="rvid"></div><div class="rshade"></div>
   <div class="rrail"><button onclick="reelLike('${x.id}',this)" class="${RLIKE[x.id]?"on":""}">${I.heart}<span>${RLIKE[x.id]?"12.5K":"12.4K"}</span></button><button onclick="out('Sharing')">${I.share}<span>Share</span></button>${x.video?`<button data-rmute onclick="reelMute()">${RMUTED?I.mute:I.vol}<span>Sound</span></button>`:""}</div>
-  <div class="rinfo"><button class="shopchip" data-anchor="rshop-${i}" onclick="openScene('neck','${esc(x.n)}')">${I.tag} Shop the look</button><h3>${esc(x.n)}</h3><p>Ep 1 · ${esc(x.meta)} · ${esc(x.tags)}</p>
+  <div class="rinfo">${x.look?`<button class="shopchip" data-anchor="rshop-${i}" onclick="openScene('${x.look}','${esc(x.n)}')">${I.tag} Shop the look</button>`:""}<h3>${esc(x.n)}</h3><p>Ep 1 · ${esc(x.meta)} · ${esc(x.tags)}</p>
   ${x.video?`<div class="langs">${LANGS.map(([id,l])=>`<button class="${id===RLANG?"on":""}" data-lang="${id}" onclick="reelLang('${id}')">${l}</button>`).join("")}</div>`:""}
   <div class="rprog"><i></i></div></div></section>`; }
 function reelAd(s, i){ const k = s.ad, b = BRANDS[k], id = "reel-"+k, v = b.variants[0];
@@ -338,7 +340,10 @@ function chipOn2(el){ $$("button", el.parentElement).forEach(c=>c.classList.togg
 const PLS = {};            // per title: position and which breaks have played, kept while the demo is open
 let PL = null, plTimer = 0;
 const DUR = 31*60, START = 14*60+40, MID = 15*60, SCENE = 14*60+46, SCENE_LEN = 12, BREAK = 15, SKIP = 5;
-const BRK = { pre:"can", mid:"eye", pause:"bk", scene:"neck", comp:"westelm" };
+const BRK = { pre:"can", mid:"eye", pause:"bk", comp:"westelm" };
+// The look sold from the scene differs by title, so it is not the same brand everywhere.
+const LOOKS = ["zara","gucci","neck"];
+const sceneBrand = id => id === "heartbeat" ? "zara" : LOOKS[Array.from(String(id)).reduce((a,c)=>a + c.charCodeAt(0), 0) % LOOKS.length];
 const mmss = s => { s = Math.max(0, Math.floor(s)); return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`; };
 function watchInfo(id){ if(TT[id]){ const x = TT[id]; return { n:x.n, sub:`${x.ep||"S1 E1"}${x.epn?" · "+x.epn:""}`, stills:x.full?["d_tr1","d_tr2","d_tr0"]:[x.img], poster:!x.full, back:`#/t/${id}` }; }
   const c = CLIPS[id] || CLIPS.l_wtc; return { n:c[0], sub:"Cricket · "+c[1], stills:[CLIPS[id]?id:"l_wtc"], poster:false }; }
@@ -347,14 +352,14 @@ function watchScreen(id){ const w = watchInfo(id); const more = ["roslin","sanga
   <div class="pl" id="pl"><div class="plst ${w.poster?"poster":""}" id="plst">${w.stills.map((k,i)=>`<div class="st ${i?"":"on"}" style="background-image:url(${IMG[k][2]})"></div>`).join("")}</div>
     <div class="plui" id="plui" onclick="plTap(event)"><div class="plt"><button onclick="event.stopPropagation();back()" aria-label="Back">${I.back}</button><div><b>${esc(w.n)}</b><span>${esc(w.sub)}</span></div><button onclick="event.stopPropagation();out('Casting')" aria-label="Cast">${I.cast}</button></div>
       <div class="plc"><button onclick="event.stopPropagation();plSeek(PL.t-10)" aria-label="Back 10 seconds">${I.rw}</button><button class="pp" id="plpp" onclick="event.stopPropagation();plToggle()" aria-label="Play or pause">${I.pause}</button><button onclick="event.stopPropagation();plSeek(PL.t+10)" aria-label="Forward 10 seconds">${I.ff}</button></div>
-      <button class="scenechip" id="scenechip" data-anchor="scene" onclick="event.stopPropagation();openScene('neck','${esc(w.n)}')">${I.tag} Shop this look</button>
+      <button class="scenechip" id="scenechip" data-anchor="scene" onclick="event.stopPropagation();openScene('${sceneBrand(id)}','${esc(w.n)}')">${I.tag} Shop this look</button>
       <div class="plb"><span id="plt1">00:00</span><div class="bar" id="plbar" onclick="event.stopPropagation();plBar(event)"><i id="plfill"></i><u style="left:${MID/DUR*100}%"></u><em id="plknob"></em></div><span>${mmss(DUR)}</span></div></div>
     <div class="plad" id="plad" data-anchor="brk"></div></div>
   <div class="adstrip" id="adstrip"></div>
   <div class="scr" id="scr">
     <div id="pausead" data-anchor="pause"></div>
     <div class="winfo"><h1>${esc(w.n)}</h1><span>${esc(w.sub)}</span></div>
-    <div class="tacts">${TT[id]?`<button data-wl="${id}" class="${WL.has(id)?"on":""}" onclick="wlToggle('${id}')"><i>${WL.has(id)?I.check:I.plus}</i>Watchlist</button>`:""}<button onclick="out('Sharing')"><i>${I.share}</i>Share</button><button onclick="openScene('neck','${esc(w.n)}')"><i>${I.tag}</i>Shop the look</button><button onclick="out('Downloads')"><i>${I.dl}</i>Download</button></div>
+    <div class="tacts">${TT[id]?`<button data-wl="${id}" class="${WL.has(id)?"on":""}" onclick="wlToggle('${id}')"><i>${WL.has(id)?I.check:I.plus}</i>Watchlist</button>`:""}<button onclick="out('Sharing')"><i>${I.share}</i>Share</button><button onclick="openScene('${sceneBrand(id)}','${esc(w.n)}')"><i>${I.tag}</i>Shop the look</button><button onclick="out('Downloads')"><i>${I.dl}</i>Download</button></div>
     <div class="comp" data-anchor="comp"><div class="tkh">${av(BRK.comp)}<div><b>${esc(BRANDS[BRK.comp].head)}</b><span>Sponsored · ${esc(BRANDS[BRK.comp].name)}</span></div>${dots("comp")}</div>${flick("comp",BRK.comp)}${minis("comp",BRK.comp)}<button class="wbtn" onclick="ctaGo('comp')">${esc(BRANDS[BRK.comp].cta)}</button></div>
     ${rail("More Like This", more)}
   </div></div>`; }
@@ -366,7 +371,7 @@ function plInit(id, jump){
   clearInterval(plTimer); plTimer = setInterval(plTick, 250);
   plDraw(); if(!mem.pre) plBreak("pre");
   if(jump === "pause") plToggle();
-  if(jump === "scene") setTimeout(()=>openScene("neck", watchInfo(id).n), 350);
+  if(jump === "scene") setTimeout(()=>openScene(sceneBrand(id), watchInfo(id).n), 350);
   if(jump === "comp") setTimeout(()=>scrollToAnchor("comp"), 120);
   if(jump === "mid" || jump === "pre") flash("#pl");
 }
@@ -418,7 +423,7 @@ function openScene(k, from){ const b = BRANDS[k];
   <div class="shb"><div class="shf">${flick("scene",k)}</div><div class="shr">${minis("scene",k)}<div class="shp" data-spop="scene"><em data-sn="scene">${esc(vname(k,0))}</em></div><button class="wbtn" onclick="ctaGo('scene')">${esc(b.cta)}</button></div></div></div>`); }
 /* ---- in-app browser: the brand's own page opens inside the app, as it does in other apps ---- */
 function openSite(k, url){ const b = BRANDS[k]; let u; try{ u = new URL(url); }catch(e){ u = new URL(b.home); }
-  const host = u.host.replace(/^www\./,""), key = u.host + u.pathname, cap = CAPS[key], live = FRAME_OK.test(u.hostname);
+  const host = u.host.replace(/^www\./,""), key = u.host + decodeURIComponent(u.pathname), hit = CAPS.find(c=>key.includes(c[0])), cap = hit && hit[1], live = FRAME_OK.test(u.hostname);
   const path = (u.pathname === "/" ? "" : u.pathname).replace(/\/$/,"");
   const body = live ? `<iframe class="iabf" title="${esc(b.name)}" src="${esc(u.href)}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" referrerpolicy="no-referrer"></iframe>`
     : cap ? `<div class="iabcap">${pic(cap, b.name)}</div>`
@@ -476,7 +481,7 @@ function render(anim=true){
     if(anc && /^r\d/.test(anc)) i = RS.findIndex(s=>s.anchor === anc);
     if(anc === "bc") i = RS.findIndex(s=>s.md && s.md.frame);
     p.scrollTop = i * p.clientHeight; p.addEventListener("scroll", ()=>{ clearTimeout(p._t); p._t = setTimeout(reelActivate, 110); }, {passive:true}); reelActivate();
-    if(anc === "rshop"){ const nm = RS[i].md.n; setTimeout(()=>openScene("neck", nm), 450); }
+    if(anc === "rshop"){ const md = RS[i].md; if(md.look) setTimeout(()=>openScene(md.look, md.n), 450); }
     else if(anc && anc !== "bc") flash(`.rs[data-anchor="${anc}"] .rfl`); }
   else if(anc) setTimeout(()=>scrollToAnchor(anc), 80);
   if(name === "search" && !r.a && anim && !anc && !matchMedia("(pointer: coarse)").matches) setTimeout(()=>$("#q")?.focus({preventScroll:true}), 300);
@@ -490,7 +495,7 @@ function flash(sel){ setTimeout(()=>{ const el = typeof sel === "string" ? $(sel
 const GUIDE = [
   ["Ad breaks in the stream", [["Pre-roll: before the episode starts","#/watch/heartbeat","pre"],["Mid-roll: ad break inside the episode","#/watch/heartbeat","mid"],["Pause ad","#/watch/heartbeat","pause"],["Companion ad under the player","#/watch/heartbeat","comp"]]],
   ["Shop the look", [["In the player: shop the scene","#/watch/heartbeat","scene"],["Title page: shop the look","#/t/heartbeat","look"],["Home: Shop the Look rail","#/home","shop"]]],
-  ["Tadka micro-dramas", [["Sponsored video in the Tadka feed","#/tadka","tk1"],["Tadka feed: second sponsored video","#/tadka","tk2"],["Flick inside a micro-drama episode","#/reel/blankcheque","bc"],["Full-screen ad between episodes","#/reel/delivery","r1"],["Shop the look inside a micro-drama","#/reel/delivery","rshop"]]],
+  ["Tadka micro-dramas", [["Sponsored video in the Tadka feed","#/tadka","tk1"],["Tadka feed: second sponsored video","#/tadka","tk2"],["Flick inside a micro-drama episode","#/reel/blankcheque","bc"],["Full-screen ad between episodes","#/reel/delivery","r1"],["Shop the look inside a micro-drama","#/reel/redsilk","rshop"]]],
   ["Swipeable banners", [["Home: masthead","#/home","mast"],["Home: For You carousel","#/home","fy"],["TV: masthead","#/tv","mast"],["TV: For You carousel","#/tv","fy"],["Movies: masthead","#/movies","mast"],["Movies: For You carousel","#/movies","fy"],["Sports: masthead","#/sports","mast"],["Sports: For You carousel","#/sports","fy"]]],
   ["Billboards between rails", [["Home: billboard","#/home","bill"],["Movies: billboard","#/movies","bill"],["Sports: billboard","#/sports","bill"]]],
   ["Search", [["Sponsored tile in Popular Searches","#/search","stile"],["Sponsored result at the top","#/search/cricket","sres"]]]
