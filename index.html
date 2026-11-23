@@ -1096,7 +1096,7 @@ const HOME = {
     ${fy("f-home",[fyPlay("obsreplay"), fyCut("h_biggboss","biggboss"), fyFlick("fy","lorlip","fy"), fyClip("h_bumrah","l_wtc"), fyCut("h_moana","moana","Subscribe to Watch"), fyFlick("fy2","eye","fy2"), fyCut("h_queen","queen"), fyCut("h_apsara","apsara")])}
     ${rail("New on JioHotstar",["office","chiranjeevi","dilwaniya","hanuman","imgame","roslin"])}
     ${slice("k_free",[[3,49,31,47,"go('#/t/biggboss')","Bigg Boss"],[35,49,31,47,"go('#/t/yehrishta')","Yeh Rishta Kya Kehlata Hai"],[67,49,31,47,"go('#/t/anupamaa')","Anupamaa"]])}
-    ${sec("Shop the Look", `<div class="row looks">${lookCard("shop","lorhair","shop")}${lookCard("shop2","grwm")}${lookCard("shop3","puffer")}</div>`, "Sponsored · Styles from the shows you watch")}
+    ${sec("Shop the Look", `<div class="row looks">${lookCard("shop","lorhair","shop")}${lookCard("shop2","grwm","shop2")}${lookCard("shop3","puffer","shop3")}</div>`, "Sponsored · Styles from the shows you watch")}
     ${banner("b_biggboss","go('#/t/biggboss')")}
     ${top10("Top 10 in India Today",["biggboss","dhamaal","roadies","anupamaa","yehrishta","laughterchefs"],["All","Hindi","English","Tamil","Telugu","Malayalam"])}
     ${bill("bill","juice","bill")}
@@ -1521,8 +1521,30 @@ const GUIDE = [
 let curPick = "";
 function buildGuide(){ let n = 0;
   $("#glist").innerHTML = GUIDE.map(([sec,items],si)=>`<h6>${sec}</h6>` + items.map((it,ii)=>{ n++; const key = si+"-"+ii;
-    return `<button class="gitem ${key===curPick?"cur":""}" onclick="pick(${si},${ii})"><span class="n">${n}</span>${it[0]}</button>`; }).join("")).join("");
+    return `<button class="gitem ${key===curPick?"cur":""}" data-k="${key}" onclick="pick(${si},${ii})"><span class="n">${n}</span>${it[0]}</button>`; }).join("")).join("");
   $("#gcount").textContent = n; }
+/* The list follows the viewer: whichever kind of slot is on screen is the one marked in it, however they got there (scrolling, tapping a title, swiping a banner).
+   A title or banner that is not itself in the list marks the entry for its kind of slot. */
+const gkey = (name, anchor) => { for(let si = 0; si < GUIDE.length; si++){ const ii = GUIDE[si][1].findIndex(it=>it[2] === anchor && it[1].replace(/^#\/?/,"").split("/")[0] === name); if(ii >= 0) return si+"-"+ii; } return null; };
+function seen(anchors){ let best = null, br = 0; anchors.forEach(a=>{ $$(`[data-anchor="${a}"]`, VIEW).forEach(el=>{ const h = el.matches(".flick") ? el : (el.querySelector(".flick") || el); const r = vis(h).ratio; if(r >= .5 && r > br){ br = r; best = a; } }); }); return best; }
+function nowSlot(){ const r = parse(), name = TABS.includes(r.name) || ["reel","t","watch"].includes(r.name) ? r.name : "home";
+  if(OVER.classList.contains("on")){ if(!$(".sheet", OVER)) return undefined;                // a store is open: keep what was marked
+    return name === "watch" ? gkey("watch","scene") : (name === "reel" || name === "tadka") ? gkey("reel","rshop") : undefined; }
+  if(name === "watch"){ if(TT[r.a] && TT[r.a].frame) return gkey("watch","ob"); if(!PL) return null;
+    if(PL.brk) return gkey("watch", PL.brk); const pz = $("#pausead", VIEW); if(pz && pz.firstChild) return gkey("watch","pause"); return seen(["comp"]) ? gkey("watch","comp") : null; }
+  if(name === "t") return seen(["look"]) ? gkey("t","look") : null;
+  if(name === "reel"){ const a = ($(".rs.on", VIEW) || {dataset:{}}).dataset.anchor || ""; return a === "bc" ? gkey("reel","bc") : a === "tk1f" ? gkey("tadka","tk1") : /^r\d/.test(a) ? gkey("reel","r1") : null; }
+  if(name === "tadka"){ const a = seen(["tk1","tk2"]); return a ? gkey("tadka", a) : null; }
+  if(name === "search"){ const a = seen(["stile","sres"]); return a ? gkey("search", a) : null; }
+  if(name === "space") return null;
+  const a = seen(["mast","mast2","fy","fy2","shop","shop2","shop3","bill"]); if(!a) return null;
+  return gkey(name, a.replace(/\d$/,"")) || gkey("home", a.replace(/\d$/,"")); }
+function spy(){ const k = nowSlot(); if(k === undefined || k === curPick || (k === null && !curPick)) return; curPick = k || "";
+  const list = $("#glist"); $$(".gitem.cur", list).forEach(e=>e.classList.remove("cur")); const el = k && list.querySelector(`[data-k="${k}"]`); if(!el) return; el.classList.add("cur");
+  // bring the marked entry into view inside the list, without moving anything else on the page
+  let sc = el.parentElement; while(sc && sc !== document.body && !(sc.scrollHeight > sc.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(sc).overflowY))) sc = sc.parentElement;
+  if(sc && sc !== document.body){ const a = el.getBoundingClientRect(), b = sc.getBoundingClientRect(); if(a.top < b.top + 8 || a.bottom > b.bottom - 8) sc.scrollTo({ top: sc.scrollTop + (a.top - b.top) - b.height/2 + a.height/2, behavior:"smooth" }); } }
+setInterval(spy, 350);
 let guideAt = 0;
 function pick(si, ii){ if(Date.now() - guideAt < 500) return;   // the tap that opened the list must not also pick from it
   const it = GUIDE[si][1][ii]; curPick = si+"-"+ii; toggleGuide(false);
