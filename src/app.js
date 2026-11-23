@@ -32,32 +32,49 @@ function wlToggle(id, ev){ if(ev) ev.stopPropagation(); const on = !WL.has(id); 
 /*ENGINE*/
 
 /* ================= what the app's button for a Flick does ================= */
-function ctaGo(id, url){ const s = SLOTS[id]; if(!s) return; const b = BRANDS[s.brand];
-  if(b.kind === "watch") return go("#/reel/delivery"); if(b.kind !== "site") return;
-  const key = s.brand + "|" + s.v, fixed = b.pages && b.pages[s.v];
-  if(url !== undefined){                                   // the Flick answered with its own link
-    clearTimeout(s.urlT); const u = url || b.home; URLC[s.brand + "|" + (s.askV === undefined ? s.v : s.askV)] = u;
-    if(s.probe){ s.probe = false; return; }                // a quiet look-up, nobody pressed anything
-    s.asked = 0; return leave(s.brand, fixed || u); }
-  if(fixed) return leave(s.brand, fixed);
-  if(URLC[key]) return leave(s.brand, URLC[key]);          // already known: open at once, inside the tap
-  // Ask the Flick for its own link by pressing its own (hidden) button for the option on screen; it answers through the same message a tap on it would send.
-  s.asked = Date.now(); s.probe = false; s.askV = s.v; const pressed = pressOwn(id); clearTimeout(s.urlT);
-  s.urlT = setTimeout(()=>{ if(s.asked){ s.asked = 0; leave(s.brand, URLC[key] || b.home); } }, pressed ? 800 : 0); }
-const URLC = {};   // links the Flicks have reported, by brand and option
-// Where the link opens: the in-app browser, or for a brand marked direct the phone's own browser. If the browser refuses the new tab, the in-app browser offers the link instead.
-function leave(k, url){ if(BRANDS[k].direct){ let w = null; try{ w = window.open(url, "_blank"); if(w) w.opener = null; }catch(e){} if(w) return; }
-  openSite(k, url); }
-// A brand that opens in a new tab needs its link before the tap, or the browser treats the tab as a pop-up. So its Flicks are asked quietly once they are ready.
-setInterval(()=>{ Object.values(SLOTS).forEach(s=>{ const b = BRANDS[s.brand]; if(!b.direct || !s.ready || !s.mounted || s.asked || s.probe || URLC[s.brand+"|"+s.v] || Date.now() - (s.probeAt||0) < 1200) return;
-  s.probeAt = Date.now(); s.probe = true; s.askV = s.v; if(!pressOwn(s.id)) s.probe = false; }); }, 900);
-function pressOwn(id){ try{ const f = $(`.flick[data-slot="${id}"] iframe`, APP), w = f.contentWindow, d = f.contentDocument;
-    const find = root => { for(const e of root.querySelectorAll("*")){ if(e.tagName === "VERTEX-PLAYER" && e.shadowRoot) return e; if(e.shadowRoot){ const x = find(e.shadowRoot); if(x) return x; } } return null; };
-    const vp = find(d); if(!vp) return false; const r = vp.shadowRoot;
-    const ts = Array.from(r.querySelectorAll("[data-vertex-trigger]")).filter(e=>!e.matches(".vx-swatch,[data-vertex-diff]") && !e.closest(".vx-picker"));
-    // One button per option: take the one for the option on screen by its place, because the app's own hiding of these buttons can make them all look alike.
-    const s = SLOTS[id], n = BRANDS[s.brand].variants.length;
-    const t = (ts.length === n && ts[s.v]) || ts.find(e=>w.getComputedStyle(e).display !== "none") || ts[0]; if(!t) return false; t.click(); return true; }catch(e){ return false; } }
+// It opens a store inside JioHotstar with the product for the option the Flick is on. Nothing leaves the app, and nothing outside the Flick changes its option.
+function ctaGo(id){ const s = SLOTS[id]; if(!s) return; const b = BRANDS[s.brand];
+  if(b.kind === "watch") return go("#/reel/delivery");
+  openStore(s.brand, s.v, id); }
+// The picture of the option, taken from the Flick's own option button, so the cart shows what the Flick showed.
+function swatchImg(id, v){ try{ const sw = swatchFor(id, v), im = sw && sw.querySelector("img"); return (im && (im.currentSrc || im.src)) || ""; }catch(e){ return ""; } }
+
+/* ---- the store sheet: product, cart, phone number, OTP, order placed ---- */
+let ST = null, STT = 0;
+const rs = n => "₹" + num(n);
+function openStore(k, v, slot){ const b = BRANDS[k], so = STORES[b.store]; clearTimeout(STT);
+  const w = $(".screen.watch", VIEW), top = w ? Math.round($(".stpad", w).offsetHeight + APP.clientWidth*9/16) : 92;
+  const img = slot ? swatchImg(slot, v) : "";
+  reelHold(true);
+  openOver(`<div class="scrim" onclick="closeOver()"></div><div class="sto" style="top:${top}px;--sc:${so.col}"><div class="stoh">${so.n ? `<i class="stlg">${esc(so.n.charAt(0))}</i>` : av(k)}<b>${esc(so.n || b.name)}</b><button onclick="closeOver()" aria-label="Close">${I.x}</button></div><div class="stob" id="stob"></div></div>`);
+  ST = { k, v, lead:b.store === "lead", step:"load", qty:1, phone:"", otp:"", img, show:!!w };
+  stDraw(); STT = setTimeout(()=>stGo("item"), 1100); }
+function stGo(step){ if(!ST || !$("#stob")) return; clearTimeout(STT); ST.step = step; stDraw();
+  if(step === "otp") STT = setTimeout(()=>{ const i = $("#stotp"); if(i && ST && ST.step === "otp" && !i.value){ i.value = "482916"; stOtp(i); } }, 1300); }   // as if the phone read the code from the message
+function stQty(d){ if(!ST) return; ST.qty = Math.max(1, Math.min(9, ST.qty + d)); stDraw(); }
+function stPhone(i){ i.value = i.value.replace(/\D/g,"").slice(0,10); ST.phone = i.value; $("#stnext").disabled = ST.phone.length !== 10; }
+function stOtp(i){ i.value = i.value.replace(/\D/g,"").slice(0,6); ST.otp = i.value; $("#stnext").disabled = ST.otp.length !== 6; }
+function stDraw(){ const el = $("#stob"); if(!el || !ST) return; const b = BRANDS[ST.k], so = STORES[b.store];
+  const opt = b.variants.length > 1 ? vshort(ST.k, ST.v) : "", title = ST.lead ? b.name : `${b.name} ${b.item}`, tot = (b.price||0)*ST.qty;
+  const thumb = `<span class="stim">${ST.img ? `<img src="${esc(ST.img)}" alt="">` : av(ST.k)}</span>`;
+  const bar = (t, to) => `<div class="stbar"><button onclick="${to ? `stGo('${to}')` : "closeOver()"}" aria-label="Back">${I.back}</button><b>${t}</b></div>`;
+  const name = `<div class="stnm"><b>${esc(title)}</b><span>${esc(ST.lead ? `${b.item}${opt?" · "+opt:""}` : opt || b.item)}</span></div>`;
+  const qty = `<div class="stq"><button onclick="stQty(-1)" aria-label="Fewer">−</button><b>${ST.qty}</b><button onclick="stQty(1)" aria-label="More">+</button></div>`;
+  let h;
+  if(ST.step === "load") h = `<div class="stsp"><i></i><b>${esc(so.n || b.name)}</b>${so.line ? `<span>${esc(so.line)}</span>` : ""}</div>`;
+  else if(ST.step === "item") h = ST.lead
+    ? `<div class="stsc"><div class="stcard big">${thumb}${name}</div></div><div class="stft"><button class="stbtn" onclick="stGo('phone')">${esc(b.cta)}</button></div>`
+    : `<div class="stloc"><b>Delivery in ${so.eta}</b><span>Home</span></div><div class="stsc"><div class="stcard big">${thumb}${name}<div class="stpr"><b>${rs(b.price)}</b>${qty}</div></div></div>
+       <div class="stft two"><div><b>${ST.qty} item${ST.qty>1?"s":""}</b><span>${rs(tot)}</span></div><button class="stbtn" onclick="stGo('cart')">Go to Cart</button></div>`;
+  else if(ST.step === "cart") h = `${bar("Your Cart","item")}<div class="stsc"><div class="stcard"><div class="steta">${so.eta}</div><div class="stln">${thumb}${name}${qty}<em>${rs(tot)}</em></div></div>
+       <div class="stcard bill"><h6>Bill details</h6><p><span>Item total</span><b>${rs(tot)}</b></p><p><span>Delivery fee</span><b class="free">FREE</b></p><p class="tot"><span>To pay</span><b>${rs(tot)}</b></p></div></div>
+       <div class="stft"><span class="stfl">Login to place order</span><button class="stbtn" onclick="stGo('phone')">Login with OTP</button></div>`;
+  else if(ST.step === "phone") h = `${bar("Login", ST.lead ? "item" : "cart")}<div class="stsc pad"><label class="stlb" for="stph">Phone number</label><div class="stin"><span>+91</span><input id="stph" type="tel" inputmode="numeric" autocomplete="off" value="${esc(ST.phone)}" oninput="stPhone(this)" aria-label="Phone number"></div>
+       <button class="stbtn" id="stnext" ${ST.phone.length===10?"":"disabled"} onclick="stGo('otp')">Continue</button></div>`;
+  else if(ST.step === "otp") h = `${bar("Verify OTP sent to " + esc(ST.phone), "phone")}<div class="stsc pad"><label class="stlb" for="stotp">Enter OTP</label><div class="stin otp"><input id="stotp" type="tel" inputmode="numeric" autocomplete="off" value="" oninput="stOtp(this)" aria-label="OTP"></div>
+       <button class="stbtn" id="stnext" disabled onclick="stGo('done')">Verify</button></div>`;
+  else h = `<div class="stdn"><i>${I.check}</i><b>${ST.lead ? "Request sent" : "Order placed"}</b><span>${ST.lead ? `${esc(b.name)} will call you on +91 ${esc(ST.phone)}` : `${esc(title)}${opt?" · "+esc(opt):""}${ST.qty>1?" × "+ST.qty:""}<br>Arriving in ${so.eta} · ${rs(tot)} · Pay on delivery`}</span><button class="stbtn" onclick="closeOver()">${ST.show ? "Back to the show" : "Done"}</button></div>`;
+  el.innerHTML = h; el.dataset.step = ST.step; }
 // A Flick with two options shows two dots: the dots are matched to the Flick once its slot is known.
 function fixDots(){ $$("[data-sd]", APP).forEach(d=>{ const s = SLOTS[d.dataset.sd]; if(!s) return; const n = BRANDS[s.brand].variants.length; if(d.children.length === n) return;
   d.innerHTML = Array.from({length:n},(_,i)=>`<i class="${i===s.v?"on":""}"></i>`).join(""); }); }
@@ -112,14 +129,14 @@ const minis = (id,k) => `<div class="minis">${BRANDS[k].variants.map((_,i)=>mini
 /* ================= screens ================= */
 const HOME = {
   home: () => `
-    ${mast("m-home",[mastFlick("mast","outfit","mast"), mastFlick("mast2","eye","mast2"), mastCut("m_tv","out('JioHotstar on TV')","Explore Now"), mastCut("m_mahabharat","out('The teaser')","Teaser")])}
-    ${fy("f-home",[fyCut("h_biggboss","biggboss"), fyFlick("fy","lip","fy"), fyClip("h_bumrah","l_wtc"), fyCut("h_moana","moana","Subscribe to Watch"), fyFlick("fy2","nike","fy2"), fyCut("h_queen","queen"), fyCut("h_apsara","apsara")])}
+    ${mast("m-home",[mastFlick("mast","reva","mast"), mastFlick("mast2","fossil","mast2"), mastCut("m_tv","out('JioHotstar on TV')","Explore Now"), mastCut("m_mahabharat","out('The teaser')","Teaser")])}
+    ${fy("f-home",[fyCut("h_biggboss","biggboss"), fyFlick("fy","lorlip","fy"), fyClip("h_bumrah","l_wtc"), fyCut("h_moana","moana","Subscribe to Watch"), fyFlick("fy2","eye","fy2"), fyCut("h_queen","queen"), fyCut("h_apsara","apsara")])}
     ${rail("New on JioHotstar",["office","chiranjeevi","dilwaniya","hanuman","imgame","roslin"])}
     ${slice("k_free",[[3,49,31,47,"go('#/t/biggboss')","Bigg Boss"],[35,49,31,47,"go('#/t/yehrishta')","Yeh Rishta Kya Kehlata Hai"],[67,49,31,47,"go('#/t/anupamaa')","Anupamaa"]])}
-    ${sec("Shop the Look", `<div class="row looks">${lookCard("shop","neck","shop")}${lookCard("shop2","gucci")}${lookCard("shop3","zara")}</div>`, "Sponsored · Styles from the shows you watch")}
+    ${sec("Shop the Look", `<div class="row looks">${lookCard("shop","lorhair","shop")}${lookCard("shop2","gucci")}${lookCard("shop3","zara")}</div>`, "Sponsored · Styles from the shows you watch")}
     ${banner("b_biggboss","go('#/t/biggboss')")}
     ${top10("Top 10 in India Today",["biggboss","dhamaal","roadies","anupamaa","yehrishta","laughterchefs"],["All","Hindi","English","Tamil","Telugu","Malayalam"])}
-    ${bill("bill","can","bill")}
+    ${bill("bill","juice","bill")}
     ${rail("Peacock's Finest",["koffee","obsession","suits","wolf","beautifuldisaster"])}
     ${rail("Captain Cool Club",["msdhoni","roarlion","83"])}
     ${rail("Star Maa Shows",["mahabharatham","starmaa2","bbtelugu"])}
@@ -128,8 +145,8 @@ const HOME = {
     ${slice("k_peacock",[[3,48,31,50,"go('#/t/obsession')","Obsession"],[35,48,31,50,"out('Oppenheimer')","Oppenheimer"],[67,48,31,50,"out('Michael')","Michael"]])}
     ${sec("Popular Shows", `<div class="chips">${["All","Romance","Drama","Thriller","Horror","Comedy"].map((c,i)=>`<button class="chip ${i?"":"on"}" onclick="chipOn(this)">${c}</button>`).join("")}</div><div class="row">${["biggboss","anupamaa","yehrishta","heartbeat","sangamarmar","koffee"].map(id=>poster(id)).join("")}</div>`)}`,
   tv: () => `
-    ${mast("m-tv",[mastFlick("mast","westelm","mast"), mastCut("m_arunachal","out('Arunachal League')","Explore"), mastCut("m_dilki","out('The trailer')","Trailer")])}
-    ${fy("f-tv",[fyCut("h_dhamaal","dhamaal"), fyFlick("fy","outfit","fy"), fyCut("h_biggboss","biggboss"), fyCut("h_queen","queen")])}
+    ${mast("m-tv",[mastFlick("mast","gapus","mast"), mastCut("m_arunachal","out('Arunachal League')","Explore"), mastCut("m_dilki","out('The trailer')","Trailer")])}
+    ${fy("f-tv",[fyCut("h_dhamaal","dhamaal"), fyFlick("fy","mms","fy"), fyCut("h_biggboss","biggboss"), fyCut("h_queen","queen")])}
     ${trail("Popular Channels",["c_starplus","c_colors","c_vijay"],"out('Channel pages')")}
     ${top10("Top 10 Shows - Hindi",["biggboss","dhamaal","roadies","laughterchefs","koffee","anupamaa"])}
     ${rail("Comedy Shows",["laughterchefs","dhamaal","perfectcrown","office"])}
@@ -140,8 +157,8 @@ const HOME = {
     ${rail("House of Dramas",["heartbeat","roslin","sangamarmar","draarohi","fitoor"])}
     ${rail("The House of Bigg Boss!",["biggboss","bbkannada","bbtamil","bbtelugu"])}`,
   movies: () => `
-    ${mast("m-mov",[mastFlick("mast","can","mast"), mastCut("m_mahabharat","out('The teaser')","Teaser")])}
-    ${fy("f-mov",[fyCut("h_bethlehem","bethlehem"), fyFlick("fy","dor","fy"), fyCut("h_obsession","obsession","Subscribe to Watch"), fyCut("h_moana","moana","Subscribe to Watch")])}
+    ${mast("m-mov",[mastFlick("mast","dor","mast"), mastCut("m_mahabharat","out('The teaser')","Teaser")])}
+    ${fy("f-mov",[fyCut("h_bethlehem","bethlehem"), fyFlick("fy","benjerry","fy"), fyCut("h_obsession","obsession","Subscribe to Watch"), fyCut("h_moana","moana","Subscribe to Watch")])}
     ${banner("b_karan","go('#/t/koffee')")}
     ${rail("Hahaha Loading...",["wolf","dhadkan","beautifuldisaster","welcomejungle"])}
     ${top10("Top 10 Movies - Hindi",["varahi","kabirsingh","maainti","12th","drishyam","brahmastra"])}
@@ -154,7 +171,7 @@ const HOME = {
     ${rail("Pokémon World",["pokemon","pokemon2","pokemon3","doraemon"])}`,
   sports: () => `
     ${mast("m-sp",[mastFlick("mast","nike","mast"), mastCut("m_dhaichaal","out('The trailer')","Trailer")])}
-    ${fy("f-sp",[fyClip("h_wtc","l_wtc"), fyFlick("fy","bk","fy"), fyClip("h_rcb","l_rcb"), fyClip("h_sandpaper","l_sp1")])}
+    ${fy("f-sp",[fyClip("h_wtc","l_wtc"), fyFlick("fy","ua","fy"), fyClip("h_rcb","l_rcb"), fyClip("h_sandpaper","l_sp1")])}
     ${banner("b_arunachal","out('Arunachal League')")}
     ${trail("Popular Tournaments",["t_ipl","t_t10","t_domestic"],"out('Tournament pages')")}
     ${lrail("CSK Icon Dhoni Hangs Up His Boots",["l_stumpings","l_finishes","l_dhoni7"])}
@@ -195,12 +212,12 @@ function tkAd(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
   <div class="tkb" data-spop="${id}"><span><em data-sv="${id}">${esc(vshort(k,0))}</em></span>${ctaBtn(id,k,"wbtn sm")}</div></div>`; }
 function tadkaScreen(){ const c = TADKA.map(tkCard); bcFetch();
   return `<div class="screen tadka">${stpad()}${header("tadka")}<div class="scr" id="scr">
-  ${c[0]}${tkAd("tk1","grwm","tk1")}${c[1]}${c[2]}${c[3]}${tkAd("tk2","ugc","tk2")}${c[4]}${c[5]}${c[6]}
+  ${c[0]}${tkAd("tk1","shirt","tk1")}${c[1]}${c[2]}${c[3]}${tkAd("tk2","ugc","tk2")}${c[4]}${c[5]}${c[6]}
   ${sec("Latest on Tadka", `<div class="row">${[["tr_reality","reality"],["tr_shehzada","ceo"],["tr_saanp","redsilk"]].map(([k,id])=>`<button class="po tall" onclick="go('#/reel/${id}')">${pic(k)}</button>`).join("")}${["delivery","ceo","redsilk"].map(id=>`<button class="po tall" onclick="go('#/reel/${id}')">${pic("o_"+id)}</button>`).join("")}</div>`)}
   </div>${nav("tadka")}</div>`; }
 
 /* ---- Tadka player: full-screen vertical episodes, with a full-screen ad between them ---- */
-const REEL_ADS = ["gucci","neck","zara"];
+const REEL_ADS = ["grwm","puffer"];
 function reelSlides(){ const s = []; let n = 0; TADKA.forEach(x=>{ s.push({md:x}); if(!x.frame && n < REEL_ADS.length){ s.push({ad:REEL_ADS[n], anchor:"r"+(n+1)}); n++; } }); return s; }
 let RS = [], RCUR = -1, RLANG = "English", RMUTED = false, RLIKE = {};
 function reelScreen(id){ RS = reelSlides(); RCUR = -1; bcFetch();
@@ -304,7 +321,7 @@ const SGRID = {
 };
 let SCHIP = "India";
 function sgrid(){ return SGRID[SCHIP].map(x=>{
-  if(x === "AD"){ const k = "levis", b = BRANDS[k], id = "stile"; return `<div class="sad" data-anchor="stile">${flick(id,k)}<div class="sab" data-spop="${id}"><div><b>${esc(b.name)}</b><span>Sponsored · <em data-sv="${id}">${esc(vshort(k,0))}</em></span></div>${ctaBtn(id,k,"mbtn")}</div></div>`; }
+  if(x === "AD"){ const k = "bose", b = BRANDS[k], id = "stile"; return `<div class="sad" data-anchor="stile">${flick(id,k)}<div class="sab" data-spop="${id}"><div><b>${esc(b.name)}</b><span>Sponsored · <em data-sv="${id}">${esc(vshort(k,0))}</em></span></div>${ctaBtn(id,k,"mbtn")}</div></div>`; }
   return x.startsWith("L:") ? poster(x.slice(2),"big") : poster(x); }).join(""); }
 function setChip(c){ SCHIP = c; render(false); }
 function searchScreen(q){
@@ -353,12 +370,11 @@ function chipOn2(el){ $$("button", el.parentElement).forEach(c=>c.classList.togg
 const PLS = {};            // per title: position and which breaks have played, kept while the demo is open
 let PL = null, plTimer = 0;
 const DUR = 31*60, START = 14*60+40, MID = 15*60, SCENE = 14*60+46, SCENE_LEN = 12, BREAK = 15, SKIP = 5;
-const BRK = { pre:"can", mid:"eye", pause:"bk", comp:"westelm" };
-// The look sold from the scene differs by title, so it is not the same brand everywhere.
-const LOOKS = ["zara","gucci","neck"];
-const sceneBrand = id => id === "heartbeat" ? "zara" : LOOKS[Array.from(String(id)).reduce((a,c)=>a + c.charCodeAt(0), 0) % LOOKS.length];
+const BRK = { pre:"caesars", mid:"mia", pause:"bk", comp:"can" };
+// The look sold from the scene in the player. Each micro-drama names its own in TADKA.
+const sceneBrand = id => "levis";
 const mmss = s => { s = Math.max(0, Math.floor(s)); return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`; };
-function watchInfo(id){ if(TT[id]){ const x = TT[id]; return { n:x.n, sub:`${x.ep||"S1 E1"}${x.epn?" · "+x.epn:""}`, stills:x.full?["d_tr1","d_tr2","d_tr0"]:[x.img], poster:!x.full, back:`#/t/${id}` }; }
+function watchInfo(id){ if(TT[id]){ const x = TT[id]; return { n:x.n, sub:`${x.ep||"S1 E1"}${x.epn?" · "+x.epn:""}`, stills:x.stills||(x.full?["d_tr1","d_tr2","d_tr0"]:[x.img]), poster:!x.full&&!x.stills, back:`#/t/${id}` }; }
   const c = CLIPS[id] || CLIPS.l_wtc; return { n:c[0], sub:"Cricket · "+c[1], stills:[CLIPS[id]?id:"l_wtc"], poster:false }; }
 function watchScreen(id){ const w = watchInfo(id); const more = ["roslin","sangamarmar","draarohi","magicshiri","khalbali","honeymoon"].filter(k=>k!==id);
   return `<div class="screen watch">${stpad()}
@@ -372,6 +388,7 @@ function watchScreen(id){ const w = watchInfo(id); const more = ["roslin","sanga
   <div class="scr" id="scr">
     <div id="pausead" data-anchor="pause"></div>
     <div class="winfo"><h1>${esc(w.n)}</h1><span>${esc(w.sub)}</span></div>
+    ${TT[id]?`<div class="wtabs"><button class="on">For You</button><button onclick="ctaGo('comp')"><i style="background:${STORES.instamart.col}"></i>Shop</button><button onclick="out('Jeeto')">Jeeto</button><button onclick="out('Memes')">Memes</button><button onclick="openStore(BRK.pause, SLOTS.pz ? SLOTS.pz.v : 0, SLOTS.pz ? 'pz' : null)"><i style="background:${STORES.swiggy.col}"></i>Order Food</button><button onclick="out('Episodes')">Episodes</button></div>`:""}
     <div class="tacts">${TT[id]?`<button data-wl="${id}" class="${WL.has(id)?"on":""}" onclick="wlToggle('${id}')"><i>${WL.has(id)?I.check:I.plus}</i>Watchlist</button>`:""}<button onclick="out('Sharing')"><i>${I.share}</i>Share</button><button onclick="openScene('${sceneBrand(id)}','${esc(w.n)}')"><i>${I.tag}</i>Shop the look</button><button onclick="out('Downloads')"><i>${I.dl}</i>Download</button></div>
     <div class="comp" data-anchor="comp"><div class="tkh">${av(BRK.comp)}<div><b>${esc(BRANDS[BRK.comp].head)}</b><span>Sponsored · ${esc(BRANDS[BRK.comp].name)}</span></div>${dots("comp")}</div>${flick("comp",BRK.comp)}${minis("comp",BRK.comp)}<button class="wbtn" onclick="ctaGo('comp')">${esc(BRANDS[BRK.comp].cta)}</button></div>
     ${rail("More Like This", more)}
@@ -390,7 +407,8 @@ function plInit(id, jump){
 }
 function plStop(){ clearInterval(plTimer); plTimer = 0; PL = null; }
 function plTick(){ if(!PL || !$("#pl")) return;
-  if(PL.brk){ PL.left -= .25; if(PL.left <= 0) return plBreakEnd(); plStrip(); return; }
+  if(PL.brk){ if(OVER.classList.contains("on") || document.hidden) return;   // the break waits while a store is open
+    PL.left -= .25; if(PL.left <= 0) return plBreakEnd(); plStrip(); return; }
   if(!PL.playing || OVER.classList.contains("on") || document.hidden) return;
   PL.t += .25; PL.mem.t = PL.t;
   if(!PL.mem.mid && PL.t >= MID){ PL.t = MID; return plBreak("mid"); }
@@ -417,15 +435,16 @@ function plSeek(t){ if(!PL || PL.brk) return; t = Math.max(0, Math.min(DUR, t));
 function plBar(e){ const r = $("#plbar").getBoundingClientRect(); plSeek((e.clientX - r.left)/r.width*DUR); }
 // Ad break: the player opens up to a square and the Flick plays in it, with the countdown and the app's button in a strip under it.
 function plBreak(kind){ if(!PL) return; plClearPause(); PL.playing = true; PL.brk = kind; PL.left = BREAK; const k = BRK[kind];
-  $("#plad").innerHTML = flick("brk", k); $("#pl").classList.add("ad"); $("#pl").classList.remove("ui","paused"); $("#adstrip").classList.add("on"); plStrip(true);
+  $("#plad").innerHTML = flick("brk", k); $("#pl").classList.add("ad"); $("#pl").classList.toggle("wide", !!BRANDS[k].wide);   // a 16:9 Flick plays in the player as it is, in the content's own frame
+  $("#pl").classList.toggle("r43", !!BRANDS[k].r43); $("#pl").classList.remove("ui","paused"); $("#adstrip").classList.add("on"); plStrip(true);
   $("#scr").scrollTo({top:0}); setTimeout(()=>{ const h = $(".flick", $("#plad")); if(h){ fitFlick(h); audit(); } }, 320); audit(); }
 function plStrip(full){ const k = BRK[PL.brk], b = BRANDS[k], el = $("#adstrip"), can = BREAK - PL.left >= SKIP;
-  if(full) el.innerHTML = `<div class="as1"><span class="adk">Ad · 1 of 1</span>${av(k)}<div class="mt"><b>${esc(b.name)}</b><span><em data-sv="brk">${esc(vshort(k,0))}</em> · your ${PL.brk==="pre"?"episode starts":"episode resumes"} in <em id="adleft"></em></span></div></div><div class="as2"><button class="wbtn sm" onclick="ctaGo('brk')">${esc(b.cta)}</button><button class="skip" id="adskip" onclick="plSkip()"></button></div>`;
+  if(full) el.innerHTML = `<div class="as1"><span class="adk">Ad · 1 of 1</span>${av(k)}<div class="mt"><b>${esc(b.name)}</b><span><em data-sv="brk">${esc(vshort(k,0))}</em> · ${esc(watchInfo(PL.id).n)} ${PL.brk==="pre"?"starts":"resumes"} in <em id="adleft"></em></span></div></div><div class="as2"><button class="wbtn sm" onclick="ctaGo('brk')">${esc(b.cta)}</button><button class="skip" id="adskip" onclick="plSkip()"></button></div>`;
   const l = $("#adleft"); if(l) l.textContent = mmss(Math.ceil(PL.left)).slice(1);
   const s = $("#adskip"); if(s){ s.disabled = !can; s.innerHTML = can ? `Skip Ad ${I.right}` : `Skip in ${Math.ceil(SKIP-(BREAK-PL.left))}`; } }
 function plSkip(){ if(PL && PL.brk && BREAK - PL.left >= SKIP) plBreakEnd(); }
 function plBreakEnd(){ if(!PL) return; const kind = PL.brk; PL.brk = null; PL.mem[kind] = true;
-  $$(".flick[data-slot]", $("#plad")).forEach(x=>{ unmount(x); delete SLOTS[x.dataset.slot]; }); $("#plad").innerHTML = ""; $("#pl").classList.remove("ad"); $("#adstrip").classList.remove("on"); $("#adstrip").innerHTML = "";
+  $$(".flick[data-slot]", $("#plad")).forEach(x=>{ unmount(x); delete SLOTS[x.dataset.slot]; }); $("#plad").innerHTML = ""; $("#pl").classList.remove("ad","wide","r43"); $("#adstrip").classList.remove("on"); $("#adstrip").innerHTML = "";
   PL.playing = true; plDraw(); plShowUI(); audit(); }
 
 /* ---- shop the scene: a sheet over the player or the micro-drama, with the Flick and its three options ---- */
@@ -434,24 +453,13 @@ function openScene(k, from){ const b = BRANDS[k];
   openOver(`<div class="scrim" onclick="closeOver()"></div><div class="sheet"><div class="grab"></div><button class="shx" onclick="closeOver()" aria-label="Close">${I.x}</button>
   <div class="shh">${av(k)}<div><b>${esc(b.head)}</b><span>Sponsored · ${esc(b.name)}${from?` · seen in ${esc(from)}`:""}</span></div></div>
   <div class="shb"><div class="shf">${flick("scene",k)}</div><div class="shr">${minis("scene",k)}<div class="shp" data-spop="scene"><em data-sn="scene">${esc(vname(k,0))}</em></div><button class="wbtn" onclick="ctaGo('scene')">${esc(b.cta)}</button></div></div></div>`); }
-/* ---- in-app browser: the brand's own page opens inside the app, as it does in other apps ---- */
-function openSite(k, url){ const b = BRANDS[k]; let u; try{ u = new URL(url); }catch(e){ u = new URL(b.home); }
-  const host = u.host.replace(/^www\./,""), key = u.host + decodeURIComponent(u.pathname), hit = CAPS.find(c=>key.includes(c[0])), cap = hit && hit[1], live = FRAME_OK.test(u.hostname);
-  const path = (u.pathname === "/" ? "" : u.pathname).replace(/\/$/,"");
-  const body = live ? `<iframe class="iabf" title="${esc(b.name)}" src="${esc(u.href)}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" referrerpolicy="no-referrer"></iframe>`
-    : cap ? `<div class="iabcap">${pic(cap, b.name)}</div>`
-    : `<div class="iabh">${av(k)}<b>${esc(b.name)}</b><span>${esc(host + path)}</span><a class="wbtn" href="${esc(u.href)}" target="_blank" rel="noopener noreferrer">Open ${esc(host)}</a></div>`;
-  reelHold(true);
-  openOver(`<div class="iab" data-url="${esc(u.href)}"><div class="iabt"><button onclick="closeOver()" aria-label="Close">${I.x}</button><div class="iabu"><b>${I.lock}${esc(host)}</b><span>${esc(b.name)}</span></div><button onclick="iabReload()" aria-label="Reload">${I.reload}</button><button onclick="out('Sharing')" aria-label="Share">${I.share}</button></div><div class="iabp"><i></i></div><div class="iabc shb">${body}</div></div>`); }
-function iabReload(){ const f = $(".iabf", OVER), p = $(".iabp i", OVER); if(p){ p.style.animation = "none"; void p.offsetWidth; p.style.animation = ""; } if(f) f.src = f.src; }
-
 /* ================= overlays ================= */
 let OVSTATE = false;
-function openOver(html){ const was = OVER.classList.contains("on");   // a sheet handing over to the browser: one layer, one Back step
+function openOver(html){ const was = OVER.classList.contains("on");   // a sheet handing over to the store: one layer, one Back step
   $$(".flick[data-slot]", OVER).forEach(h=>{ unmount(h); delete SLOTS[h.dataset.slot]; });
   OVER.innerHTML = html; OVER.classList.add("on"); document.body.classList.add("ovon"); if(!was) try{ history.pushState({ov:1}, ""); OVSTATE = true; }catch(e){} sizeOver(); audit(); }
 function closeOver(silent){ if(!OVER.classList.contains("on")) return; $$(".flick[data-slot]", OVER).forEach(h=>{ unmount(h); delete SLOTS[h.dataset.slot]; });
-  OVER.classList.remove("on"); OVER.innerHTML = ""; document.body.classList.remove("ovon"); if(OVSTATE && !silent){ OVSTATE = false; try{ history.back(); }catch(e){} } OVSTATE = false; reelHold(false); audit(); }
+  OVER.classList.remove("on"); OVER.innerHTML = ""; document.body.classList.remove("ovon"); clearTimeout(STT); ST = null; if(OVSTATE && !silent){ OVSTATE = false; try{ history.back(); }catch(e){} } OVSTATE = false; reelHold(false); audit(); }
 addEventListener("popstate", ()=>{ if(OVER.classList.contains("on")){ OVSTATE = false; closeOver(true); } });
 function sizeOver(){ const box = $(".shf", OVER), f = box && box.querySelector(".flick"); if(!f) return; fitFlick(f); }
 
@@ -506,8 +514,8 @@ function flash(sel){ setTimeout(()=>{ const el = typeof sel === "string" ? $(sel
 
 /* ================= ad slots list: slot types only, no brand names ================= */
 const GUIDE = [
-  ["Ad breaks in the stream", [["Pre-roll: before the episode starts","#/watch/heartbeat","pre"],["Mid-roll: ad break inside the episode","#/watch/heartbeat","mid"],["Pause ad","#/watch/heartbeat","pause"],["Companion ad under the player","#/watch/heartbeat","comp"]]],
-  ["Shop the look", [["In the player: shop the scene","#/watch/heartbeat","scene"],["Title page: shop the look","#/t/heartbeat","look"],["Home: Shop the Look rail","#/home","shop"]]],
+  ["Ad breaks in the stream", [["Pre-roll: before the episode starts","#/watch/biggboss","pre"],["Mid-roll: ad break inside the episode","#/watch/biggboss","mid"],["Pause ad","#/watch/biggboss","pause"],["Companion ad under the player","#/watch/biggboss","comp"]]],
+  ["Shop the look", [["In the player: shop the scene","#/watch/biggboss","scene"],["Title page: shop the look","#/t/biggboss","look"],["Home: Shop the Look rail","#/home","shop"]]],
   ["Tadka micro-dramas", [["Sponsored video in the Tadka feed","#/tadka","tk1"],["Tadka feed: second sponsored video","#/tadka","tk2"],["Flick inside a micro-drama episode","#/reel/blankcheque","bc"],["Full-screen ad between episodes","#/reel/delivery","r1"],["Shop the look inside a micro-drama","#/reel/redsilk","rshop"]]],
   ["Swipeable banners", [["Home: masthead","#/home","mast"],["Home: For You carousel","#/home","fy"],["TV: masthead","#/tv","mast"],["TV: For You carousel","#/tv","fy"],["Movies: masthead","#/movies","mast"],["Movies: For You carousel","#/movies","fy"],["Sports: masthead","#/sports","mast"],["Sports: For You carousel","#/sports","fy"]]],
   ["Billboards between rails", [["Home: billboard","#/home","bill"],["Movies: billboard","#/movies","bill"],["Sports: billboard","#/sports","bill"]]],

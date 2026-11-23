@@ -60,9 +60,9 @@ const VMEM = {}; let CURH = "#/home";
 function flick(id, brand, opt={}){
   const b = BRANDS[brand], v = opt.v != null ? opt.v : (VMEM[CURH+"|"+id] || 0);
   SLOTS[id] = { id, brand, v, want:v, ready:false, error:false, mounted:false, on:opt.on||null, cta:opt.cta||"pdp", tap:!!opt.tap, lastCta:0, muted:null, timer:null };
-  return `<div class="flick ${b.tall?"tall":""}" data-slot="${id}"><div class="fstate"></div></div>`;
+  return `<div class="flick ${b.tall?"tall":b.wide?"wide":b.r43?"r43":""}" data-slot="${id}"><div class="fstate"></div></div>`;
 }
-const baseOf = b => b.tall ? [360,640] : [540,540];
+const baseOf = b => b.tall ? [360,640] : b.wide ? [640,360] : b.r43 ? [600,450] : [540,540];
 function mount(host){
   const s = SLOTS[host.dataset.slot]; if(!s || s.mounted || s.error) return;
   s.mounted = true; s.ready = false; s.muted = null;
