@@ -183,7 +183,7 @@ svg{display:block}input{font:inherit;color:inherit}em{font-style:normal}h1,h2,h3
 .reel{background:#000}
 .rback{position:absolute;left:10px;top:54px;z-index:30;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.4);display:grid;place-items:center;transition:opacity .3s}
 .reel.bare .rback{display:none}
-.reel.quiet .rback{opacity:0;pointer-events:none}
+/* Back stays on screen in full screen, even while the other controls are faded out */
 .rrail,.rinfo>*,.rshade{transition:opacity .3s}
 .rs.quiet .rrail,.rs.quiet .rshade,.rs.quiet .rinfo>*:not(.rprog){opacity:0;pointer-events:none}
 .pager{position:absolute;inset:0;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior:contain}
@@ -520,6 +520,10 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background:ra
 /* Tadka feed: shop the look from the card */
 .tkshop{position:absolute;right:12px;bottom:60px;z-index:3;cursor:pointer;margin:0}
 
+/* Back during an ad break: the player's own top bar is hidden then, so Back gets its own button over the corner of the ad */
+.plbk{position:absolute;left:6px;top:6px;z-index:6;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);display:none;place-items:center}
+.pl.ad .plbk{display:grid}
+
 </style>
 </head>
 <body class="splash">
@@ -648,6 +652,15 @@ const BRANDS = {
     head:"Pick the one that moves you", variants:V3() },
   cadillac:{ name:"Cadillac", av:"C", avc:"#1a1a1a", src:T2+"z70k1k/ad.js", cfg:"studio", kind:"shop", store:"lead", cta:"Book a Test Drive", unit:"Model", named:true, item:"Test drive",
     head:"Explore your Cadillac", variants:[{n:"OPTIQ"},{n:"CELESTIQ"},{n:"ESCALADE-V"}] },
+  bentley:{ name:"Bentley", av:"B", avc:"#0f3b2e", src:T3+"6a9bc07393e71f3ec9b12c81_xogy7s/ad.js", cfg:"fonts", kind:"shop", store:"lead", cta:"Get in Touch", unit:"Model", item:"Enquiry",
+    head:"Craftsmanship, your way", variants:V3() },
+  ford:{ name:"Ford", av:"F", avc:"#003478", src:T2+"opd0tt/ad.js", kind:"shop", store:"lead", cta:"Book a Test Drive", unit:"Model", item:"Test drive",
+    head:"Built for the long weekend", variants:V3() },
+  /* ---- travel and home ---- */
+  airbnb:{ name:"Airbnb", av:"A", avc:"#ff385c", src:T3+"6aa2aef14954ac6f0d9dcd05_ddladj/ad.js", cfg:"fonts", r43:true, kind:"shop", store:"lead", cta:"Plan a Stay", unit:"Stay", item:"Stay enquiry",
+    head:"More than just a stay", variants:V3() },
+  westelm:{ name:"West Elm", av:"WE", avc:"#3d4a3f", src:T2+"c5htms/ad.js", kind:"shop", store:"instamart", cta:"Order Now", unit:"Chair", item:"Accent chair", price:34990,
+    head:"The accent chair from the set", variants:V3() },
   /* ---- cards: nothing to add to a cart, so the button asks for a call back ---- */
   amex:{ name:"American Express", av:"AX", avc:"#016fd0", src:T1+"f41m4u/ad.js", cfg:"house", kind:"shop", store:"lead", cta:"Get Your Card", unit:"Card", item:"Card application",
     head:"The world, on your terms", variants:V3() },
@@ -676,8 +689,14 @@ const TAGCFG = {
   shirt:CLICKCFG("https://www.ajio.com/men-shirts/c/830216013", "dv360_studio"),
   mia:CLICKCFG("https://www.miabytanishq.com/en_IN/necklaces-and-pendants", "dv360_studio"),
   ua:`<script>window.clickTag="\${CLICK_URL}";window.AD_CONFIG=window.AD_CONFIG||{};window.AD_CONFIG.dsp="dv360_3p";window.AD_CONFIG.macros={"publisher_id":"\${PUBLISHER_ID}","universal_site_id":"\${UNIVERSAL_SITE_ID}","exchange_id":"\${EXCHANGE_ID}","app_bundle":"\${BUNDLE_ID}","adsxt_publisher_id":"\${ADSXT_PUBLISHER_ID}","adsxt_ad_system_domain":"\${ADSXT_AD_SYSTEM_DOMAIN}","adstxt_ad_system_domain":"\${ADSTXT_AD_SYSTEM_DOMAIN}","dsp_line_item_id":"\${CAMPAIGN_ID}","dsp_insertion_order_id":"\${INSERTION_ORDER_ID}","dsp_creative_id":"\${CREATIVE_ID}","inventory_source_id":"\${INVENTORY_SOURCE_EXTERNAL_ID}","auction_id":"\${AUCTION_ID}","impression_id":"\${IMPRESSION_ID}","geo_dma":"\${GEO_DMA}","gdpr":"\${GDPR}","source_url":"\${SOURCE_URL}","source_url_enc":"\${SOURCE_URL_ENC}"};window.AD_CONFIG.clickTracker={"mode":"clicktag","template":""};<\/script>`,
+  fonts:FONTSCAN,
   loreal:`<script>var ExitApi=window.ExitApi||{exit:function(){}};var clickTag=(function(){try{var s=(location.search||"")+"&"+((location.hash||"").replace(/^#/,""));var m=/[?&]clickTag=([^&]*)/.exec(s);return m?decodeURIComponent(m[1]):"";}catch(e){return "";}})();<\/script>\n${FONTSCAN}`
 };
+// Titles that are not in the slots list take their ads from these, turn by turn, so two titles rarely show the same ones.
+// POOL: square and 4:3 Flicks for the break, the pause ad, the unit under the player and the title page. LOOKS: what can be sold as a look from a scene.
+const POOL = ["bentley","mms","nike","amex","lip","westelm","dor","fossil","ford","eye","benjerry","reva","airbnb","gapus","juice","merc","bose","lorlip","patagonia","cadillac","lego","ua","genmills","sony","barkbox","can","bk","caesars","gapin","levis","outfit"];
+const LOOKS = ["zara","gucci","neck","nike","gapus","patagonia","ua","reva","fossil","gapin","grwm","puffer","levis","outfit"];
+const isLook = k => /^(nykaa|nykaaf|ajio)$/.test(BRANDS[k].store);
 const vshort = (k,i) => { const b = BRANDS[k], v = b.variants[i]; return v.n || `${b.unit} ${i+1}`; };
 const vname = (k,i) => `${BRANDS[k].name} ${vshort(k,i)}`;
 
@@ -1304,8 +1323,8 @@ function titleScreen(id){ const x = TT[id] || TT.heartbeat; id = x.id;
   <div class="ttags">${x.tags.map(g=>`<span>${g}</span>`).join("<i></i>")}</div>
   ${x.desc?`<p class="tdesc">${esc(x.desc)}</p>`:""}${x.note?`<div class="tnote">${esc(x.note)}</div>`:""}
   <div class="tacts"><button data-wl="${id}" class="${WL.has(id)?"on":""}" onclick="wlToggle('${id}')"><i>${WL.has(id)?I.check:I.plus}</i>Watchlist</button><button onclick="out('Sharing')"><i>${I.share}</i>Share</button><button onclick="toast('Thanks for rating')"><i>${I.smile}</i>Rate</button></div>
-  <section class="look" data-anchor="look"><div class="lh"><div><h2>Shop the Look</h2><span>Sponsored · ${esc(BRANDS.outfit.name)}</span></div>${dots("look")}</div>
-    <div class="lbox">${flick("look","outfit")}</div>${minis("look","outfit")}<button class="wbtn" onclick="ctaGo('look')">${esc(BRANDS.outfit.cta)}</button></section>
+  ${(k=>`<section class="look" data-anchor="look"><div class="lh"><div><h2>${isLook(k)?"Shop the Look":esc(BRANDS[k].head)}</h2><span>Sponsored · ${esc(BRANDS[k].name)}</span></div>${dots("look")}</div>
+    <div class="lbox">${flick("look",k)}</div>${minis("look",k)}<button class="wbtn" onclick="ctaGo('look')">${esc(BRANDS[k].cta)}</button></section`)(titleAd(id))}>
   <div class="seasons">${x.full?`<button onclick="chipOn2(this)">Season 1</button><button onclick="chipOn2(this)">Season 2</button><button class="on" onclick="chipOn2(this)">Season 3</button>`:`<button class="on">Episodes</button>`}</div>
   ${eps.map(([n,m])=>`<button class="eprow" onclick="${x.sub?`out('Subscriptions')`:`go('#/watch/${id}')`}"><span class="eth">${pic(x.full?"d_ep":x.img)}<i>${I.play}</i></span><span><b>${esc(n)}</b><em>${esc(m)}</em></span><span class="edl" onclick="event.stopPropagation();out('Downloads')">${I.dl}</span></button>`).join("")}
   ${more.length?rail("More Like This", more):""}
@@ -1317,25 +1336,32 @@ function chipOn2(el){ $$("button", el.parentElement).forEach(c=>c.classList.togg
 const PLS = {};            // per title: position and which breaks have played, kept while the demo is open
 let PL = null, plTimer = 0;
 const DUR = 31*60, START = 14*60+40, MID = 15*60, SCENE = 14*60+46, SCENE_LEN = 12, BREAK = 15, SKIP = 5;
-const BRK = { pre:"caesars", mid:"amex", pause:"bk", comp:"can" };
+// The slots-list title (Bigg Boss) keeps its own ads. Every other title takes its turn through the pools, so a random title does not show the same brand as the last one.
+const BRK0 = { pre:"caesars", mid:"amex", pause:"bk", comp:"can" };
+let BRK = BRK0;
+const ORDER = Object.keys(TT).concat(Object.keys(CLIPS)), seed = id => Math.max(0, ORDER.indexOf(String(id))) * 4;   // by the title's place in the catalogue, so neighbours differ
+function turn(pool, n, skip){ const out = []; for(let i = 0; out.length < 1 && i < pool.length; i++){ const k = pool[(n + i) % pool.length]; if(!skip.includes(k)) out.push(k); } return out[0]; }
+function brkFor(id){ if(id === "biggboss") return BRK0; const n = seed(id), o = {}, used = [titleAd(id)];
+  ["pre","comp","pause","mid"].forEach((s,i)=>{ o[s] = turn(POOL, n + 3 + i*7, used); used.push(o[s]); }); return o; }
+function titleAd(id){ return id === "biggboss" ? "outfit" : turn(POOL, seed(id), []); }
 // The look sold from the scene in the player. Each micro-drama names its own in TADKA.
-const sceneBrand = id => "levis";
+const sceneBrand = id => id === "biggboss" ? "levis" : turn(LOOKS, seed(id) + 5, Object.values(brkFor(id)).concat(titleAd(id)));
 const mmss = s => { s = Math.max(0, Math.floor(s)); return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`; };
 function watchInfo(id){ if(TT[id]){ const x = TT[id]; return { n:x.n, sub:`${x.ep||"S1 E1"}${x.epn?" · "+x.epn:""}`, stills:x.stills||(x.full?["d_tr1","d_tr2","d_tr0"]:[x.img]), poster:!x.full&&!x.stills, back:`#/t/${id}` }; }
   const c = CLIPS[id] || CLIPS.l_wtc; return { n:c[0], sub:"Cricket · "+c[1], stills:[CLIPS[id]?id:"l_wtc"], poster:false }; }
-function watchScreen(id){ if(TT[id] && TT[id].frame) return frameWatch(id); const w = watchInfo(id); const more = ["roslin","sangamarmar","draarohi","magicshiri","khalbali","honeymoon"].filter(k=>k!==id);
+function watchScreen(id){ if(TT[id] && TT[id].frame) return frameWatch(id); BRK = brkFor(id); const w = watchInfo(id); const more = ["roslin","sangamarmar","draarohi","magicshiri","khalbali","honeymoon"].filter(k=>k!==id);
   return `<div class="screen watch">${stpad()}
   <div class="pl" id="pl"><div class="plst ${w.poster?"poster":""}" id="plst">${w.stills.map((k,i)=>`<div class="st ${i?"":"on"}" style="background-image:url(${IMG[k][2]})"></div>`).join("")}</div>
     <div class="plui" id="plui" onclick="plTap(event)"><div class="plt"><button onclick="event.stopPropagation();back()" aria-label="Back">${I.back}</button><div><b>${esc(w.n)}</b><span>${esc(w.sub)}</span></div><button onclick="event.stopPropagation();out('Casting')" aria-label="Cast">${I.cast}</button></div>
       <div class="plc"><button onclick="event.stopPropagation();plSeek(PL.t-10)" aria-label="Back 10 seconds">${I.rw}</button><button class="pp" id="plpp" onclick="event.stopPropagation();plToggle()" aria-label="Play or pause">${I.pause}</button><button onclick="event.stopPropagation();plSeek(PL.t+10)" aria-label="Forward 10 seconds">${I.ff}</button></div>
       <button class="scenechip" id="scenechip" data-anchor="scene" onclick="event.stopPropagation();openScene('${sceneBrand(id)}','${esc(w.n)}')">${I.tag} Shop this look</button>
       <div class="plb"><span id="plt1">00:00</span><div class="bar" id="plbar" onclick="event.stopPropagation();plBar(event)"><i id="plfill"></i><u style="left:${MID/DUR*100}%"></u><em id="plknob"></em></div><span>${mmss(DUR)}</span></div></div>
-    <div class="plad" id="plad" data-anchor="brk"></div></div>
+    <div class="plad" id="plad" data-anchor="brk"></div><button class="plbk" onclick="back()" aria-label="Back">${I.back}</button></div>
   <div class="adstrip" id="adstrip"></div>
   <div class="scr" id="scr">
     <div id="pausead" data-anchor="pause"></div>
     <div class="winfo"><h1>${esc(w.n)}</h1><span>${esc(w.sub)}</span></div>
-    ${TT[id]?`<div class="wtabs"><button class="on">For You</button><button onclick="ctaGo('comp')"><i style="background:${STORES.instamart.col}"></i>Shop</button><button onclick="out('Jeeto')">Jeeto</button><button onclick="out('Memes')">Memes</button><button onclick="openStore(BRK.pause, SLOTS.pz ? SLOTS.pz.v : 0, SLOTS.pz ? 'pz' : null)"><i style="background:${STORES.swiggy.col}"></i>Order Food</button><button onclick="out('Episodes')">Episodes</button></div>`:""}
+    ${TT[id]?`<div class="wtabs"><button class="on">For You</button><button onclick="BRANDS[BRK.comp].store==='instamart' ? ctaGo('comp') : openStore('can',0,null)"><i style="background:${STORES.instamart.col}"></i>Shop</button><button onclick="out('Jeeto')">Jeeto</button><button onclick="out('Memes')">Memes</button><button onclick="BRANDS[BRK.pause].store==='swiggy' ? openStore(BRK.pause, SLOTS.pz ? SLOTS.pz.v : 0, SLOTS.pz ? 'pz' : null) : openStore('bk',0,null)"><i style="background:${STORES.swiggy.col}"></i>Order Food</button><button onclick="out('Episodes')">Episodes</button></div>`:""}
     <div class="tacts">${TT[id]?`<button data-wl="${id}" class="${WL.has(id)?"on":""}" onclick="wlToggle('${id}')"><i>${WL.has(id)?I.check:I.plus}</i>Watchlist</button>`:""}<button onclick="out('Sharing')"><i>${I.share}</i>Share</button><button onclick="openScene('${sceneBrand(id)}','${esc(w.n)}')"><i>${I.tag}</i>Shop the look</button><button onclick="out('Downloads')"><i>${I.dl}</i>Download</button></div>
     <div class="comp" data-anchor="comp"><div class="tkh">${av(BRK.comp)}<div><b>${esc(BRANDS[BRK.comp].head)}</b><span>Sponsored · ${esc(BRANDS[BRK.comp].name)}</span></div>${dots("comp")}</div>${flick("comp",BRK.comp)}${minis("comp",BRK.comp)}<button class="wbtn" onclick="ctaGo('comp')">${esc(BRANDS[BRK.comp].cta)}</button></div>
     ${rail("More Like This", more)}

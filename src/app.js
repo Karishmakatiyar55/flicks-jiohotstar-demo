@@ -363,8 +363,8 @@ function titleScreen(id){ const x = TT[id] || TT.heartbeat; id = x.id;
   <div class="ttags">${x.tags.map(g=>`<span>${g}</span>`).join("<i></i>")}</div>
   ${x.desc?`<p class="tdesc">${esc(x.desc)}</p>`:""}${x.note?`<div class="tnote">${esc(x.note)}</div>`:""}
   <div class="tacts"><button data-wl="${id}" class="${WL.has(id)?"on":""}" onclick="wlToggle('${id}')"><i>${WL.has(id)?I.check:I.plus}</i>Watchlist</button><button onclick="out('Sharing')"><i>${I.share}</i>Share</button><button onclick="toast('Thanks for rating')"><i>${I.smile}</i>Rate</button></div>
-  <section class="look" data-anchor="look"><div class="lh"><div><h2>Shop the Look</h2><span>Sponsored · ${esc(BRANDS.outfit.name)}</span></div>${dots("look")}</div>
-    <div class="lbox">${flick("look","outfit")}</div>${minis("look","outfit")}<button class="wbtn" onclick="ctaGo('look')">${esc(BRANDS.outfit.cta)}</button></section>
+  ${(k=>`<section class="look" data-anchor="look"><div class="lh"><div><h2>${isLook(k)?"Shop the Look":esc(BRANDS[k].head)}</h2><span>Sponsored · ${esc(BRANDS[k].name)}</span></div>${dots("look")}</div>
+    <div class="lbox">${flick("look",k)}</div>${minis("look",k)}<button class="wbtn" onclick="ctaGo('look')">${esc(BRANDS[k].cta)}</button></section`)(titleAd(id))}>
   <div class="seasons">${x.full?`<button onclick="chipOn2(this)">Season 1</button><button onclick="chipOn2(this)">Season 2</button><button class="on" onclick="chipOn2(this)">Season 3</button>`:`<button class="on">Episodes</button>`}</div>
   ${eps.map(([n,m])=>`<button class="eprow" onclick="${x.sub?`out('Subscriptions')`:`go('#/watch/${id}')`}"><span class="eth">${pic(x.full?"d_ep":x.img)}<i>${I.play}</i></span><span><b>${esc(n)}</b><em>${esc(m)}</em></span><span class="edl" onclick="event.stopPropagation();out('Downloads')">${I.dl}</span></button>`).join("")}
   ${more.length?rail("More Like This", more):""}
@@ -376,25 +376,32 @@ function chipOn2(el){ $$("button", el.parentElement).forEach(c=>c.classList.togg
 const PLS = {};            // per title: position and which breaks have played, kept while the demo is open
 let PL = null, plTimer = 0;
 const DUR = 31*60, START = 14*60+40, MID = 15*60, SCENE = 14*60+46, SCENE_LEN = 12, BREAK = 15, SKIP = 5;
-const BRK = { pre:"caesars", mid:"amex", pause:"bk", comp:"can" };
+// The slots-list title (Bigg Boss) keeps its own ads. Every other title takes its turn through the pools, so a random title does not show the same brand as the last one.
+const BRK0 = { pre:"caesars", mid:"amex", pause:"bk", comp:"can" };
+let BRK = BRK0;
+const ORDER = Object.keys(TT).concat(Object.keys(CLIPS)), seed = id => Math.max(0, ORDER.indexOf(String(id))) * 4;   // by the title's place in the catalogue, so neighbours differ
+function turn(pool, n, skip){ const out = []; for(let i = 0; out.length < 1 && i < pool.length; i++){ const k = pool[(n + i) % pool.length]; if(!skip.includes(k)) out.push(k); } return out[0]; }
+function brkFor(id){ if(id === "biggboss") return BRK0; const n = seed(id), o = {}, used = [titleAd(id)];
+  ["pre","comp","pause","mid"].forEach((s,i)=>{ o[s] = turn(POOL, n + 3 + i*7, used); used.push(o[s]); }); return o; }
+function titleAd(id){ return id === "biggboss" ? "outfit" : turn(POOL, seed(id), []); }
 // The look sold from the scene in the player. Each micro-drama names its own in TADKA.
-const sceneBrand = id => "levis";
+const sceneBrand = id => id === "biggboss" ? "levis" : turn(LOOKS, seed(id) + 5, Object.values(brkFor(id)).concat(titleAd(id)));
 const mmss = s => { s = Math.max(0, Math.floor(s)); return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`; };
 function watchInfo(id){ if(TT[id]){ const x = TT[id]; return { n:x.n, sub:`${x.ep||"S1 E1"}${x.epn?" · "+x.epn:""}`, stills:x.stills||(x.full?["d_tr1","d_tr2","d_tr0"]:[x.img]), poster:!x.full&&!x.stills, back:`#/t/${id}` }; }
   const c = CLIPS[id] || CLIPS.l_wtc; return { n:c[0], sub:"Cricket · "+c[1], stills:[CLIPS[id]?id:"l_wtc"], poster:false }; }
-function watchScreen(id){ if(TT[id] && TT[id].frame) return frameWatch(id); const w = watchInfo(id); const more = ["roslin","sangamarmar","draarohi","magicshiri","khalbali","honeymoon"].filter(k=>k!==id);
+function watchScreen(id){ if(TT[id] && TT[id].frame) return frameWatch(id); BRK = brkFor(id); const w = watchInfo(id); const more = ["roslin","sangamarmar","draarohi","magicshiri","khalbali","honeymoon"].filter(k=>k!==id);
   return `<div class="screen watch">${stpad()}
   <div class="pl" id="pl"><div class="plst ${w.poster?"poster":""}" id="plst">${w.stills.map((k,i)=>`<div class="st ${i?"":"on"}" style="background-image:url(${IMG[k][2]})"></div>`).join("")}</div>
     <div class="plui" id="plui" onclick="plTap(event)"><div class="plt"><button onclick="event.stopPropagation();back()" aria-label="Back">${I.back}</button><div><b>${esc(w.n)}</b><span>${esc(w.sub)}</span></div><button onclick="event.stopPropagation();out('Casting')" aria-label="Cast">${I.cast}</button></div>
       <div class="plc"><button onclick="event.stopPropagation();plSeek(PL.t-10)" aria-label="Back 10 seconds">${I.rw}</button><button class="pp" id="plpp" onclick="event.stopPropagation();plToggle()" aria-label="Play or pause">${I.pause}</button><button onclick="event.stopPropagation();plSeek(PL.t+10)" aria-label="Forward 10 seconds">${I.ff}</button></div>
       <button class="scenechip" id="scenechip" data-anchor="scene" onclick="event.stopPropagation();openScene('${sceneBrand(id)}','${esc(w.n)}')">${I.tag} Shop this look</button>
       <div class="plb"><span id="plt1">00:00</span><div class="bar" id="plbar" onclick="event.stopPropagation();plBar(event)"><i id="plfill"></i><u style="left:${MID/DUR*100}%"></u><em id="plknob"></em></div><span>${mmss(DUR)}</span></div></div>
-    <div class="plad" id="plad" data-anchor="brk"></div></div>
+    <div class="plad" id="plad" data-anchor="brk"></div><button class="plbk" onclick="back()" aria-label="Back">${I.back}</button></div>
   <div class="adstrip" id="adstrip"></div>
   <div class="scr" id="scr">
     <div id="pausead" data-anchor="pause"></div>
     <div class="winfo"><h1>${esc(w.n)}</h1><span>${esc(w.sub)}</span></div>
-    ${TT[id]?`<div class="wtabs"><button class="on">For You</button><button onclick="ctaGo('comp')"><i style="background:${STORES.instamart.col}"></i>Shop</button><button onclick="out('Jeeto')">Jeeto</button><button onclick="out('Memes')">Memes</button><button onclick="openStore(BRK.pause, SLOTS.pz ? SLOTS.pz.v : 0, SLOTS.pz ? 'pz' : null)"><i style="background:${STORES.swiggy.col}"></i>Order Food</button><button onclick="out('Episodes')">Episodes</button></div>`:""}
+    ${TT[id]?`<div class="wtabs"><button class="on">For You</button><button onclick="BRANDS[BRK.comp].store==='instamart' ? ctaGo('comp') : openStore('can',0,null)"><i style="background:${STORES.instamart.col}"></i>Shop</button><button onclick="out('Jeeto')">Jeeto</button><button onclick="out('Memes')">Memes</button><button onclick="BRANDS[BRK.pause].store==='swiggy' ? openStore(BRK.pause, SLOTS.pz ? SLOTS.pz.v : 0, SLOTS.pz ? 'pz' : null) : openStore('bk',0,null)"><i style="background:${STORES.swiggy.col}"></i>Order Food</button><button onclick="out('Episodes')">Episodes</button></div>`:""}
     <div class="tacts">${TT[id]?`<button data-wl="${id}" class="${WL.has(id)?"on":""}" onclick="wlToggle('${id}')"><i>${WL.has(id)?I.check:I.plus}</i>Watchlist</button>`:""}<button onclick="out('Sharing')"><i>${I.share}</i>Share</button><button onclick="openScene('${sceneBrand(id)}','${esc(w.n)}')"><i>${I.tag}</i>Shop the look</button><button onclick="out('Downloads')"><i>${I.dl}</i>Download</button></div>
     <div class="comp" data-anchor="comp"><div class="tkh">${av(BRK.comp)}<div><b>${esc(BRANDS[BRK.comp].head)}</b><span>Sponsored · ${esc(BRANDS[BRK.comp].name)}</span></div>${dots("comp")}</div>${flick("comp",BRK.comp)}${minis("comp",BRK.comp)}<button class="wbtn" onclick="ctaGo('comp')">${esc(BRANDS[BRK.comp].cta)}</button></div>
     ${rail("More Like This", more)}

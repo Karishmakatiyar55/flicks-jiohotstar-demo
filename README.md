@@ -27,12 +27,12 @@ JioHotstar already carries Instamart in its Shop tab and Swiggy in its Order Foo
 | Nykaa | L'Oréal Paris (lipstick, hair colour), e.l.f., Ulta Beauty |
 | Nykaa Fashion | Reva Diamonds, Fossil, Mia by Tanishq, David Yurman, Gucci, Zara, Levi's (two), Nike, Under Armour, Gap (two), Patagonia, the puffer jacket, Get Ready With Me |
 | AJIO | The shirt Flick (its own tag points at ajio.com) |
-| Call back | Mercedes-Benz and Cadillac ("Book a Test Drive") and American Express ("Get Your Card") ask for a phone number, there is no cart |
+| Call back | Mercedes-Benz, Cadillac and Ford ("Book a Test Drive"), Bentley ("Get in Touch"), American Express ("Get Your Card") and Airbnb ("Plan a Stay") ask for a phone number, there is no cart |
 
 - **The prices are placeholders** and the item names are generic. The tags do not carry them.
 - The picture in the cart is the Flick's own option picture.
 - The phone number typed is kept only on the page. No message is sent; the OTP fills in by itself.
-- No Flick is used twice: each of the 36 tags sits in one slot.
+- The 26 listed slots each have their own tag. Every other title a viewer opens takes its ads in turn from the whole library (40 tags), so random titles show different brands: cars (Mercedes-Benz, Cadillac, Bentley, Ford), cards (American Express), travel (Airbnb), furniture (West Elm), food, drinks, beauty, fashion, jewellery, electronics.
 
 ## What is real and what is not
 

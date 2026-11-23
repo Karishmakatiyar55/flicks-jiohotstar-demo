@@ -98,6 +98,15 @@ const BRANDS = {
     head:"Pick the one that moves you", variants:V3() },
   cadillac:{ name:"Cadillac", av:"C", avc:"#1a1a1a", src:T2+"z70k1k/ad.js", cfg:"studio", kind:"shop", store:"lead", cta:"Book a Test Drive", unit:"Model", named:true, item:"Test drive",
     head:"Explore your Cadillac", variants:[{n:"OPTIQ"},{n:"CELESTIQ"},{n:"ESCALADE-V"}] },
+  bentley:{ name:"Bentley", av:"B", avc:"#0f3b2e", src:T3+"6a9bc07393e71f3ec9b12c81_xogy7s/ad.js", cfg:"fonts", kind:"shop", store:"lead", cta:"Get in Touch", unit:"Model", item:"Enquiry",
+    head:"Craftsmanship, your way", variants:V3() },
+  ford:{ name:"Ford", av:"F", avc:"#003478", src:T2+"opd0tt/ad.js", kind:"shop", store:"lead", cta:"Book a Test Drive", unit:"Model", item:"Test drive",
+    head:"Built for the long weekend", variants:V3() },
+  /* ---- travel and home ---- */
+  airbnb:{ name:"Airbnb", av:"A", avc:"#ff385c", src:T3+"6aa2aef14954ac6f0d9dcd05_ddladj/ad.js", cfg:"fonts", r43:true, kind:"shop", store:"lead", cta:"Plan a Stay", unit:"Stay", item:"Stay enquiry",
+    head:"More than just a stay", variants:V3() },
+  westelm:{ name:"West Elm", av:"WE", avc:"#3d4a3f", src:T2+"c5htms/ad.js", kind:"shop", store:"instamart", cta:"Order Now", unit:"Chair", item:"Accent chair", price:34990,
+    head:"The accent chair from the set", variants:V3() },
   /* ---- cards: nothing to add to a cart, so the button asks for a call back ---- */
   amex:{ name:"American Express", av:"AX", avc:"#016fd0", src:T1+"f41m4u/ad.js", cfg:"house", kind:"shop", store:"lead", cta:"Get Your Card", unit:"Card", item:"Card application",
     head:"The world, on your terms", variants:V3() },
@@ -126,8 +135,14 @@ const TAGCFG = {
   shirt:CLICKCFG("https://www.ajio.com/men-shirts/c/830216013", "dv360_studio"),
   mia:CLICKCFG("https://www.miabytanishq.com/en_IN/necklaces-and-pendants", "dv360_studio"),
   ua:`<script>window.clickTag="\${CLICK_URL}";window.AD_CONFIG=window.AD_CONFIG||{};window.AD_CONFIG.dsp="dv360_3p";window.AD_CONFIG.macros={"publisher_id":"\${PUBLISHER_ID}","universal_site_id":"\${UNIVERSAL_SITE_ID}","exchange_id":"\${EXCHANGE_ID}","app_bundle":"\${BUNDLE_ID}","adsxt_publisher_id":"\${ADSXT_PUBLISHER_ID}","adsxt_ad_system_domain":"\${ADSXT_AD_SYSTEM_DOMAIN}","adstxt_ad_system_domain":"\${ADSTXT_AD_SYSTEM_DOMAIN}","dsp_line_item_id":"\${CAMPAIGN_ID}","dsp_insertion_order_id":"\${INSERTION_ORDER_ID}","dsp_creative_id":"\${CREATIVE_ID}","inventory_source_id":"\${INVENTORY_SOURCE_EXTERNAL_ID}","auction_id":"\${AUCTION_ID}","impression_id":"\${IMPRESSION_ID}","geo_dma":"\${GEO_DMA}","gdpr":"\${GDPR}","source_url":"\${SOURCE_URL}","source_url_enc":"\${SOURCE_URL_ENC}"};window.AD_CONFIG.clickTracker={"mode":"clicktag","template":""};<\/script>`,
+  fonts:FONTSCAN,
   loreal:`<script>var ExitApi=window.ExitApi||{exit:function(){}};var clickTag=(function(){try{var s=(location.search||"")+"&"+((location.hash||"").replace(/^#/,""));var m=/[?&]clickTag=([^&]*)/.exec(s);return m?decodeURIComponent(m[1]):"";}catch(e){return "";}})();<\/script>\n${FONTSCAN}`
 };
+// Titles that are not in the slots list take their ads from these, turn by turn, so two titles rarely show the same ones.
+// POOL: square and 4:3 Flicks for the break, the pause ad, the unit under the player and the title page. LOOKS: what can be sold as a look from a scene.
+const POOL = ["bentley","mms","nike","amex","lip","westelm","dor","fossil","ford","eye","benjerry","reva","airbnb","gapus","juice","merc","bose","lorlip","patagonia","cadillac","lego","ua","genmills","sony","barkbox","can","bk","caesars","gapin","levis","outfit"];
+const LOOKS = ["zara","gucci","neck","nike","gapus","patagonia","ua","reva","fossil","gapin","grwm","puffer","levis","outfit"];
+const isLook = k => /^(nykaa|nykaaf|ajio)$/.test(BRANDS[k].store);
 const vshort = (k,i) => { const b = BRANDS[k], v = b.variants[i]; return v.n || `${b.unit} ${i+1}`; };
 const vname = (k,i) => `${BRANDS[k].name} ${vshort(k,i)}`;
 

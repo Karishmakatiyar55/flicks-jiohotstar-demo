@@ -171,7 +171,7 @@ svg{display:block}input{font:inherit;color:inherit}em{font-style:normal}h1,h2,h3
 .reel{background:#000}
 .rback{position:absolute;left:10px;top:54px;z-index:30;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.4);display:grid;place-items:center;transition:opacity .3s}
 .reel.bare .rback{display:none}
-.reel.quiet .rback{opacity:0;pointer-events:none}
+/* Back stays on screen in full screen, even while the other controls are faded out */
 .rrail,.rinfo>*,.rshade{transition:opacity .3s}
 .rs.quiet .rrail,.rs.quiet .rshade,.rs.quiet .rinfo>*:not(.rprog){opacity:0;pointer-events:none}
 .pager{position:absolute;inset:0;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior:contain}
@@ -507,3 +507,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background:ra
 
 /* Tadka feed: shop the look from the card */
 .tkshop{position:absolute;right:12px;bottom:60px;z-index:3;cursor:pointer;margin:0}
+
+/* Back during an ad break: the player's own top bar is hidden then, so Back gets its own button over the corner of the ad */
+.plbk{position:absolute;left:6px;top:6px;z-index:6;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);display:none;place-items:center}
+.pl.ad .plbk{display:grid}
