@@ -27,12 +27,12 @@ JioHotstar already carries Instamart in its Shop tab and Swiggy in its Order Foo
 | Nykaa | L'Oréal Paris (lipstick, hair colour), e.l.f., Ulta Beauty |
 | Nykaa Fashion | Reva Diamonds, Fossil, Mia by Tanishq, David Yurman, Gucci, Zara, Levi's (two), Nike, Under Armour, Gap (two), Patagonia, the puffer jacket, Get Ready With Me |
 | AJIO | The shirt Flick (its own tag points at ajio.com) |
-| Call back | Mercedes-Benz ("Book a Test Drive") and American Express ("Get Your Card") ask for a phone number, there is no cart |
+| Call back | Mercedes-Benz and Cadillac ("Book a Test Drive") and American Express ("Get Your Card") ask for a phone number, there is no cart |
 
 - **The prices are placeholders** and the item names are generic. The tags do not carry them.
 - The picture in the cart is the Flick's own option picture.
 - The phone number typed is kept only on the page. No message is sent; the OTP fills in by itself.
-- No Flick is used twice: each of the 35 tags sits in one slot.
+- No Flick is used twice: each of the 36 tags sits in one slot.
 
 ## What is real and what is not
 
@@ -43,8 +43,8 @@ JioHotstar already carries Instamart in its Shop tab and Swiggy in its Order Foo
 - "Pritam and Pedro" in Tadka is the "In-shots Shirt change" Flick shown as an episode, in the feed and full screen.
 - Blank Cheque in Tadka is Flam's shoppable micro-drama preview (`flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/`), shown in a frame as it is.
 - Options are switched only inside a Flick. The names under a Flick follow it and are not buttons.
-- The other real video is the Tadka micro-drama shown as "The Last Delivery" (a title made up for the demo), played from `microdrama-audio-diff.vercel.app` with four audio languages. Its cover was generated with Flowy to match the video. My Secret CEO and Red Silk are Flam's own posters, not JioHotstar titles.
-- In the Tadka feed, Blank Cheque and The Last Delivery play by themselves, silent, a second after they come on screen.
+- My Secret CEO and Red Silk are Flam's own posters, not JioHotstar titles.
+- In the Tadka feed, Blank Cheque plays by itself, silent, a second after it comes on screen.
 - Option names shown as "Look 1", "Shade 2" are placeholders where the real names are not known.
 - The second sponsored video in the Tadka feed is a content Flick (the viewer picks who plays the lead); its button opens the micro-drama.
 - Login, casting, downloads and sharing say they are outside the demo.

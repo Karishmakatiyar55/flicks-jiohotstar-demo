@@ -34,7 +34,7 @@ function wlToggle(id, ev){ if(ev) ev.stopPropagation(); const on = !WL.has(id); 
 /* ================= what the app's button for a Flick does ================= */
 // It opens a store inside JioHotstar with the product for the option the Flick is on. Nothing leaves the app, and nothing outside the Flick changes its option.
 function ctaGo(id){ const s = SLOTS[id]; if(!s) return; const b = BRANDS[s.brand];
-  if(b.kind === "watch") return go("#/reel/delivery");
+  if(b.kind === "watch") return go("#/reel/ceo");
   openStore(s.brand, s.v, id); }
 // The picture of the option, taken from the Flick's own option button, so the cart shows what the Flick showed.
 function swatchImg(id, v){ try{ const sw = swatchFor(id, v); if(!sw) return ""; const im = sw.querySelector("img"); if(im) return im.currentSrc || im.src || "";
@@ -136,7 +136,7 @@ const HOME = {
     ${fy("f-home",[fyPlay("obsreplay"), fyCut("h_biggboss","biggboss"), fyFlick("fy","lorlip","fy"), fyClip("h_bumrah","l_wtc"), fyCut("h_moana","moana","Subscribe to Watch"), fyFlick("fy2","eye","fy2"), fyCut("h_queen","queen"), fyCut("h_apsara","apsara")])}
     ${rail("New on JioHotstar",["office","chiranjeevi","dilwaniya","hanuman","imgame","roslin"])}
     ${slice("k_free",[[3,49,31,47,"go('#/t/biggboss')","Bigg Boss"],[35,49,31,47,"go('#/t/yehrishta')","Yeh Rishta Kya Kehlata Hai"],[67,49,31,47,"go('#/t/anupamaa')","Anupamaa"]])}
-    ${sec("Shop the Look", `<div class="row looks">${lookCard("shop","lorhair","shop")}${lookCard("shop2","gucci")}${lookCard("shop3","zara")}</div>`, "Sponsored · Styles from the shows you watch")}
+    ${sec("Shop the Look", `<div class="row looks">${lookCard("shop","lorhair","shop")}${lookCard("shop2","grwm")}${lookCard("shop3","puffer")}</div>`, "Sponsored · Styles from the shows you watch")}
     ${banner("b_biggboss","go('#/t/biggboss')")}
     ${top10("Top 10 in India Today",["biggboss","dhamaal","roadies","anupamaa","yehrishta","laughterchefs"],["All","Hindi","English","Tamil","Telugu","Malayalam"])}
     ${bill("bill","juice","bill")}
@@ -194,8 +194,9 @@ function tkCard(x, i){ if(x.flick){ const k = x.flick;
     return `<div class="tkc flk" data-anchor="tk1"><div class="tkfl">${flick("tk1",k)}</div><div class="tkfb" data-spop="tk1"><span class="tkft"><b>${esc(x.n)}</b><em>${esc(x.meta)} · <i data-sv="tk1">${esc(vshort(k,0))}</i></em></span>${ctaBtn("tk1",k,"wbtn sm")}<button class="tkfp" onclick="go('#/reel/${x.id}')" aria-label="Full screen">${I.play}</button></div></div>`; }
   const pv = x.preview ? ` data-pv="${x.preview}"` : "", hold = x.preview ? `<span class="tkv"></span>` : "";
   if(x.frame) return `<button class="tkc own fr"${pv} onclick="tkOpen('${x.id}',this)" aria-label="${esc(x.n)}"><span class="frt"><b>${esc(x.n)}</b><em>${esc(x.meta)}</em></span><img src="${x.poster}" alt="" onerror="this.remove()" draggable="false">${hold}<span class="bdg">${x.badge}</span><i class="pl">${I.play}</i></button>`;
-  if(x.cut) return `<div class="tkc">${slice(x.img,[[0,0,100,100,`go('#/reel/${x.id}')`,x.n]])}</div>`;
-  return `<button class="tkc own"${pv} onclick="tkOpen('${x.id}',this)" aria-label="${esc(x.n)}">${pic(x.img,x.n)}${hold}${x.badge?`<span class="bdg">${x.badge}</span>`:""}${x.video?`<span class="tkn"><b>${esc(x.n)}</b><em>${esc(x.meta)} · ${esc(x.tags)}</em></span>`:""}<i class="pl">${I.play}</i></button>`; }
+  const chip = x.look ? `<span class="shopchip tkshop" role="button" tabindex="0" onclick="event.stopPropagation();openScene('${x.look}','${esc(x.n)}')">${I.tag} Shop the look</span>` : "";   // the look can be bought from the card, without opening the episode
+  if(x.cut) return `<div class="tkc" data-md="${x.id}">${slice(x.img,[[0,0,100,100,`go('#/reel/${x.id}')`,x.n]])}${chip}</div>`;
+  return `<button class="tkc own"${pv} onclick="tkOpen('${x.id}',this)" aria-label="${esc(x.n)}">${pic(x.img,x.n)}${hold}${x.badge?`<span class="bdg">${x.badge}</span>`:""}${x.video?`<span class="tkn"><b>${esc(x.n)}</b><em>${esc(x.meta)} · ${esc(x.tags)}</em></span>`:""}${chip}<i class="pl">${I.play}</i></button>`; }
 let FEEDCUR = null, FEEDSINCE = 0;
 const RSTART = {};   // where each micro-drama's preview had got to when it was opened
 function tkOpen(id, c){ const v = c.querySelector(".tkv video"); if(v && !v.error && v.currentTime > 0){ RSTART[id] = v.currentTime; if(TADKA.find(t=>t.id===id).frame) BCT = v.currentTime; } go("#/reel/"+id); }
@@ -217,12 +218,12 @@ function tkAd(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
   <div class="tkb" data-spop="${id}"><span><em data-sv="${id}">${esc(vshort(k,0))}</em></span>${ctaBtn(id,k,"wbtn sm")}</div></div>`; }
 function tadkaScreen(){ const c = TADKA.map(tkCard); bcFetch();
   return `<div class="screen tadka">${stpad()}${header("tadka")}<div class="scr" id="scr">
-  ${c[0]}${c[1]}${c[2]}${c[3]}${tkAd("tk2","ugc","tk2")}${c[4]}${c[5]}${c[6]}${c[7]}${c[8]}
-  ${sec("Latest on Tadka", `<div class="row">${[["tr_reality","reality"],["tr_shehzada","ceo"],["tr_saanp","redsilk"]].map(([k,id])=>`<button class="po tall" onclick="go('#/reel/${id}')">${pic(k)}</button>`).join("")}${["delivery","ceo","redsilk"].map(id=>`<button class="po tall" onclick="go('#/reel/${id}')">${pic("o_"+id)}</button>`).join("")}</div>`)}
+  ${c[0]}${c[1]}${c[2]}${c[3]}${tkAd("tk2","ugc","tk2")}${c[4]}${c[5]}${c[6]}${c[7]}
+  ${sec("Latest on Tadka", `<div class="row">${[["tr_reality","reality"],["tr_shehzada","ceo"],["tr_saanp","redsilk"]].map(([k,id])=>`<button class="po tall" onclick="go('#/reel/${id}')">${pic(k)}</button>`).join("")}${["ceo","redsilk"].map(id=>`<button class="po tall" onclick="go('#/reel/${id}')">${pic("o_"+id)}</button>`).join("")}</div>`)}
   </div>${nav("tadka")}</div>`; }
 
 /* ---- Tadka player: full-screen vertical episodes, with a full-screen ad between them ---- */
-const REEL_ADS = ["grwm","puffer"];
+const REEL_ADS = ["cadillac"];
 function reelSlides(){ const s = []; let n = 0; TADKA.forEach(x=>{ if(x.flick){ s.push({md:x, ad:x.flick, own:true, anchor:"tk1f"}); return; } s.push({md:x}); if(!x.frame && n < REEL_ADS.length){ s.push({ad:REEL_ADS[n], anchor:"r"+(n+1)}); n++; } }); return s; }
 let RS = [], RCUR = -1, RLANG = "English", RMUTED = false, RLIKE = {};
 function reelScreen(id){ RS = reelSlides(); RCUR = -1; bcFetch();
@@ -237,7 +238,7 @@ function reelMd(x, i){
 function reelAd(s, i){ const k = s.ad, b = BRANDS[k], id = "reel-"+k, v = b.variants[0];
   return `<section class="rs ad ${s.own?"own":""}" data-i="${i}" data-anchor="${s.anchor}"><div class="rah">${s.own?"":av(k)}<div><b>${esc(s.own?s.md.n:b.name)}</b><span>${s.own?esc(s.md.meta):"Sponsored"}</span></div>${dots(id)}</div><div class="rfl">${flick(id,k)}</div>
   <div class="raf" data-spop="${id}"><span class="rv"><em data-sv="${id}">${esc(vshort(k,0))}</em></span><div class="rbt">${ctaBtn(id,k,"wbtn")}<button class="wbtn ghost" onclick="reelGo(${i+1})">Next episode ${I.down}</button></div></div></section>`; }
-function reelFit(){ $$(".rs.ad", VIEW).forEach(s=>{ const box = s.querySelector(".rfl"), f = box.querySelector(".flick"); const w = Math.floor(Math.min(box.clientWidth, box.clientHeight*9/16)); f.style.width = w+"px"; fitFlick(f); }); }
+function reelFit(){ $$(".rs.ad", VIEW).forEach(s=>{ const box = s.querySelector(".rfl"), f = box.querySelector(".flick"); const sl = SLOTS[f.dataset.slot], [bw,bh] = sl ? baseOf(BRANDS[sl.brand]) : [9,16]; const w = Math.floor(Math.min(box.clientWidth, box.clientHeight*bw/bh)); f.style.width = w+"px"; fitFlick(f); }); }
 function reelGo(i){ const p = $("#pager"); if(!p) return; i = Math.max(0, Math.min(RS.length-1, i)); p.scrollTo({top:i*p.clientHeight, behavior:"smooth"}); }
 function reelActivate(){ const p = $("#pager"); if(!p) return; const i = Math.round(p.scrollTop / (p.clientHeight||1)); if(i === RCUR) return; RCUR = i;
   $$(".rs", p).forEach(sn=>{ const on = +sn.dataset.i === i; sn.classList.toggle("on", on);

@@ -504,3 +504,6 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background:ra
 .pl.plfr{transition:none}
 .plfr iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#000}
 .obx{position:absolute;left:6px;top:6px;z-index:3;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.45);display:grid;place-items:center}
+
+/* Tadka feed: shop the look from the card */
+.tkshop{position:absolute;right:12px;bottom:60px;z-index:3;cursor:pointer;margin:0}

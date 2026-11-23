@@ -96,6 +96,8 @@ const BRANDS = {
   /* ---- cars: nothing to add to a cart, so the button asks for a call back ---- */
   merc:{ name:"Mercedes-Benz", av:"MB", avc:"#111", src:T3+"6a9bc07393e71f3ec9b12c81_i3pdeq/ad.js", kind:"shop", store:"lead", cta:"Book a Test Drive", unit:"Model", item:"Test drive",
     head:"Pick the one that moves you", variants:V3() },
+  cadillac:{ name:"Cadillac", av:"C", avc:"#1a1a1a", src:T2+"z70k1k/ad.js", cfg:"studio", kind:"shop", store:"lead", cta:"Book a Test Drive", unit:"Model", named:true, item:"Test drive",
+    head:"Explore your Cadillac", variants:[{n:"OPTIQ"},{n:"CELESTIQ"},{n:"ESCALADE-V"}] },
   /* ---- cards: nothing to add to a cart, so the button asks for a call back ---- */
   amex:{ name:"American Express", av:"AX", avc:"#016fd0", src:T1+"f41m4u/ad.js", cfg:"house", kind:"shop", store:"lead", cta:"Get Your Card", unit:"Card", item:"Card application",
     head:"The world, on your terms", variants:V3() },
@@ -214,9 +216,8 @@ const TADKA = [
   { id:"blankcheque", n:"Blank Cheque", meta:"Episode 3", tags:"Drama · Shoppable", frame:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/", poster:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/media/poster.jpg", preview:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/media/main.mp4", badge:"Shop while you watch" },
   // An episode that is itself a Flick: the "In-shots Shirt change" tag. It plays in the feed and full screen, and the shirt can be changed and bought in both.
   { id:"pritam", n:"Pritam and Pedro", meta:"Hotstar Specials", tags:"Shop while you watch", flick:"shirt" },
-  { id:"delivery", n:"The Last Delivery", meta:"24 Eps · 4 Languages", tags:"Thriller · Mystery", img:"o_delivery", video:true, preview:MD_PREVIEW, badge:"New Episodes Daily" },
-  { id:"reality", n:"Reality Check", meta:"10 Eps · Hindi", tags:"Celebrities · Reality", img:"tk_reality", cut:true },
-  { id:"rizz", n:"Rizz Master", meta:"375 Eps · Hindi", tags:"Looking for Love · Reality", img:"tk_rizz", cut:true },
+  { id:"reality", n:"Reality Check", meta:"10 Eps · Hindi", tags:"Celebrities · Reality", img:"tk_reality", cut:true, look:"zara" },
+  { id:"rizz", n:"Rizz Master", meta:"375 Eps · Hindi", tags:"Looking for Love · Reality", img:"tk_rizz", cut:true, look:"gucci" },
   { id:"ceo", n:"My Secret CEO", meta:"80 Eps · 2 Languages", tags:"Rich vs Poor · Romance", img:"o_ceo", badge:"New Episodes Added", look:"patagonia" },
   { id:"pregnant", n:"Pregnant Luxury Empire Heir", meta:"47 Eps · 2 Languages", tags:"Rich vs Poor · Romance", img:"tk_pregnant", cut:true, look:"neck" },
   { id:"redsilk", n:"Red Silk", meta:"42 Eps · Hindi", tags:"Fashion · Drama", img:"o_redsilk", look:"gapin" },
