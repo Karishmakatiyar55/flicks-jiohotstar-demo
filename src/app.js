@@ -136,7 +136,7 @@ const HOME = {
     ${fy("f-home",[fyPlay("obsreplay"), fyCut("h_biggboss","biggboss"), fyFlick("fy","lorlip","fy"), fyClip("h_bumrah","l_wtc"), fyCut("h_moana","moana","Subscribe to Watch"), fyFlick("fy2","eye","fy2"), fyCut("h_queen","queen"), fyCut("h_apsara","apsara")])}
     ${rail("New on JioHotstar",["office","chiranjeevi","dilwaniya","hanuman","imgame","roslin"])}
     ${slice("k_free",[[3,49,31,47,"go('#/t/biggboss')","Bigg Boss"],[35,49,31,47,"go('#/t/yehrishta')","Yeh Rishta Kya Kehlata Hai"],[67,49,31,47,"go('#/t/anupamaa')","Anupamaa"]])}
-    ${sec("Shop the Look", `<div class="row looks">${lookCard("shop","lorhair","shop")}${lookCard("shop2","grwm","shop2")}${lookCard("shop3","puffer","shop3")}</div>`, "Sponsored · Styles from the shows you watch")}
+    ${sec("Shop the Look", `<div class="row looks">${lookCard("shop","lorhair","shop")}${lookCard("shop2","gucci","shop2")}${lookCard("shop3","zara","shop3")}</div>`, "Sponsored · Styles from the shows you watch")}
     ${banner("b_biggboss","go('#/t/biggboss')")}
     ${top10("Top 10 in India Today",["biggboss","dhamaal","roadies","anupamaa","yehrishta","laughterchefs"],["All","Hindi","English","Tamil","Telugu","Malayalam"])}
     ${bill("bill","juice","bill")}
@@ -223,7 +223,7 @@ function tadkaScreen(){ const c = TADKA.map(tkCard); bcFetch();
   </div>${nav("tadka")}</div>`; }
 
 /* ---- Tadka player: full-screen vertical episodes, with a full-screen ad between them ---- */
-const REEL_ADS = ["cadillac"];
+const REEL_ADS = ["grwm","puffer"];
 function reelSlides(){ const s = []; let n = 0; TADKA.forEach(x=>{ if(x.flick){ s.push({md:x, ad:x.flick, own:true, anchor:"tk1f"}); return; } s.push({md:x}); if(!x.frame && n < REEL_ADS.length){ s.push({ad:REEL_ADS[n], anchor:"r"+(n+1)}); n++; } }); return s; }
 let RS = [], RCUR = -1, RLANG = "English", RMUTED = false, RLIKE = {};
 function reelScreen(id){ RS = reelSlides(); RCUR = -1; bcFetch();
