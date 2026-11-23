@@ -557,8 +557,9 @@ const BRANDS = {
   /* ---- make-up and hair ---- */
   lorlip:{ name:"L'Oréal Paris", av:"L'O", avc:"#111", src:T3+"6aa2aef14954ac6f0d9dcd05_s6bp0g/ad.js", cfg:"loreal", r43:true, kind:"shop", store:"nykaa", cta:"Shop Now", unit:"Shade", item:"Lipstick", price:899,
     head:"Her lip shade, in three tones", variants:V3() },
-  lorhair:{ name:"L'Oréal Paris", av:"L'O", avc:"#111", src:T3+"6aa2aef14954ac6f0d9dcd05_w6l3nz/ad.js", cfg:"loreal", tall:true, kind:"shop", store:"nykaa", cta:"Shop Now", unit:"Colour", item:"Excellence Crème hair colour", price:649,
-    head:"The hair colour from the show", variants:[{},{}] },
+  lorhair:{ name:"L'Oréal Paris", av:"L'O", avc:"#111", src:T3+"6aa2aef14954ac6f0d9dcd05_w6l3nz/ad.js", cfg:"loreal", tall:true, kind:"shop", store:"nykaa", cta:"Shop Now", unit:"Colour", named:true, item:"Excellence Crème hair colour", price:649,
+    // Colour names are the ones printed on the Flick's own option buttons.
+    head:"The hair colour from the show", variants:[{n:"Beige Brown"},{n:"Burgundy"},{n:"Caramel Brown"}] },
   eye:{ name:"e.l.f.", av:"elf", avc:"#111", src:T2+"it6hi9/ad.js", kind:"shop", store:"nykaa", cta:"Shop Now", unit:"Look", item:"Eyeshadow palette", price:1150,
     head:"The eye look from the episode", variants:V3() },
   lip:{ name:"Ulta Beauty", av:"U", avc:"#e9552b", src:T2+"onflg2/ad.js", kind:"shop", store:"nykaa", cta:"Shop Now", unit:"Shade", item:"Lipstick", price:1450,
@@ -810,7 +811,14 @@ if(!r.querySelector(".vx-swatch,.vx-picker,[data-vertex-diff]"))continue;
 var st=document.createElement("style");st.setAttribute("data-nocta","");
 st.textContent="[data-vertex-trigger]:not(.vx-swatch):not(.vx-picker):not([data-vertex-diff]):not(.vx-picker *):not(:has(.vx-swatch,.vx-picker,[data-vertex-diff])){visibility:hidden!important;opacity:0!important;pointer-events:none!important}";
 r.appendChild(st)}catch(e){}}}
-var until=Date.now()+6e4;(function again(){var ps=deep(document,"vertex-player",[]);for(var i=0;i<ps.length;i++)hook(ps[i]);nocta(ps);
+/* A Flick whose option buttons were all published pointing at one and the same option (seen on the L'Oreal hair colour tag, 24 Nov 2026: three buttons, all "Variant 3")
+   cannot be switched. Its buttons are numbered by their place instead, and the highlight follows the option that is on. Flicks whose buttons are numbered properly are left alone. */
+function mark(r,x){var b=r.querySelectorAll("button[data-flam-renum]");for(var i=0;i<b.length;i++){if(+b[i].getAttribute("data-vertex-diff")===x)b[i].setAttribute("data-active","");else b[i].removeAttribute("data-active")}}
+function fixdiff(ps){for(var i=0;i<ps.length;i++){try{var r=ps[i].shadowRoot;if(!r||r.__fd)continue;var b=r.querySelectorAll("button[data-vertex-diff]");if(b.length<2)continue;r.__fd=1;
+var same=true;for(var j=1;j<b.length;j++)if(b[j].getAttribute("data-vertex-diff")!==b[0].getAttribute("data-vertex-diff"))same=false;if(!same)continue;
+for(var k=0;k<b.length;k++){b[k].setAttribute("data-vertex-diff",String(k));b[k].setAttribute("data-flam-renum","");b[k].setAttribute("aria-label","Variant "+(k+1))}
+mark(r,0);(function(r,v){v.addEventListener("vertex-diff-change",function(e){var d=e.detail||{};var x=d.diff!=null?d.diff:(d.diffId!=null?d.diffId:d.diff_id);setTimeout(function(){mark(r,+x||0)},0)})})(r,ps[i])}catch(e){}}}
+var until=Date.now()+6e4;(function again(){var ps=deep(document,"vertex-player",[]);for(var i=0;i<ps.length;i++)hook(ps[i]);nocta(ps);fixdiff(ps);
 if(!RD){for(var k=0;k<ps.length;k++){try{var vd=ps[k].shadowRoot&&ps[k].shadowRoot.querySelector("video");if(vd&&vd.readyState>=2){ready();break}}catch(e){}}}
 if(Date.now()<until)setTimeout(again,250)})();
 try{new MutationObserver(function(){var v=document.querySelector("vertex-player");if(v)hook(v)}).observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
@@ -935,7 +943,8 @@ function ctaGo(id){ const s = SLOTS[id]; if(!s) return; const b = BRANDS[s.brand
   if(b.kind === "watch") return go("#/reel/delivery");
   openStore(s.brand, s.v, id); }
 // The picture of the option, taken from the Flick's own option button, so the cart shows what the Flick showed.
-function swatchImg(id, v){ try{ const sw = swatchFor(id, v), im = sw && sw.querySelector("img"); return (im && (im.currentSrc || im.src)) || ""; }catch(e){ return ""; } }
+function swatchImg(id, v){ try{ const sw = swatchFor(id, v); if(!sw) return ""; const im = sw.querySelector("img"); if(im) return im.currentSrc || im.src || "";
+    for(const e of [sw, ...sw.querySelectorAll("*")]){ const m = /url\(["']?([^"')]+)["']?\)/.exec(e.ownerDocument.defaultView.getComputedStyle(e).backgroundImage || ""); if(m) return m[1]; } return ""; }catch(e){ return ""; } }
 
 /* ---- the store sheet: product, cart, phone number, OTP, order placed ---- */
 let ST = null, STT = 0;

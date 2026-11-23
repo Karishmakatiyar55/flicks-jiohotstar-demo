@@ -35,8 +35,9 @@ const BRANDS = {
   /* ---- make-up and hair ---- */
   lorlip:{ name:"L'Oréal Paris", av:"L'O", avc:"#111", src:T3+"6aa2aef14954ac6f0d9dcd05_s6bp0g/ad.js", cfg:"loreal", r43:true, kind:"shop", store:"nykaa", cta:"Shop Now", unit:"Shade", item:"Lipstick", price:899,
     head:"Her lip shade, in three tones", variants:V3() },
-  lorhair:{ name:"L'Oréal Paris", av:"L'O", avc:"#111", src:T3+"6aa2aef14954ac6f0d9dcd05_w6l3nz/ad.js", cfg:"loreal", tall:true, kind:"shop", store:"nykaa", cta:"Shop Now", unit:"Colour", item:"Excellence Crème hair colour", price:649,
-    head:"The hair colour from the show", variants:[{},{}] },
+  lorhair:{ name:"L'Oréal Paris", av:"L'O", avc:"#111", src:T3+"6aa2aef14954ac6f0d9dcd05_w6l3nz/ad.js", cfg:"loreal", tall:true, kind:"shop", store:"nykaa", cta:"Shop Now", unit:"Colour", named:true, item:"Excellence Crème hair colour", price:649,
+    // Colour names are the ones printed on the Flick's own option buttons.
+    head:"The hair colour from the show", variants:[{n:"Beige Brown"},{n:"Burgundy"},{n:"Caramel Brown"}] },
   eye:{ name:"e.l.f.", av:"elf", avc:"#111", src:T2+"it6hi9/ad.js", kind:"shop", store:"nykaa", cta:"Shop Now", unit:"Look", item:"Eyeshadow palette", price:1150,
     head:"The eye look from the episode", variants:V3() },
   lip:{ name:"Ulta Beauty", av:"U", avc:"#e9552b", src:T2+"onflg2/ad.js", kind:"shop", store:"nykaa", cta:"Shop Now", unit:"Shade", item:"Lipstick", price:1450,

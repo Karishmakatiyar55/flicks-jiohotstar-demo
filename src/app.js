@@ -37,7 +37,8 @@ function ctaGo(id){ const s = SLOTS[id]; if(!s) return; const b = BRANDS[s.brand
   if(b.kind === "watch") return go("#/reel/delivery");
   openStore(s.brand, s.v, id); }
 // The picture of the option, taken from the Flick's own option button, so the cart shows what the Flick showed.
-function swatchImg(id, v){ try{ const sw = swatchFor(id, v), im = sw && sw.querySelector("img"); return (im && (im.currentSrc || im.src)) || ""; }catch(e){ return ""; } }
+function swatchImg(id, v){ try{ const sw = swatchFor(id, v); if(!sw) return ""; const im = sw.querySelector("img"); if(im) return im.currentSrc || im.src || "";
+    for(const e of [sw, ...sw.querySelectorAll("*")]){ const m = /url\(["']?([^"')]+)["']?\)/.exec(e.ownerDocument.defaultView.getComputedStyle(e).backgroundImage || ""); if(m) return m[1]; } return ""; }catch(e){ return ""; } }
 
 /* ---- the store sheet: product, cart, phone number, OTP, order placed ---- */
 let ST = null, STT = 0;

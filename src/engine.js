@@ -36,7 +36,14 @@ if(!r.querySelector(".vx-swatch,.vx-picker,[data-vertex-diff]"))continue;
 var st=document.createElement("style");st.setAttribute("data-nocta","");
 st.textContent="[data-vertex-trigger]:not(.vx-swatch):not(.vx-picker):not([data-vertex-diff]):not(.vx-picker *):not(:has(.vx-swatch,.vx-picker,[data-vertex-diff])){visibility:hidden!important;opacity:0!important;pointer-events:none!important}";
 r.appendChild(st)}catch(e){}}}
-var until=Date.now()+6e4;(function again(){var ps=deep(document,"vertex-player",[]);for(var i=0;i<ps.length;i++)hook(ps[i]);nocta(ps);
+/* A Flick whose option buttons were all published pointing at one and the same option (seen on the L'Oreal hair colour tag, 24 Nov 2026: three buttons, all "Variant 3")
+   cannot be switched. Its buttons are numbered by their place instead, and the highlight follows the option that is on. Flicks whose buttons are numbered properly are left alone. */
+function mark(r,x){var b=r.querySelectorAll("button[data-flam-renum]");for(var i=0;i<b.length;i++){if(+b[i].getAttribute("data-vertex-diff")===x)b[i].setAttribute("data-active","");else b[i].removeAttribute("data-active")}}
+function fixdiff(ps){for(var i=0;i<ps.length;i++){try{var r=ps[i].shadowRoot;if(!r||r.__fd)continue;var b=r.querySelectorAll("button[data-vertex-diff]");if(b.length<2)continue;r.__fd=1;
+var same=true;for(var j=1;j<b.length;j++)if(b[j].getAttribute("data-vertex-diff")!==b[0].getAttribute("data-vertex-diff"))same=false;if(!same)continue;
+for(var k=0;k<b.length;k++){b[k].setAttribute("data-vertex-diff",String(k));b[k].setAttribute("data-flam-renum","");b[k].setAttribute("aria-label","Variant "+(k+1))}
+mark(r,0);(function(r,v){v.addEventListener("vertex-diff-change",function(e){var d=e.detail||{};var x=d.diff!=null?d.diff:(d.diffId!=null?d.diffId:d.diff_id);setTimeout(function(){mark(r,+x||0)},0)})})(r,ps[i])}catch(e){}}}
+var until=Date.now()+6e4;(function again(){var ps=deep(document,"vertex-player",[]);for(var i=0;i<ps.length;i++)hook(ps[i]);nocta(ps);fixdiff(ps);
 if(!RD){for(var k=0;k<ps.length;k++){try{var vd=ps[k].shadowRoot&&ps[k].shadowRoot.querySelector("video");if(vd&&vd.readyState>=2){ready();break}}catch(e){}}}
 if(Date.now()<until)setTimeout(again,250)})();
 try{new MutationObserver(function(){var v=document.querySelector("vertex-player");if(v)hook(v)}).observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
