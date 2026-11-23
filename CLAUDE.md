@@ -39,6 +39,7 @@ After any change to the demo, in the same turn:
 - The Bigg Boss player stills (`bb_s*.webp`) are cut from Karishma's own 23 Nov screen recording (the show's trailer in the title page). No pictures were taken from the internet.
 - The "In-shots Shirt change" Flick sits in the Tadka feed as its first sponsored video.
 - "Shop the look" units: the player sells Levi's, and each micro-drama names its own in `TADKA` (`look`). The Last Delivery, a thriller, has none.
+- The L'Oréal hair colour tag (`…w6l3nz`) was published with its three option buttons all pointing at the same option ("Variant 3"), so in the tag as saved no option can be picked and all three look selected (checked 24 Nov 2026 by running the saved tag with none of the app's code). The bridge in `src/engine.js` (`fixdiff`) numbers such buttons by their place inside the frame and keeps the highlight on the one that is on. It only acts when every button carries the same number, so properly published Flicks are untouched. Remove it once the tag is fixed at source. This is the one place the demo changes anything inside a Flick.
 - Shapes come from each tag's own script: square unless `tall` (9:16), `wide` (16:9) or `r43` (4:3).
 - The slots list (desktop panel and phone sheet) shows slot types only, never brand or Flick names.
 - Desktop: thin Flam x JioHotstar header, Flam dark style, slots list beside a framed phone. Phones (860 px and under): the app fills the screen; a rose "Ad slots" pill that blinks until opened once.
