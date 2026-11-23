@@ -322,9 +322,10 @@ button.watch span{font-weight:500;color:#333}
 .shx{position:absolute;right:12px;top:14px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);display:grid;place-items:center}
 .shh{display:flex;gap:10px;align-items:center;padding-right:40px;margin-bottom:12px;flex:none}
 .shh>div{display:flex;flex-direction:column;min-width:0}.shh b{font-size:14px}.shh span{font-size:11px;color:var(--tx3)}
-.shb{display:flex;gap:12px;min-height:0;overflow-y:auto;scrollbar-width:none}
-.shf{width:46%;flex:none}.shf .flick{border-radius:12px}
-.shr{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.shb{display:flex;flex-direction:column;align-items:center;gap:12px;min-height:0;overflow-y:auto;scrollbar-width:none}
+.shf{width:100%;flex:none;display:flex;justify-content:center}.shf .flick{border-radius:14px;flex:none}
+.shr{width:100%;flex:none;display:flex;flex-direction:column;gap:10px}
+.shn{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--tx2);padding:0 2px}.shn em{font-style:normal}
 .shr .minis{flex-direction:column;padding:0}.shr .mini{flex-direction:row;justify-content:space-between;align-items:center;padding:10px}
 .shp{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--tx2);padding:4px 2px;border-radius:8px;margin-top:auto}.shp b{font-size:18px;color:#fff}
 .sheet.leave{padding-bottom:28px;gap:10px}
@@ -479,3 +480,27 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background:ra
 .stdn span{font-size:13px;line-height:1.5;color:#4a4f5c;margin-bottom:12px}
 .stdn .stbtn{max-width:240px}
 @keyframes stpop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+
+/* one line under a Flick naming the option it is on */
+.optn{padding:10px 2px;font-size:12.5px;color:var(--tx2)}.optn em{font-style:normal}
+/* For You: a title that plays from its card */
+.fcard.own{aspect-ratio:1030/1290;display:flex;flex-direction:column}
+.fown{flex:1;min-height:0;position:relative;display:block;overflow:hidden;text-align:left}
+.fown img{width:100%;height:100%;object-fit:cover;display:block}
+.fown::after{content:"";position:absolute;inset:40% 0 0;background:linear-gradient(transparent,rgba(13,14,18,.92))}
+.fot{position:absolute;left:14px;right:14px;bottom:10px;z-index:1;display:flex;flex-direction:column;gap:3px}
+.fot b{font-size:24px;font-weight:800;letter-spacing:-.3px;line-height:1.05}.fot em{font-style:normal;font-size:12px;color:#d5d7de}
+.fob{flex:none;padding:10px 12px 12px;background:linear-gradient(#1b1c22,#15161b)}
+.fob .wbtn{display:flex;align-items:center;justify-content:center;gap:8px}.fob .wbtn svg{width:16px;height:16px}
+/* Tadka: an episode that is itself a Flick */
+.tkc.flk{display:block;background:var(--card);border-radius:14px;overflow:hidden}
+.tkfl .flick{border-radius:0}
+.tkfb{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.tkft{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.tkft b{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tkft em{font-style:normal;font-size:11.5px;color:var(--tx3)}.tkft i{font-style:normal}
+.tkfp{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center;flex:none}.tkfp svg{width:16px;height:16px}
+/* a video that carries its Flick inside it */
+.pl.plfr{transition:none}
+.plfr iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#000}
+.obx{position:absolute;left:6px;top:6px;z-index:3;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.45);display:grid;place-items:center}

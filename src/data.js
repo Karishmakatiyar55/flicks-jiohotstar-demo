@@ -66,7 +66,7 @@ const BRANDS = {
   grwm:{ name:"Get Ready With Me", av:"GR", avc:"#c0477f", src:T1+"flicks1-grwm/ad.js", tall:true, kind:"shop", store:"nykaaf", cta:"Shop Now", unit:"Dress", named:true, item:"Dress", price:2799,
     head:"Get ready with me", variants:[{n:"Red"},{n:"Blue"},{n:"Black"}] },
   shirt:{ name:"AJIO", av:"A", avc:"#2c4152", src:T2+"tnro5s/ad.js", cfg:"shirt", tall:true, kind:"shop", store:"ajio", cta:"Shop Now", unit:"Shirt", item:"Men's shirt", price:1299,
-    head:"His shirt, three ways", variants:V3() },
+    head:"Pritam and Pedro", variants:V3() },
   /* ---- food and drink ---- */
   caesars:{ name:"Little Caesars", av:"LC", avc:"#f36f21", src:T1+"xlgqpx/ad.js", cfg:"studio", kind:"shop", store:"swiggy", cta:"Order Now", unit:"Pizza", item:"Pizza", price:399,
     head:"Your slice is calling", variants:V3() },
@@ -96,6 +96,9 @@ const BRANDS = {
   /* ---- cars: nothing to add to a cart, so the button asks for a call back ---- */
   merc:{ name:"Mercedes-Benz", av:"MB", avc:"#111", src:T3+"6a9bc07393e71f3ec9b12c81_i3pdeq/ad.js", kind:"shop", store:"lead", cta:"Book a Test Drive", unit:"Model", item:"Test drive",
     head:"Pick the one that moves you", variants:V3() },
+  /* ---- cards: nothing to add to a cart, so the button asks for a call back ---- */
+  amex:{ name:"American Express", av:"AX", avc:"#016fd0", src:T1+"f41m4u/ad.js", cfg:"house", kind:"shop", store:"lead", cta:"Get Your Card", unit:"Card", item:"Card application",
+    head:"The world, on your terms", variants:V3() },
   /* ---- the app's own promo ---- */
   ugc:{ name:"Tadka Originals", av:"T", avc:"#e3138b", src:T1+"flicks4-ugc-p1/ad.js", kind:"watch", cta:"Watch Now", unit:"Lead", label:"Promoted",
     head:"Pick who plays the lead", variants:[{},{}] }
@@ -141,6 +144,7 @@ t("chiranjeevi","Chiranjeevi","2026 · Telugu · Drama",["Drama"]);
 t("dilwaniya","Dulhaniya Le Aaegi","2026 · Hindi · Romance",["Romance","Comedy"]);
 t("koffee","Koffee with Karan","2026 · Hindi · Talk Show",["Talk Show"],{note:"New Episode Wed", ep:"S9 E6"});
 t("obsession","Obsession","2026 · 6 Languages · Horror · Thriller",["Horror","Thriller"]);
+t("obsreplay","Obsession Replay","Peacock on JioHotstar",["Peacock"],{img:"ob_poster", frame:"obsession-preview.html", ep:"Replay"});
 t("suits","Suits","2019 · English · Legal Drama",["Drama","Legal"]);
 t("msdhoni","M.S. Dhoni: The Untold Story","2016 · Hindi · Biopic",["Biopic","Sports"]);
 t("roarlion","Roar of the Lion","2019 · Hindi · Docuseries",["Documentary","Sports"]);
@@ -208,6 +212,8 @@ const MD_BASE = "https://microdrama-audio-diff.vercel.app/videos/", MD_PREVIEW =
 const TADKA = [
   // Blank Cheque is Flam's own shoppable micro-drama preview: the episode plays and the Flick comes in inside it. It is shown as it is, untouched.
   { id:"blankcheque", n:"Blank Cheque", meta:"Episode 3", tags:"Drama · Shoppable", frame:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/", poster:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/media/poster.jpg", preview:"https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/media/main.mp4", badge:"Shop while you watch" },
+  // An episode that is itself a Flick: the "In-shots Shirt change" tag. It plays in the feed and full screen, and the shirt can be changed and bought in both.
+  { id:"pritam", n:"Pritam and Pedro", meta:"Hotstar Specials", tags:"Shop while you watch", flick:"shirt" },
   { id:"delivery", n:"The Last Delivery", meta:"24 Eps · 4 Languages", tags:"Thriller · Mystery", img:"o_delivery", video:true, preview:MD_PREVIEW, badge:"New Episodes Daily" },
   { id:"reality", n:"Reality Check", meta:"10 Eps · Hindi", tags:"Celebrities · Reality", img:"tk_reality", cut:true },
   { id:"rizz", n:"Rizz Master", meta:"375 Eps · Hindi", tags:"Looking for Love · Reality", img:"tk_rizz", cut:true },
@@ -218,4 +224,4 @@ const TADKA = [
 ];
 const LANGS = [["English","English"],["Kannada","ಕನ್ನಡ"],["Japanese","日本語"],["Spanish","Español"]];
 // search: words that bring up a sponsored result
-const SPON = [[/cricket|sport|ipl|match|dhoni|kohli|football/i,"sony"],[/kid|cartoon|anim|pokemon|doraemon|family/i,"lego"],[/comedy|fun|party|snack|laugh|breakfast/i,"genmills"],[/dog|pet|puppy/i,"barkbox"]];
+const SPON = [[/cricket|sport|ipl|match|dhoni|kohli|football/i,"ua"],[/kid|cartoon|anim|pokemon|doraemon|family/i,"lego"],[/comedy|fun|party|snack|laugh|breakfast/i,"genmills"],[/dog|pet|puppy/i,"barkbox"]];

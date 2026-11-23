@@ -5,7 +5,7 @@ A working replica of the JioHotstar app with Flicks (Flam's interactive video ad
 - **On a phone** it opens full screen, like the app. The rose "Ad slots" button lists every placement and jumps to it.
 - **On desktop** it shows a framed phone with the list of ad slots beside it.
 
-## Where the Flicks sit (25 slots)
+## Where the Flicks sit (26 slots)
 
 | Group | Slots |
 |---|---|
@@ -27,19 +27,20 @@ JioHotstar already carries Instamart in its Shop tab and Swiggy in its Order Foo
 | Nykaa | L'Oréal Paris (lipstick, hair colour), e.l.f., Ulta Beauty |
 | Nykaa Fashion | Reva Diamonds, Fossil, Mia by Tanishq, David Yurman, Gucci, Zara, Levi's (two), Nike, Under Armour, Gap (two), Patagonia, the puffer jacket, Get Ready With Me |
 | AJIO | The shirt Flick (its own tag points at ajio.com) |
-| Call back | Mercedes-Benz: "Book a Test Drive" asks for a phone number, there is no cart |
+| Call back | Mercedes-Benz ("Book a Test Drive") and American Express ("Get Your Card") ask for a phone number, there is no cart |
 
 - **The prices are placeholders** and the item names are generic. The tags do not carry them.
 - The picture in the cart is the Flick's own option picture.
 - The phone number typed is kept only on the page. No message is sent; the OTP fills in by itself.
-- No Flick is used twice: each of the 34 tags sits in one slot.
+- No Flick is used twice: each of the 35 tags sits in one slot.
 
 ## What is real and what is not
 
 - The app's screens are cuts from a screen recording of the JioHotstar iOS app (18 Nov 2026): header, banners, For You cards, posters, sports clips, Tadka cards, the Heart Beat title page.
 - The Flicks are live ad tags from the saved `flicks-ad-tags` codes, loaded from `flicks.flamapp.live`, `native-ads-dev.appless.workers.dev` and `native-ads.appless.workers.dev`.
 - **The episode in the player is not video.** JioHotstar blocks screen recording of its player, so the stream is a set of stills moved along a real timeline. Ad breaks, the pause ad and the scene chip are driven by that timeline. The Bigg Boss stills are cut from the show's trailer as it played in a 23 Nov 2026 screen recording of the app, so they are soft.
-- The mid-roll is the 16:9 Mia by Tanishq necklace Flick, played in the player's own frame in between the content.
+- "Obsession Replay" (first card in For You on Home; the title is made up) is real video: a copy of Flam's own preview page for the "In-video necklace change" Flick, kept in the repo as `obsession-preview.html` and shown as it is. The Mia by Tanishq Flick comes on inside the video by itself at 0:22. The mid-roll break on Bigg Boss is the American Express Flick.
+- "Pritam and Pedro" in Tadka is the "In-shots Shirt change" Flick shown as an episode, in the feed and full screen.
 - Blank Cheque in Tadka is Flam's shoppable micro-drama preview (`flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/`), shown in a frame as it is.
 - Options are switched only inside a Flick. The names under a Flick follow it and are not buttons.
 - The other real video is the Tadka micro-drama shown as "The Last Delivery" (a title made up for the demo), played from `microdrama-audio-diff.vercel.app` with four audio languages. Its cover was generated with Flowy to match the video. My Secret CEO and Red Silk are Flam's own posters, not JioHotstar titles.

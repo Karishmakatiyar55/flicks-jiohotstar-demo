@@ -43,9 +43,9 @@ function swatchImg(id, v){ try{ const sw = swatchFor(id, v); if(!sw) return ""; 
 /* ---- the store sheet: product, cart, phone number, OTP, order placed ---- */
 let ST = null, STT = 0;
 const rs = n => "₹" + num(n);
-function openStore(k, v, slot){ const b = BRANDS[k], so = STORES[b.store]; clearTimeout(STT);
+function openStore(k, v, slot, pic0){ const b = BRANDS[k], so = STORES[b.store]; clearTimeout(STT);
   const w = $(".screen.watch", VIEW), top = w ? Math.round($(".stpad", w).offsetHeight + APP.clientWidth*9/16) : 92;
-  const img = slot ? swatchImg(slot, v) : "";
+  const img = pic0 || (slot ? swatchImg(slot, v) : "");
   reelHold(true);
   openOver(`<div class="scrim" onclick="closeOver()"></div><div class="sto" style="top:${top}px;--sc:${so.col}"><div class="stoh">${so.n ? `<i class="stlg">${esc(so.n.charAt(0))}</i>` : av(k)}<b>${esc(so.n || b.name)}</b><button onclick="closeOver()" aria-label="Close">${I.x}</button></div><div class="stob" id="stob"></div></div>`);
   ST = { k, v, lead:b.store === "lead", step:"load", qty:1, phone:"", otp:"", img, show:!!w };
@@ -111,6 +111,8 @@ const mast = (id, cards) => `<div class="hero mast" data-hero="${id}">${cards.jo
 // For You: the tall swipeable cards. A cut of the app's card with its buttons live, or a Flick card of the same size.
 const fyCut = (k, id, label) => `<div class="fcard">${slice(k,[[0,0,100,84,`go('#/t/${id}')`,TT[id].n],[3,86,77,12,TT[id].sub?`out('Subscriptions')`:`go('#/watch/${id}')`,label||"Watch Now"],[82,86,15,12,`wlToggle('${id}')`,"Watchlist"]])}</div>`;
 const fyClip = (k, clip) => `<div class="fcard">${slice(k,[[0,0,100,84,`go('#/watch/${clip}')`,"Watch"],[3,86,94,12,`go('#/watch/${clip}')`,"Watch Now"]])}</div>`;
+// A title that plays straight from its card.
+const fyPlay = id => { const x = TT[id]; return `<div class="fcard own" data-anchor="ob"><button class="fown" onclick="go('#/watch/${id}')" aria-label="${esc(x.n)}">${pic(x.img, x.n)}<span class="fot"><b>${esc(x.n)}</b><em>${esc(x.meta)}</em></span></button><div class="fob"><button class="wbtn" onclick="go('#/watch/${id}')">${I.play} Watch Now</button></div></div>`; };
 function fyFlick(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
   return `<div class="fcard ad" data-anchor="${anchor}">${flick(id,k)}<div class="fb" data-spop="${id}"><div class="fl1"><span class="spill">Sponsored</span>${av(k)}<b>${esc(b.name)}</b>${dots(id)}</div>
   <div class="fl2"><span><em data-sv="${id}">${esc(vshort(k,0))}</em></span></div>
@@ -125,13 +127,13 @@ function lookCard(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
   return `<div class="lcard" ${anchor?`data-anchor="${anchor}"`:""}>${flick(id,k)}<div class="lb" data-spop="${id}"><div class="l1">${av(k)}<b>${esc(b.name)}</b>${dots(id)}</div><div class="l2"><em data-sv="${id}">${esc(vshort(k,0))}</em></div>${ctaBtn(id,k,"wbtn sm")}</div></div>`; }
 // The options of a Flick as name and price under it. They only show which one the Flick is on: the option is changed inside the Flick, never from here.
 const mini = (id,k,i) => { const v = BRANDS[k].variants[i]; return `<div class="mini ${i?"":"on"}" data-sync="${id}" data-i="${i}"><span>${esc(vshort(k,i))}</span></div>`; };
-const minis = (id,k) => `<div class="minis">${BRANDS[k].variants.map((_,i)=>mini(id,k,i)).join("")}</div>`;
+const minis = (id,k) => `<div class="optn" data-spop="${id}"><em data-sn="${id}">${esc(vname(k,0))}</em></div>`;   // one line naming the option the Flick is on; the options themselves are inside the Flick
 
 /* ================= screens ================= */
 const HOME = {
   home: () => `
     ${mast("m-home",[mastFlick("mast","reva","mast"), mastFlick("mast2","fossil","mast2"), mastCut("m_tv","out('JioHotstar on TV')","Explore Now"), mastCut("m_mahabharat","out('The teaser')","Teaser")])}
-    ${fy("f-home",[fyCut("h_biggboss","biggboss"), fyFlick("fy","lorlip","fy"), fyClip("h_bumrah","l_wtc"), fyCut("h_moana","moana","Subscribe to Watch"), fyFlick("fy2","eye","fy2"), fyCut("h_queen","queen"), fyCut("h_apsara","apsara")])}
+    ${fy("f-home",[fyPlay("obsreplay"), fyCut("h_biggboss","biggboss"), fyFlick("fy","lorlip","fy"), fyClip("h_bumrah","l_wtc"), fyCut("h_moana","moana","Subscribe to Watch"), fyFlick("fy2","eye","fy2"), fyCut("h_queen","queen"), fyCut("h_apsara","apsara")])}
     ${rail("New on JioHotstar",["office","chiranjeevi","dilwaniya","hanuman","imgame","roslin"])}
     ${slice("k_free",[[3,49,31,47,"go('#/t/biggboss')","Bigg Boss"],[35,49,31,47,"go('#/t/yehrishta')","Yeh Rishta Kya Kehlata Hai"],[67,49,31,47,"go('#/t/anupamaa')","Anupamaa"]])}
     ${sec("Shop the Look", `<div class="row looks">${lookCard("shop","lorhair","shop")}${lookCard("shop2","gucci")}${lookCard("shop3","zara")}</div>`, "Sponsored · Styles from the shows you watch")}
@@ -172,7 +174,7 @@ const HOME = {
     ${rail("Pokémon World",["pokemon","pokemon2","pokemon3","doraemon"])}`,
   sports: () => `
     ${mast("m-sp",[mastFlick("mast","nike","mast"), mastCut("m_dhaichaal","out('The trailer')","Trailer")])}
-    ${fy("f-sp",[fyClip("h_wtc","l_wtc"), fyFlick("fy","ua","fy"), fyClip("h_rcb","l_rcb"), fyClip("h_sandpaper","l_sp1")])}
+    ${fy("f-sp",[fyClip("h_wtc","l_wtc"), fyFlick("fy","sony","fy"), fyClip("h_rcb","l_rcb"), fyClip("h_sandpaper","l_sp1")])}
     ${banner("b_arunachal","out('Arunachal League')")}
     ${trail("Popular Tournaments",["t_ipl","t_t10","t_domestic"],"out('Tournament pages')")}
     ${lrail("CSK Icon Dhoni Hangs Up His Boots",["l_stumpings","l_finishes","l_dhoni7"])}
@@ -188,7 +190,9 @@ const homeScreen = tab => `<div class="screen">${stpad()}${header("home")}<div c
 
 /* ---- Tadka: the micro-drama feed ---- */
 // Tadka feed cards behave like the app's own: the cover shows for a second, then the card plays by itself, silent; the play button opens it full screen.
-function tkCard(x, i){ const pv = x.preview ? ` data-pv="${x.preview}"` : "", hold = x.preview ? `<span class="tkv"></span>` : "";
+function tkCard(x, i){ if(x.flick){ const k = x.flick;
+    return `<div class="tkc flk" data-anchor="tk1"><div class="tkfl">${flick("tk1",k)}</div><div class="tkfb" data-spop="tk1"><span class="tkft"><b>${esc(x.n)}</b><em>${esc(x.meta)} · <i data-sv="tk1">${esc(vshort(k,0))}</i></em></span>${ctaBtn("tk1",k,"wbtn sm")}<button class="tkfp" onclick="go('#/reel/${x.id}')" aria-label="Full screen">${I.play}</button></div></div>`; }
+  const pv = x.preview ? ` data-pv="${x.preview}"` : "", hold = x.preview ? `<span class="tkv"></span>` : "";
   if(x.frame) return `<button class="tkc own fr"${pv} onclick="tkOpen('${x.id}',this)" aria-label="${esc(x.n)}"><span class="frt"><b>${esc(x.n)}</b><em>${esc(x.meta)}</em></span><img src="${x.poster}" alt="" onerror="this.remove()" draggable="false">${hold}<span class="bdg">${x.badge}</span><i class="pl">${I.play}</i></button>`;
   if(x.cut) return `<div class="tkc">${slice(x.img,[[0,0,100,100,`go('#/reel/${x.id}')`,x.n]])}</div>`;
   return `<button class="tkc own"${pv} onclick="tkOpen('${x.id}',this)" aria-label="${esc(x.n)}">${pic(x.img,x.n)}${hold}${x.badge?`<span class="bdg">${x.badge}</span>`:""}${x.video?`<span class="tkn"><b>${esc(x.n)}</b><em>${esc(x.meta)} · ${esc(x.tags)}</em></span>`:""}<i class="pl">${I.play}</i></button>`; }
@@ -213,13 +217,13 @@ function tkAd(id, k, anchor){ const b = BRANDS[k], v = b.variants[0];
   <div class="tkb" data-spop="${id}"><span><em data-sv="${id}">${esc(vshort(k,0))}</em></span>${ctaBtn(id,k,"wbtn sm")}</div></div>`; }
 function tadkaScreen(){ const c = TADKA.map(tkCard); bcFetch();
   return `<div class="screen tadka">${stpad()}${header("tadka")}<div class="scr" id="scr">
-  ${c[0]}${tkAd("tk1","shirt","tk1")}${c[1]}${c[2]}${c[3]}${tkAd("tk2","ugc","tk2")}${c[4]}${c[5]}${c[6]}
+  ${c[0]}${c[1]}${c[2]}${c[3]}${tkAd("tk2","ugc","tk2")}${c[4]}${c[5]}${c[6]}${c[7]}${c[8]}
   ${sec("Latest on Tadka", `<div class="row">${[["tr_reality","reality"],["tr_shehzada","ceo"],["tr_saanp","redsilk"]].map(([k,id])=>`<button class="po tall" onclick="go('#/reel/${id}')">${pic(k)}</button>`).join("")}${["delivery","ceo","redsilk"].map(id=>`<button class="po tall" onclick="go('#/reel/${id}')">${pic("o_"+id)}</button>`).join("")}</div>`)}
   </div>${nav("tadka")}</div>`; }
 
 /* ---- Tadka player: full-screen vertical episodes, with a full-screen ad between them ---- */
 const REEL_ADS = ["grwm","puffer"];
-function reelSlides(){ const s = []; let n = 0; TADKA.forEach(x=>{ s.push({md:x}); if(!x.frame && n < REEL_ADS.length){ s.push({ad:REEL_ADS[n], anchor:"r"+(n+1)}); n++; } }); return s; }
+function reelSlides(){ const s = []; let n = 0; TADKA.forEach(x=>{ if(x.flick){ s.push({md:x, ad:x.flick, own:true, anchor:"tk1f"}); return; } s.push({md:x}); if(!x.frame && n < REEL_ADS.length){ s.push({ad:REEL_ADS[n], anchor:"r"+(n+1)}); n++; } }); return s; }
 let RS = [], RCUR = -1, RLANG = "English", RMUTED = false, RLIKE = {};
 function reelScreen(id){ RS = reelSlides(); RCUR = -1; bcFetch();
   return `<div class="screen reel"><button class="rback" onclick="back()" aria-label="Back">${I.back}</button><div class="pager" id="pager">${RS.map((s,i)=> s.ad ? reelAd(s,i) : reelMd(s.md,i)).join("")}</div></div>`; }
@@ -231,7 +235,7 @@ function reelMd(x, i){
   ${x.video?`<div class="langs">${LANGS.map(([id,l])=>`<button class="${id===RLANG?"on":""}" data-lang="${id}" onclick="reelLang('${id}')">${l}</button>`).join("")}</div>`:""}
   <div class="rprog"><i></i></div></div></section>`; }
 function reelAd(s, i){ const k = s.ad, b = BRANDS[k], id = "reel-"+k, v = b.variants[0];
-  return `<section class="rs ad" data-i="${i}" data-anchor="${s.anchor}"><div class="rah">${av(k)}<div><b>${esc(b.name)}</b><span>Sponsored</span></div>${dots(id)}</div><div class="rfl">${flick(id,k)}</div>
+  return `<section class="rs ad ${s.own?"own":""}" data-i="${i}" data-anchor="${s.anchor}"><div class="rah">${s.own?"":av(k)}<div><b>${esc(s.own?s.md.n:b.name)}</b><span>${s.own?esc(s.md.meta):"Sponsored"}</span></div>${dots(id)}</div><div class="rfl">${flick(id,k)}</div>
   <div class="raf" data-spop="${id}"><span class="rv"><em data-sv="${id}">${esc(vshort(k,0))}</em></span><div class="rbt">${ctaBtn(id,k,"wbtn")}<button class="wbtn ghost" onclick="reelGo(${i+1})">Next episode ${I.down}</button></div></div></section>`; }
 function reelFit(){ $$(".rs.ad", VIEW).forEach(s=>{ const box = s.querySelector(".rfl"), f = box.querySelector(".flick"); const w = Math.floor(Math.min(box.clientWidth, box.clientHeight*9/16)); f.style.width = w+"px"; fitFlick(f); }); }
 function reelGo(i){ const p = $("#pager"); if(!p) return; i = Math.max(0, Math.min(RS.length-1, i)); p.scrollTo({top:i*p.clientHeight, behavior:"smooth"}); }
@@ -309,7 +313,7 @@ function reelDrop(v){ try{ v.pause(); v.muted = true; v.removeAttribute("src"); 
 function reelWire(v, hold){ v.addEventListener("timeupdate", ()=>{ const b = hold.parentElement.querySelector(".rprog i"); if(b && v.duration) b.style.width = (v.currentTime/v.duration*100)+"%"; }); }
 function reelLike(id, el){ RLIKE[id] = !RLIKE[id]; el.classList.toggle("on", RLIKE[id]); el.querySelector("span").textContent = RLIKE[id] ? "12.5K" : "12.4K"; }
 // The episode stops while anything is open over it, and whenever the tab is hidden.
-function reelHold(stop){ const fr = $(".rs.on .rfr", VIEW); if(fr) reelFrame(fr, !stop); const v = reelVideo(); if(!v) return; if(stop) v.pause(); else v.play().catch(()=>{}); }
+function reelHold(stop){ obHold(stop); const fr = $(".rs.on .rfr", VIEW); if(fr) reelFrame(fr, !stop); const v = reelVideo(); if(!v) return; if(stop) v.pause(); else v.play().catch(()=>{}); }
 document.addEventListener("visibilitychange", ()=>{ reelHold(document.hidden || OVER.classList.contains("on")); if(document.hidden) plPause(true); });
 
 /* ---- search ---- */
@@ -371,13 +375,13 @@ function chipOn2(el){ $$("button", el.parentElement).forEach(c=>c.classList.togg
 const PLS = {};            // per title: position and which breaks have played, kept while the demo is open
 let PL = null, plTimer = 0;
 const DUR = 31*60, START = 14*60+40, MID = 15*60, SCENE = 14*60+46, SCENE_LEN = 12, BREAK = 15, SKIP = 5;
-const BRK = { pre:"caesars", mid:"mia", pause:"bk", comp:"can" };
+const BRK = { pre:"caesars", mid:"amex", pause:"bk", comp:"can" };
 // The look sold from the scene in the player. Each micro-drama names its own in TADKA.
 const sceneBrand = id => "levis";
 const mmss = s => { s = Math.max(0, Math.floor(s)); return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`; };
 function watchInfo(id){ if(TT[id]){ const x = TT[id]; return { n:x.n, sub:`${x.ep||"S1 E1"}${x.epn?" · "+x.epn:""}`, stills:x.stills||(x.full?["d_tr1","d_tr2","d_tr0"]:[x.img]), poster:!x.full&&!x.stills, back:`#/t/${id}` }; }
   const c = CLIPS[id] || CLIPS.l_wtc; return { n:c[0], sub:"Cricket · "+c[1], stills:[CLIPS[id]?id:"l_wtc"], poster:false }; }
-function watchScreen(id){ const w = watchInfo(id); const more = ["roslin","sangamarmar","draarohi","magicshiri","khalbali","honeymoon"].filter(k=>k!==id);
+function watchScreen(id){ if(TT[id] && TT[id].frame) return frameWatch(id); const w = watchInfo(id); const more = ["roslin","sangamarmar","draarohi","magicshiri","khalbali","honeymoon"].filter(k=>k!==id);
   return `<div class="screen watch">${stpad()}
   <div class="pl" id="pl"><div class="plst ${w.poster?"poster":""}" id="plst">${w.stills.map((k,i)=>`<div class="st ${i?"":"on"}" style="background-image:url(${IMG[k][2]})"></div>`).join("")}</div>
     <div class="plui" id="plui" onclick="plTap(event)"><div class="plt"><button onclick="event.stopPropagation();back()" aria-label="Back">${I.back}</button><div><b>${esc(w.n)}</b><span>${esc(w.sub)}</span></div><button onclick="event.stopPropagation();out('Casting')" aria-label="Cast">${I.cast}</button></div>
@@ -453,16 +457,40 @@ function openScene(k, from){ const b = BRANDS[k];
   reelHold(true);
   openOver(`<div class="scrim" onclick="closeOver()"></div><div class="sheet"><div class="grab"></div><button class="shx" onclick="closeOver()" aria-label="Close">${I.x}</button>
   <div class="shh">${av(k)}<div><b>${esc(b.head)}</b><span>Sponsored · ${esc(b.name)}${from?` · seen in ${esc(from)}`:""}</span></div></div>
-  <div class="shb"><div class="shf">${flick("scene",k)}</div><div class="shr">${minis("scene",k)}<div class="shp" data-spop="scene"><em data-sn="scene">${esc(vname(k,0))}</em></div><button class="wbtn" onclick="ctaGo('scene')">${esc(b.cta)}</button></div></div></div>`); }
+  <div class="shb"><div class="shf">${flick("scene",k)}</div><div class="shr" data-spop="scene"><div class="shn"><em data-sn="scene">${esc(vname(k,0))}</em>${dots("scene")}</div><button class="wbtn" onclick="ctaGo('scene')">${esc(b.cta)}</button></div></div></div>`); }
+
+/* ---- a video that carries its Flick inside it: Flam's own preview page, shown as it is in the player ---- */
+let OBT = 0, OBP = false;
+const obFrame = () => $("#obf", VIEW);
+function obInit(){ const f = obFrame(); if(!f) return; let n = 0;
+  // The viewer already pressed Watch, so the page's own Play is pressed for them. If the browser refuses sound without a tap, its Play button is put back.
+  const start = () => { if(!f.isConnected) return; try{ const w = f.contentWindow, d = f.contentDocument, b = d && d.getElementById("bigplay"), v = d && d.getElementById("main");
+      if(b && v && w.VIDEO_READY){ w.VIDEO_READY.then(()=>{ if(!f.isConnected || OVER.classList.contains("on") || document.hidden) return; if(!b.classList.contains("hidden")) b.click(); setTimeout(()=>{ try{ if(v.paused && !v.ended) b.classList.remove("hidden"); }catch(e){} }, 1500); }); return; } }catch(e){}
+    if(n++ < 80) setTimeout(start, 200); };
+  start(); clearInterval(OBT); OBT = setInterval(obWatch, 400); }
+// The Flick's own button inside the page would open the brand's site in a new tab. It opens the store inside the app instead, like every other Flick.
+function obWatch(){ const f = obFrame(); if(!f){ clearInterval(OBT); OBT = 0; return; }
+  try{ const a = f.contentDocument.querySelector("#ad iframe"), w = a && a.contentWindow; if(!w || w.__jh) return; w.__jh = 1; w.__jv = 0;
+    w.document.addEventListener("vertex-diff-change", e=>{ const d = e.detail || {}, x = d.diff != null ? d.diff : (d.diffId != null ? d.diffId : d.diff_id); w.__jv = +x || 0; }, true);
+    const shop = () => { let img = ""; try{ const im = w.document.querySelector("vertex-player").shadowRoot.querySelector(`[data-vertex-diff="${w.__jv}"] img`); img = im ? (im.currentSrc || im.src) : ""; }catch(e){} openStore("mia", w.__jv || 0, null, img); return null; };
+    w.open = shop; w.__vxOpen = () => { shop(); return true; }; w.ExitApi = { exit: shop }; }catch(e){} }
+function obHold(stop){ const f = obFrame(); if(!f) return; try{ const v = f.contentDocument.getElementById("main"); if(stop){ if(!v.paused){ OBP = true; v.pause(); } } else if(OBP){ OBP = false; v.play().catch(()=>{}); } }catch(e){} }
+function frameWatch(id){ const x = TT[id];
+  return `<div class="screen watch frm">${stpad()}<div class="pl plfr"><iframe id="obf" src="${x.frame}" title="${esc(x.n)}" allow="autoplay; fullscreen; encrypted-media" scrolling="no"></iframe><button class="obx" onclick="back()" aria-label="Back">${I.back}</button></div>
+  <div class="scr" id="scr"><div class="winfo"><h1>${esc(x.n)}</h1><span>${esc(x.meta)}</span></div>
+    <div class="tacts"><button data-wl="${id}" class="${WL.has(id)?"on":""}" onclick="wlToggle('${id}')"><i>${WL.has(id)?I.check:I.plus}</i>Watchlist</button><button onclick="out('Sharing')"><i>${I.share}</i>Share</button><button onclick="out('Downloads')"><i>${I.dl}</i>Download</button></div>
+    ${rail("Peacock's Finest",["koffee","obsession","suits","wolf","beautifuldisaster"])}</div></div>`; }
 /* ================= overlays ================= */
 let OVSTATE = false;
 function openOver(html){ const was = OVER.classList.contains("on");   // a sheet handing over to the store: one layer, one Back step
-  $$(".flick[data-slot]", OVER).forEach(h=>{ unmount(h); delete SLOTS[h.dataset.slot]; });
+  $$(".flick[data-slot]", OVER).forEach(h=>{ unmount(h); if(!html.includes(`data-slot="${h.dataset.slot}"`)) delete SLOTS[h.dataset.slot]; });   // a sheet replacing a sheet keeps the new sheet's slot
   OVER.innerHTML = html; OVER.classList.add("on"); document.body.classList.add("ovon"); if(!was) try{ history.pushState({ov:1}, ""); OVSTATE = true; }catch(e){} sizeOver(); audit(); }
 function closeOver(silent){ if(!OVER.classList.contains("on")) return; $$(".flick[data-slot]", OVER).forEach(h=>{ unmount(h); delete SLOTS[h.dataset.slot]; });
   OVER.classList.remove("on"); OVER.innerHTML = ""; document.body.classList.remove("ovon"); clearTimeout(STT); ST = null; if(OVSTATE && !silent){ OVSTATE = false; try{ history.back(); }catch(e){} } OVSTATE = false; reelHold(false); audit(); }
 addEventListener("popstate", ()=>{ if(OVER.classList.contains("on")){ OVSTATE = false; closeOver(true); } });
-function sizeOver(){ const box = $(".shf", OVER), f = box && box.querySelector(".flick"); if(!f) return; fitFlick(f); }
+function sizeOver(){ const box = $(".shf", OVER), f = box && box.querySelector(".flick"); if(!f) return; const s = SLOTS[f.dataset.slot], [bw,bh] = baseOf(BRANDS[s.brand]);
+  // The Flick is the centre of the sheet: as wide as the sheet, or as tall as the phone leaves room for.
+  const maxH = APP.clientHeight*.88 - 190; f.style.width = Math.floor(Math.min(box.clientWidth, maxH*bw/bh)) + "px"; fitFlick(f); }
 
 /* ================= router ================= */
 const NAV = [], SCROLL = {}; let lastHash = "", pendingAnchor = null;
@@ -483,7 +511,7 @@ function render(anim=true){
   if(NAV.length > 1 && NAV[NAV.length-2] === h){ NAV.pop(); dir = "enter-back"; } else if(NAV[NAV.length-1] !== h) NAV.push(h);
   closeOver(true);
   // Leaving a screen removes its Flicks and its videos outright, so nothing can keep playing behind the next screen.
-  $$(".flick[data-slot]", VIEW).forEach(unmount); $$(".rvid", VIEW).forEach(killVideo); $$(".rfr", VIEW).forEach(f=>f.innerHTML = ""); $$(".tkc[data-pv]", VIEW).forEach(feedStop); FEEDCUR = null; clearTimeout(RQT); document.body.classList.remove("nopill"); plStop(); SLOTS = {}; CURH = h;
+  $$(".flick[data-slot]", VIEW).forEach(unmount); $$(".rvid", VIEW).forEach(killVideo); $$(".rfr", VIEW).forEach(f=>f.innerHTML = ""); $$("#obf", VIEW).forEach(f=>f.remove()); clearInterval(OBT); OBT = 0; OBP = false; $$(".tkc[data-pv]", VIEW).forEach(feedStop); FEEDCUR = null; clearTimeout(RQT); document.body.classList.remove("nopill"); plStop(); SLOTS = {}; CURH = h;
   const S = {home:()=>homeScreen("home"), tv:()=>homeScreen("tv"), movies:()=>homeScreen("movies"), sports:()=>homeScreen("sports"), tadka:tadkaScreen, reel:()=>reelScreen(r.a),
     search:()=>searchScreen(r.a), space:spaceScreen, t:()=>titleScreen(r.a), watch:()=>watchScreen(r.a)};
   const name = S[r.name] ? r.name : "home";
@@ -498,7 +526,7 @@ function render(anim=true){
   $$(".hero[data-hero]", VIEW).forEach(bindHero);
   if(dir === "enter-back" && SCROLL[h] && sc) sc.scrollTop = SCROLL[h];
   const anc = pendingAnchor; pendingAnchor = null;
-  if(name === "watch") plInit(r.a, anc);
+  if(name === "watch"){ if(TT[r.a] && TT[r.a].frame) obInit(); else plInit(r.a, anc); }
   else if(name === "reel"){ const p = $("#pager"); reelFit(); let i = RS.findIndex(s=>s.md && s.md.id === r.a); if(i < 0) i = 0;
     if(anc && /^r\d/.test(anc)) i = RS.findIndex(s=>s.anchor === anc);
     if(anc === "bc") i = RS.findIndex(s=>s.md && s.md.frame);
@@ -515,9 +543,9 @@ function flash(sel){ setTimeout(()=>{ const el = typeof sel === "string" ? $(sel
 
 /* ================= ad slots list: slot types only, no brand names ================= */
 const GUIDE = [
-  ["Ad breaks in the stream", [["Pre-roll: before the episode starts","#/watch/biggboss","pre"],["Mid-roll: ad break inside the episode","#/watch/biggboss","mid"],["Pause ad","#/watch/biggboss","pause"],["Companion ad under the player","#/watch/biggboss","comp"]]],
+  ["Ad breaks in the stream", [["Pre-roll: before the episode starts","#/watch/biggboss","pre"],["Mid-roll: ad break inside the episode","#/watch/biggboss","mid"],["In-content: the Flick inside the video","#/watch/obsreplay","ob"],["Pause ad","#/watch/biggboss","pause"],["Companion ad under the player","#/watch/biggboss","comp"]]],
   ["Shop the look", [["In the player: shop the scene","#/watch/biggboss","scene"],["Title page: shop the look","#/t/biggboss","look"],["Home: Shop the Look rail","#/home","shop"]]],
-  ["Tadka micro-dramas", [["Sponsored video in the Tadka feed","#/tadka","tk1"],["Tadka feed: second sponsored video","#/tadka","tk2"],["Flick inside a micro-drama episode","#/reel/blankcheque","bc"],["Full-screen ad between episodes","#/reel/delivery","r1"],["Shop the look inside a micro-drama","#/reel/redsilk","rshop"]]],
+  ["Tadka micro-dramas", [["Shoppable episode in the Tadka feed","#/tadka","tk1"],["Sponsored video in the Tadka feed","#/tadka","tk2"],["Flick inside a micro-drama episode","#/reel/blankcheque","bc"],["Full-screen ad between episodes","#/reel/delivery","r1"],["Shop the look inside a micro-drama","#/reel/redsilk","rshop"]]],
   ["Swipeable banners", [["Home: masthead","#/home","mast"],["Home: For You carousel","#/home","fy"],["TV: masthead","#/tv","mast"],["TV: For You carousel","#/tv","fy"],["Movies: masthead","#/movies","mast"],["Movies: For You carousel","#/movies","fy"],["Sports: masthead","#/sports","mast"],["Sports: For You carousel","#/sports","fy"]]],
   ["Billboards between rails", [["Home: billboard","#/home","bill"],["Movies: billboard","#/movies","bill"],["Sports: billboard","#/sports","bill"]]],
   ["Search", [["Sponsored tile in Popular Searches","#/search","stile"],["Sponsored result at the top","#/search/cricket","sres"]]]
